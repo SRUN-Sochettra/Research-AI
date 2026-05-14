@@ -4,7 +4,6 @@ import { useState } from "react";
 import { cn } from "@/lib/utils/helpers";
 import { CitationCard } from "./citation-card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Brain,
   User,
