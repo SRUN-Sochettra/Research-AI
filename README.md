@@ -458,7 +458,7 @@ This project required debugging real-world issues that show up in production AI 
 
 ## 👤 Author
 
-**Sochettra Srun**
+**SRUN-Sochettra**
 
 - GitHub: [@SRUN-Sochettra](https://github.com/SRUN-Sochettra)
 - LinkedIn: [linkedin.com/in/sochettra-srun-a67466395](https://www.linkedin.com/in/sochettra-srun-a67466395/)
