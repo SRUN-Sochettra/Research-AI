@@ -1,0 +1,15 @@
+[project]
+id = "local-dev"
+
+[api]
+port = 54321
+
+[db]
+port = 54322
+
+[storage]
+enabled = true
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
