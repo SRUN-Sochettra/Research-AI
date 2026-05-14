@@ -21,9 +21,9 @@ import {
 import { formatDate, formatFileSize } from "@/lib/utils/helpers";
 import type { Document } from "@/types/database";
 
-const statusConfig = {
-  uploaded: {
-    label: "Uploaded",
+const statusConfig: Record<string, any> = {
+  pending: {
+    label: "Pending",
     icon: Clock,
     variant: "secondary" as const,
   },
@@ -33,12 +33,12 @@ const statusConfig = {
     variant: "default" as const,
     animate: true,
   },
-  ready: {
+  completed: {
     label: "Ready",
     icon: CheckCircle2,
     variant: "default" as const,
   },
-  error: {
+  failed: {
     label: "Error",
     icon: AlertCircle,
     variant: "destructive" as const,
@@ -46,7 +46,7 @@ const statusConfig = {
 };
 
 export function DocumentCard({ document }: { document: Document }) {
-  const status = statusConfig[document.status];
+  const status = statusConfig[document.status] || statusConfig.pending;
   const StatusIcon = status.icon;
 
   return (
@@ -71,7 +71,7 @@ export function DocumentCard({ document }: { document: Document }) {
 
       <CardContent className="pb-3">
         <div className="space-y-1 text-sm text-muted-foreground">
-          <p>{formatFileSize(document.file_size)}</p>
+          <p>{formatFileSize(document.size)}</p>
           {document.page_count && <p>{document.page_count} pages</p>}
           <p>{formatDate(document.created_at)}</p>
         </div>
@@ -81,7 +81,7 @@ export function DocumentCard({ document }: { document: Document }) {
       </CardContent>
 
       <CardFooter className="pt-0">
-        {document.status === "ready" ? (
+        {document.status === "completed" ? (
           <Button asChild className="w-full" size="sm">
             <Link href={`/chat/${document.id}`}>
               <MessageSquare className="mr-2 h-4 w-4" />
