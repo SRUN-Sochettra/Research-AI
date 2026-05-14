@@ -1,137 +1,280 @@
-// ============================================
-// Database types - matches our SQL schema exactly
-// In production, generate with: npx supabase gen types typescript
-// ============================================
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
-export type UserTier = "free" | "pro";
-export type DocumentStatus = "uploaded" | "processing" | "ready" | "error";
-export type MessageRole = "user" | "assistant" | "system";
-
-export interface Profile {
-  id: string;
-  email: string;
-  full_name: string | null;
-  avatar_url: string | null;
-  tier: UserTier;
-  usage_count: number;
-  max_documents: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Document {
-  id: string;
-  user_id: string;
-  title: string;
-  file_name: string;
-  file_path: string;
-  file_size: number;
-  mime_type: string;
-  page_count: number | null;
-  status: DocumentStatus;
-  summary: string | null;
-  metadata: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface DocumentChunk {
-  id: string;
-  document_id: string;
-  chunk_index: number;
-  content: string;
-  page_number: number | null;
-  token_count: number | null;
-  embedding: number[] | null;
-  metadata: Record<string, unknown>;
-  created_at: string;
-}
-
-export interface Conversation {
-  id: string;
-  user_id: string;
-  document_id: string;
-  title: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Citation {
-  chunk_id: string;
-  page_number: number | null;
-  snippet: string;
-  similarity: number;
-}
-
-export interface TokenUsage {
-  prompt_tokens: number;
-  completion_tokens: number;
-  total_tokens: number;
-}
-
-export interface Message {
-  id: string;
-  conversation_id: string;
-  role: MessageRole;
-  content: string;
-  citations: Citation[];
-  token_usage: TokenUsage | null;
-  latency_ms: number | null;
-  created_at: string;
-}
-
-// ============================================
-// Supabase client type helper
-// ============================================
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       profiles: {
-        Row: Profile;
-        Insert: Omit<Profile, "created_at" | "updated_at" | "usage_count" | "max_documents" | "tier">;
-        Update: Partial<Omit<Profile, "id" | "created_at">>;
-      };
+        Row: {
+          id: string
+          email: string
+          full_name: string | null
+          avatar_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          email: string
+          full_name?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          full_name?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       documents: {
-        Row: Document;
-        Insert: Omit<Document, "id" | "created_at" | "updated_at" | "status" | "summary" | "metadata"> & {
-          id?: string;
-          status?: DocumentStatus;
-          summary?: string | null;
-          metadata?: Record<string, unknown>;
-        };
-        Update: Partial<Omit<Document, "id" | "created_at" | "user_id">>;
-      };
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          file_path: string
+          file_type: string
+          size: number
+          status: string
+          summary: string | null
+          page_count: number | null
+          metadata: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          file_path: string
+          file_type: string
+          size: number
+          status?: string
+          summary?: string | null
+          page_count?: number | null
+          metadata?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          file_path?: string
+          file_type?: string
+          size?: number
+          status?: string
+          summary?: string | null
+          page_count?: number | null
+          metadata?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       document_chunks: {
-        Row: DocumentChunk;
-        Insert: Omit<DocumentChunk, "id" | "created_at"> & { id?: string };
-        Update: Partial<Omit<DocumentChunk, "id" | "created_at">>;
-      };
+        Row: {
+          id: string
+          document_id: string
+          content: string
+          chunk_index: number
+          page_number: number | null
+          token_count: number
+          embedding: number[] | null
+          metadata: Json | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          document_id: string
+          content: string
+          chunk_index: number
+          page_number?: number | null
+          token_count: number
+          embedding?: number[] | null
+          metadata?: Json | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          document_id?: string
+          content?: string
+          chunk_index?: number
+          page_number?: number | null
+          token_count?: number
+          embedding?: number[] | null
+          metadata?: Json | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_chunks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       conversations: {
-        Row: Conversation;
-        Insert: Omit<Conversation, "id" | "created_at" | "updated_at"> & { id?: string };
-        Update: Partial<Omit<Conversation, "id" | "created_at" | "user_id">>;
-      };
+        Row: {
+          id: string
+          user_id: string
+          document_id: string
+          title: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          document_id: string
+          title: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          document_id?: string
+          title?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       messages: {
-        Row: Message;
-        Insert: Omit<Message, "id" | "created_at"> & { id?: string };
-        Update: Partial<Omit<Message, "id" | "created_at">>;
-      };
-    };
+        Row: {
+          id: string
+          conversation_id: string
+          role: string
+          content: string
+          citations: Json | null
+          token_usage: Json | null
+          latency_ms: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          role: string
+          content: string
+          citations?: Json | null
+          token_usage?: Json | null
+          latency_ms?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          conversation_id?: string
+          role?: string
+          content?: string
+          citations?: Json | null
+          token_usage?: Json | null
+          latency_ms?: number | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
     Functions: {
       match_document_chunks: {
         Args: {
-          query_embedding: number[];
-          match_document_id: string;
-          match_threshold?: number;
-          match_count?: number;
-        };
+          query_embedding: number[]
+          match_document_id: string
+          match_threshold: number
+          match_count: number
+        }
         Returns: {
-          id: string;
-          content: string;
-          page_number: number | null;
-          similarity: number;
-        }[];
-      };
-    };
-  };
+          id: string
+          content: string
+          page_number: number | null
+          similarity: number
+        }[]
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+// Helper types for easier usage in the application
+export type Tables<T extends keyof Database["public"]["Tables"]> =
+  Database["public"]["Tables"][T]["Row"]
+export type Enums<T extends keyof Database["public"]["Enums"]> =
+  Database["public"]["Enums"][T]
+
+export type Profile = Tables<"profiles">
+export type Document = Tables<"documents">
+export type DocumentChunk = Tables<"document_chunks">
+export type Conversation = Tables<"conversations">
+export type Message = Tables<"messages">
+
+export type DocumentStatus = "pending" | "processing" | "completed" | "failed"
+
+export interface Citation {
+  text: string
+  documentId: string
+  pageNumber?: number
+}
+
+export interface TokenUsage {
+  promptTokens: number
+  completionTokens: number
+  totalTokens: number
 }

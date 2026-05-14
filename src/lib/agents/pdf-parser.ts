@@ -1,4 +1,6 @@
-import pdfParse from "pdf-parse";
+import * as _pdfParse from "pdf-parse";
+const pdf = (_pdfParse as any).default || _pdfParse;
+
 import { AppError } from "@/lib/utils/errors";
 
 export interface ParsedPDF {
@@ -21,10 +23,10 @@ export async function parsePDF(buffer: Buffer): Promise<ParsedPDF> {
     const pages: string[] = [];
     let pageCount = 0;
 
-    const data = await pdfParse(buffer, {
+    const data = await pdf(buffer, {
       // Called for each page during parsing
-      pagerender: function (pageData) {
-        return pageData.getTextContent().then(function (textContent) {
+      pagerender: function (pageData: any) {
+        return pageData.getTextContent().then(function (textContent: any) {
           let pageText = "";
           let lastY: number | null = null;
 
@@ -35,13 +37,15 @@ export async function parsePDF(buffer: Buffer): Promise<ParsedPDF> {
             };
             const currentY = textItem.transform[5];
 
+            if (currentY === undefined) continue;
+
             // Add newline when Y position changes significantly
             if (lastY !== null && Math.abs(currentY - lastY) > 5) {
               pageText += "\n";
             }
 
             pageText += textItem.str;
-            lastY = currentY;
+            lastY = currentY ?? null;
           }
 
           pages.push(pageText.trim());

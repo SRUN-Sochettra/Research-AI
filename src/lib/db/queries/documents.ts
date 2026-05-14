@@ -14,10 +14,9 @@ import type { EmbeddedChunk } from "@/lib/agents/embedder";
 export async function createDocument(data: {
   userId: string;
   title: string;
-  fileName: string;
   filePath: string;
   fileSize: number;
-  mimeType?: string;
+  fileType: string;
 }): Promise<Document> {
   const supabase = getSupabaseAdminClient();
 
@@ -26,11 +25,10 @@ export async function createDocument(data: {
     .insert({
       user_id: data.userId,
       title: data.title,
-      file_name: data.fileName,
       file_path: data.filePath,
-      file_size: data.fileSize,
-      mime_type: data.mimeType ?? "application/pdf",
-      status: "uploaded",
+      size: data.fileSize,
+      file_type: data.fileType,
+      status: "pending",
     })
     .select()
     .single();
@@ -64,7 +62,7 @@ export async function updateDocumentStatus(
         summary: extra.summary,
       }),
       ...(extra?.metadata !== undefined && {
-        metadata: extra.metadata,
+        metadata: extra.metadata as any,
       }),
     })
     .eq("id", documentId);
@@ -142,7 +140,7 @@ export async function saveChunks(
     page_number: chunk.pageNumber,
     token_count: chunk.tokenCount,
     embedding: chunk.embedding,
-    metadata: chunk.metadata,
+    metadata: chunk.metadata as any,
   }));
 
   // Bulk insert in batches of 50 to avoid payload limits
@@ -208,7 +206,7 @@ export async function getUserDocumentCount(
     .from("documents")
     .select("*", { count: "exact", head: true })
     .eq("user_id", userId)
-    .neq("status", "error");
+    .neq("status", "failed");
 
   if (error) return 0;
   return count ?? 0;

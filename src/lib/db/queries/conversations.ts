@@ -75,8 +75,8 @@ export async function saveMessage(data: {
       conversation_id: data.conversationId,
       role: data.role,
       content: data.content,
-      citations: data.citations ?? [],
-      token_usage: data.tokenUsage ?? null,
+      citations: (data.citations ?? []) as any,
+      token_usage: (data.tokenUsage ?? null) as any,
       latency_ms: data.latencyMs ?? null,
     })
     .select()

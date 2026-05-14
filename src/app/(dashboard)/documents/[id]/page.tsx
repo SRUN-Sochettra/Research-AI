@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/db/supabase/server";
-import { DocumentDetail } from "@/components/documents/document-detail";
+import { DocumentDetail } from "@/components/documents/document-details";
 import type { Metadata } from "next";
 
 interface PageProps {

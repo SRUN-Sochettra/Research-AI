@@ -1,7 +1,7 @@
-import { createClient } from '../supabase/server';
+import { getSupabaseServerClient } from '../supabase/server';
 
 export async function getUserProfile(id: string) {
-  const supabase = createClient();
-  const { data, error } = await supabase.from('users').select('*').eq('id', id).single();
+  const supabase = await getSupabaseServerClient();
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', id).single();
   return { data, error };
 }

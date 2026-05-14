@@ -45,6 +45,80 @@ export function useChat({
   // Abort controller for cancellation
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  // Handle individual SSE events
+  const handleSSEEvent = useCallback(
+    (
+      event: Record<string, unknown>,
+      assistantMessageId: string
+    ) => {
+      switch (event.type) {
+        case "meta":
+          // Set conversation ID from server
+          if (event.conversationId) {
+            setConversationId(event.conversationId as string);
+          }
+          break;
+
+        case "token":
+          // Append token to streaming message
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessageId
+                ? {
+                  ...msg,
+                  content: msg.content + (event.content as string),
+                }
+                : msg
+            )
+          );
+          break;
+
+        case "citations":
+          // Add citations to the message
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessageId
+                ? {
+                  ...msg,
+                  citations: event.citations as Citation[],
+                  latencyMs: event.latencyMs as number,
+                }
+                : msg
+            )
+          );
+          break;
+
+        case "done":
+          // Mark streaming as complete
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessageId
+                ? {
+                  ...msg,
+                  isStreaming: false,
+                  // Update ID to match DB record
+                  id: (event.messageId as string) || msg.id,
+                }
+                : msg
+            )
+          );
+          break;
+
+        case "error":
+          setError(
+            (event.message as string) ||
+            "An error occurred"
+          );
+          // Remove streaming placeholder
+          setMessages((prev) =>
+            prev.filter((m) => m.id !== assistantMessageId)
+          );
+          break;
+      }
+    },
+    []
+  );
+
   const sendMessage = useCallback(
     async (content: string) => {
       if (!content.trim() || isLoading) return;
@@ -157,81 +231,7 @@ export function useChat({
         streamingIdRef.current = null;
       }
     },
-    [documentId, conversationId, isLoading]
-  );
-
-  // Handle individual SSE events
-  const handleSSEEvent = useCallback(
-    (
-      event: Record<string, unknown>,
-      assistantMessageId: string
-    ) => {
-      switch (event.type) {
-        case "meta":
-          // Set conversation ID from server
-          if (event.conversationId) {
-            setConversationId(event.conversationId as string);
-          }
-          break;
-
-        case "token":
-          // Append token to streaming message
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === assistantMessageId
-                ? {
-                  ...msg,
-                  content: msg.content + (event.content as string),
-                }
-                : msg
-            )
-          );
-          break;
-
-        case "citations":
-          // Add citations to the message
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === assistantMessageId
-                ? {
-                  ...msg,
-                  citations: event.citations as Citation[],
-                  latencyMs: event.latencyMs as number,
-                }
-                : msg
-            )
-          );
-          break;
-
-        case "done":
-          // Mark streaming as complete
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === assistantMessageId
-                ? {
-                  ...msg,
-                  isStreaming: false,
-                  // Update ID to match DB record
-                  id: (event.messageId as string) || msg.id,
-                }
-                : msg
-            )
-          );
-          break;
-
-        case "error":
-          setError(
-            (event.message as string) ||
-            "An error occurred"
-          );
-          // Remove streaming placeholder
-          setMessages((prev) =>
-            prev.filter((m) => m.id !== assistantMessageId)
-          );
-          break;
-      }
-    },
-    []
+    [documentId, conversationId, isLoading, handleSSEEvent]
   );
 
   return {
