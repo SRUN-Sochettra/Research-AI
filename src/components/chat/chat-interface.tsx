@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { NoMessages } from "@/components/shared/empty-states";
 import { AlertTriangle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Document, Message } from "@/types/database";
+import type { Document, Message, Citation } from "@/types/database";
 import type { ChatMessage } from "@/hooks/use-chat";
 
 interface ChatInterfaceProps {
@@ -24,7 +24,7 @@ function toDisplayMessages(messages: Message[]): ChatMessage[] {
     id: msg.id,
     role: msg.role as "user" | "assistant",
     content: msg.content,
-    citations: msg.citations ?? [],
+    citations: (msg.citations as unknown as Citation[]) ?? [],
     latencyMs: msg.latency_ms ?? undefined,
     createdAt: new Date(msg.created_at),
   }));
@@ -55,7 +55,7 @@ export function ChatInterface({
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const isDocumentReady = document.status === "ready";
+  const isDocumentReady = document.status === "completed";
 
   return (
     <div className="flex h-full flex-col">
