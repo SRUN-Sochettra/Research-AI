@@ -128,7 +128,6 @@ export async function POST(request: NextRequest) {
       send("meta", { conversationId: conversation.id });
 
       let assistantMessage = "";
-      let savedMessageId: string | null = null;
 
       try {
         await runQAAgent(

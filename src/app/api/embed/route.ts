@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export async function POST(req: Request) {
+export async function POST() {
   try {
     // Generate embeddings logic
     return NextResponse.json({ message: 'Embeddings generated' });
