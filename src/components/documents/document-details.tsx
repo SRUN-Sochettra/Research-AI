@@ -51,7 +51,7 @@ export function DocumentDetail({ document }: { document: Document }) {
 
     const currentStatus = (status ?? document.status) as string;
     const isProcessing =
-        currentStatus === "processing" || currentStatus === "pending";
+        currentStatus === "processing" || currentStatus === "uploaded";
 
     // Cycle through processing messages for UI feedback
     if (isProcessing) {
@@ -131,7 +131,7 @@ export function DocumentDetail({ document }: { document: Document }) {
                     )}
 
                     {/* Error state */}
-                    {currentStatus === "failed" && (
+                    {currentStatus === "error" && (
                         <Alert variant="destructive">
                             <AlertCircle className="h-4 w-4" />
                             <AlertDescription>
@@ -146,7 +146,7 @@ export function DocumentDetail({ document }: { document: Document }) {
                         <MetaItem
                             icon={HardDrive}
                             label="File Size"
-                            value={formatFileSize(document.size)}
+                            value={formatFileSize(document.file_size)}
                         />
                         {(pageCount ?? document.page_count) && (
                             <MetaItem
@@ -174,7 +174,7 @@ export function DocumentDetail({ document }: { document: Document }) {
                         </div>
                     )}
 
-                    {currentStatus === "completed" && !summary && !document.summary && (
+                    {currentStatus === "ready" && !summary && !document.summary && (
                         <div className="text-sm text-muted-foreground">
                             Summary generation in progress...
                         </div>
@@ -198,7 +198,7 @@ export function DocumentDetail({ document }: { document: Document }) {
                             Delete Document
                         </Button>
 
-                        {currentStatus === "completed" && (
+                        {currentStatus === "ready" && (
                             <Button asChild>
                                 <Link href={`/chat/${document.id}`}>
                                     <MessageSquare className="mr-2 h-4 w-4" />
@@ -235,20 +235,20 @@ function MetaItem({
 
 function StatusBadge({ status }: { status: string }) {
     const config = {
-        pending: { label: "Pending", variant: "secondary" as const },
+        uploaded: { label: "Uploaded", variant: "secondary" as const },
         processing: { label: "Processing", variant: "default" as const },
-        completed: { label: "Ready", variant: "default" as const },
-        failed: { label: "Error", variant: "destructive" as const },
+        ready: { label: "Ready", variant: "default" as const },
+        error: { label: "Error", variant: "destructive" as const },
     };
 
-    const current = config[status as keyof typeof config] ?? config.pending;
+    const current = config[status as keyof typeof config] ?? config.uploaded;
 
     return (
         <Badge variant={current.variant}>
             {status === "processing" && (
                 <Loader2 className="mr-1 h-3 w-3 animate-spin" />
             )}
-            {status === "completed" && (
+            {status === "ready" && (
                 <CheckCircle2 className="mr-1 h-3 w-3" />
             )}
             {current.label}

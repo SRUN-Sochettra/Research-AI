@@ -1,116 +1,202 @@
-import { getChatModel } from "@/lib/ai/gemini";
+// src/lib/agents/summarizer.ts
+import {
+  getChatModel,
+  switchToNextModel,
+  resetModelSelection,
+  getCurrentChatModelName,
+} from "@/lib/ai/gemini";
 import { MAP_PROMPT, REDUCE_PROMPT, SUMMARY_PROMPT } from "@/lib/ai/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import type { TextChunk } from "./chunker";
 
 const MAX_DIRECT_SUMMARY_TOKENS = 3000;
 const MAX_CHUNK_TOKENS_FOR_MAP = 500;
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 30000;
 
 export async function summarizeDocument(
   chunks: TextChunk[]
 ): Promise<string> {
-  const model = getChatModel({ temperature: 0.3 });
+  // Reset to primary model at the start of each summarization
+  resetModelSelection();
+
   const outputParser = new StringOutputParser();
 
-  // Calculate total token count
   const totalTokens = chunks.reduce(
     (sum, chunk) => sum + chunk.tokenCount,
     0
   );
 
-  // For short documents: direct summarization
   if (totalTokens <= MAX_DIRECT_SUMMARY_TOKENS) {
     return await directSummarize(
       chunks.map((c) => c.content).join("\n\n"),
-      model,
       outputParser
     );
   }
 
-  // For longer documents: map-reduce summarization
-  return await mapReduceSummarize(chunks, model, outputParser);
+  return await mapReduceSummarize(chunks, outputParser);
+}
+
+// Invoke with retry + automatic model fallback on 429
+async function invokeWithRetry<T>(
+  fn: (model: ReturnType<typeof getChatModel>) => Promise<T>,
+  label: string
+): Promise<T | null> {
+  let totalAttempts = 0;
+  const maxTotalAttempts = MAX_RETRIES * 3; // across all model fallbacks
+
+  while (totalAttempts < maxTotalAttempts) {
+    const model = getChatModel({ temperature: 0.3 });
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      totalAttempts++;
+      try {
+        return await fn(model);
+      } catch (error) {
+        const is429 =
+          error instanceof Error &&
+          (error.message.includes("429") ||
+            error.message.includes("Too Many Requests") ||
+            error.message.includes("quota"));
+
+        if (!is429) {
+          console.error(`[Summarizer] ${label} failed:`, error);
+          return null;
+        }
+
+        console.warn(
+          `[Summarizer] ${label} hit rate limit on ${getCurrentChatModelName()} ` +
+          `(attempt ${attempt}/${MAX_RETRIES})`
+        );
+
+        // On last retry for this model, try switching models
+        if (attempt === MAX_RETRIES) {
+          const nextModel = switchToNextModel();
+          if (nextModel) {
+            console.warn(
+              `[Summarizer] Switching to fallback: ${nextModel}`
+            );
+            // Small delay before trying new model
+            await sleep(3000);
+            break; // Break inner loop, continue outer while
+          } else {
+            console.warn(
+              `[Summarizer] All models exhausted for ${label}`
+            );
+            return null;
+          }
+        }
+
+        // Wait before retrying same model
+        const waitMs = RETRY_DELAY_MS * attempt;
+        console.warn(
+          `[Summarizer] Waiting ${waitMs / 1000}s before retry...`
+        );
+        await sleep(waitMs);
+      }
+    }
+  }
+
+  return null;
 }
 
 async function directSummarize(
   text: string,
-  model: ReturnType<typeof getChatModel>,
   outputParser: StringOutputParser
 ): Promise<string> {
-  const chain = SUMMARY_PROMPT.pipe(model).pipe(outputParser);
-
-  const summary = await chain.invoke({ content: text });
-  return summary.trim();
+  const result = await invokeWithRetry(
+    (model) => SUMMARY_PROMPT.pipe(model).pipe(outputParser).invoke({ content: text }),
+    "direct summary"
+  );
+  return result?.trim() ?? "Summary unavailable.";
 }
 
 async function mapReduceSummarize(
   chunks: TextChunk[],
-  model: ReturnType<typeof getChatModel>,
   outputParser: StringOutputParser
 ): Promise<string> {
-  // MAP phase: summarize each chunk independently
-  const mapChain = MAP_PROMPT.pipe(model).pipe(outputParser);
-
-  // Select representative chunks (every Nth chunk to stay in limits)
-  const sampledChunks = sampleChunks(
-    chunks,
-    MAX_CHUNK_TOKENS_FOR_MAP
-  );
-
+  const sampledChunks = sampleChunks(chunks, MAX_CHUNK_TOKENS_FOR_MAP);
   const mappedSummaries: string[] = [];
 
   for (const chunk of sampledChunks) {
-    try {
-      const summary = await mapChain.invoke({
-        content: chunk.content,
-      });
+    const summary = await invokeWithRetry(
+      (model) =>
+        MAP_PROMPT.pipe(model).pipe(outputParser).invoke({
+          content: chunk.content,
+        }),
+      `chunk ${chunk.chunkIndex}`
+    );
+
+    if (summary) {
       mappedSummaries.push(summary.trim());
-    } catch (error) {
-      console.error(
-        `Failed to map chunk ${chunk.chunkIndex}:`,
-        error
-      );
-      // Continue with other chunks
     }
+
+    // Delay between calls to stay under RPM limit
+    await sleep(5000);
   }
 
   if (mappedSummaries.length === 0) {
-    throw new Error("Failed to generate any chunk summaries");
+    console.warn(
+      "[Summarizer] All chunk summaries failed. Using fallback summary."
+    );
+    return chunks[0]?.content.slice(0, 500) ?? "Summary unavailable.";
   }
 
-  // REDUCE phase: combine all summaries into one
-  const reduceChain = REDUCE_PROMPT.pipe(model).pipe(outputParser);
+  // Reset model selection for reduce phase
+  resetModelSelection();
 
-  const finalSummary = await reduceChain.invoke({
-    content: mappedSummaries.join("\n\n---\n\n"),
-  });
+  const finalSummary = await invokeWithRetry(
+    (model) =>
+      REDUCE_PROMPT.pipe(model).pipe(outputParser).invoke({
+        content: mappedSummaries.join("\n\n---\n\n"),
+      }),
+    "reduce phase"
+  );
 
-  return finalSummary.trim();
+  return finalSummary?.trim() ?? mappedSummaries[0] ?? "Summary unavailable.";
 }
 
-// Sample chunks to stay within token limits during map phase
 function sampleChunks(
   chunks: TextChunk[],
   maxTokensPerChunk: number
 ): TextChunk[] {
-  // Take first chunk (intro), last chunk (conclusion),
-  // and evenly distributed chunks in between
-  if (chunks.length <= 10) return chunks;
+  const MAX_CHUNKS = 5;
+
+  if (chunks.length <= MAX_CHUNKS) {
+    return chunks.filter((c) => c.tokenCount <= maxTokensPerChunk);
+  }
 
   const result: TextChunk[] = [];
-  const step = Math.floor(chunks.length / 8);
 
-  for (let i = 0; i < chunks.length; i += step) {
+  const first = chunks[0];
+  if (first && first.tokenCount <= maxTokensPerChunk) {
+    result.push(first);
+  }
+
+  const step = Math.floor(chunks.length / (MAX_CHUNKS - 2));
+  for (
+    let i = step;
+    i < chunks.length - 1 && result.length < MAX_CHUNKS - 1;
+    i += step
+  ) {
     const chunk = chunks[i];
     if (chunk && chunk.tokenCount <= maxTokensPerChunk) {
       result.push(chunk);
     }
   }
 
-  // Always include last chunk
-  const lastChunk = chunks[chunks.length - 1];
-  if (lastChunk && !result.includes(lastChunk)) {
-    result.push(lastChunk);
+  const last = chunks[chunks.length - 1];
+  if (
+    last &&
+    !result.includes(last) &&
+    last.tokenCount <= maxTokensPerChunk
+  ) {
+    result.push(last);
   }
 
   return result;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

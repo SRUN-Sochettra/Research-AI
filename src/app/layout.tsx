@@ -9,6 +9,7 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -17,14 +18,7 @@ export const metadata: Metadata = {
     template: `%s | ${APP_CONFIG.name}`,
   },
   description: APP_CONFIG.description,
-  keywords: [
-    "AI",
-    "research",
-    "PDF",
-    "RAG",
-    "summarize",
-    "question answering",
-  ],
+  keywords: ["AI", "research", "PDF", "RAG", "summarize", "question answering"],
   authors: [{ name: "Your Name" }],
   openGraph: {
     type: "website",
@@ -34,10 +28,7 @@ export const metadata: Metadata = {
     description: APP_CONFIG.description,
     siteName: APP_CONFIG.name,
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
@@ -46,13 +37,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="dark">
       <body className={`${inter.variable} font-sans antialiased`}>
         <SkipNav />
         <Providers>
-          <main id="main-content">
-            {children}
-          </main>
+          <main id="main-content">{children}</main>
         </Providers>
       </body>
     </html>

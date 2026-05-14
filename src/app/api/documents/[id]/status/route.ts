@@ -43,7 +43,7 @@ export async function GET(
 
     // Cache ready documents longer — they won't change
     // Cache processing documents briefly for polling
-    if (document.status === "completed") {
+    if (document.status === "ready") {
         response.headers.set(
             "Cache-Control",
             "private, max-age=300" // 5 min for ready docs

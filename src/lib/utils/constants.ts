@@ -16,9 +16,16 @@ export const LIMITS = {
 } as const;
 
 export const AI_CONFIG = {
-    embeddingModel: "text-embedding-004",
-    chatModel: "gemini-1.5-flash",
-    embeddingDimension: 768,
+    embeddingModel: "gemini-embedding-001",
+    chatModel: "gemini-3.1-flash-lite",
+    chatModelFallbacks: [
+        "gemini-3.1-flash-lite",    // 15 RPM, 500 RPD
+        "gemini-2.5-flash",         // 5 RPM, 20 RPD
+        "gemini-2.5-flash-lite",    // 10 RPM, 20 RPD
+        "gemini-2.0-flash-lite",    // backup
+        "gemini-2.0-flash",         // backup
+    ],
+    embeddingDimension: 3072,
     chunkSize: 1000,
     chunkOverlap: 200,
     maxRetrievedChunks: 5,

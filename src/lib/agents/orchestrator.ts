@@ -76,7 +76,7 @@ export async function runDocumentPipeline(
     log("summarizing", "Summary generated");
 
     // ─── DONE ────────────────────────────────────────────
-    await updateDocumentStatus(documentId, "completed", {
+    await updateDocumentStatus(documentId, "ready", {
       pageCount: parsed.pageCount,
       summary,
       metadata: {
@@ -86,7 +86,7 @@ export async function runDocumentPipeline(
       },
     });
 
-    log("done", "Pipeline completed successfully");
+    log("done", "Pipeline ready");
 
     return {
       success: true,
@@ -100,11 +100,11 @@ export async function runDocumentPipeline(
 
     console.error(`[Pipeline:${documentId}] Error:`, error);
 
-    // Mark document as failed
-    await updateDocumentStatus(documentId, "failed", {
+    // Mark document as error
+    await updateDocumentStatus(documentId, "error", {
       metadata: {
         error: errorMessage,
-        failedAt: new Date().toISOString(),
+        erroredAt: new Date().toISOString(),
       },
     }).catch(console.error); // Don't throw if status update fails
 

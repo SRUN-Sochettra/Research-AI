@@ -56,8 +56,8 @@ export function useDocumentStatus(
     useEffect(() => {
         // Only poll if document is in a processing state
         if (
-            initialStatus === "completed" ||
-            initialStatus === "failed"
+            initialStatus === "ready" ||
+            initialStatus === "error"
         ) {
             return;
         }
@@ -75,8 +75,8 @@ export function useDocumentStatus(
 
                 // Stop polling when done or errored
                 if (
-                    currentStatus === "completed" ||
-                    currentStatus === "failed" ||
+                    currentStatus === "ready" ||
+                    currentStatus === "error" ||
                     attempts >= MAX_ATTEMPTS
                 ) {
                     clearInterval(intervalId);

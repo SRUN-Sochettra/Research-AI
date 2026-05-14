@@ -7,7 +7,7 @@ import { ChatInput } from "./chat-input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { NoMessages } from "@/components/shared/empty-states";
-import { AlertTriangle, X } from "lucide-react";
+import { AlertTriangle, X, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Document, Message, Citation } from "@/types/database";
 import type { ChatMessage } from "@/hooks/use-chat";
@@ -18,7 +18,6 @@ interface ChatInterfaceProps {
   initialConversationId?: string;
 }
 
-// Convert DB messages to ChatMessage format
 function toDisplayMessages(messages: Message[]): ChatMessage[] {
   return messages.map((msg) => ({
     id: msg.id,
@@ -38,74 +37,125 @@ export function ChatInterface({
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const {
-    messages,
-    isLoading,
-    error,
-    sendMessage,
-    clearError,
-  } = useChat({
+  const { messages, isLoading, error, sendMessage, clearError } = useChat({
     documentId: document.id,
     initialMessages: toDisplayMessages(initialMessages),
     initialConversationId,
   });
 
-  // Auto-scroll to bottom on new messages
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const isDocumentReady = document.status === "completed";
+  const isDocumentReady = document.status === "ready";
 
   return (
-    <div className="flex h-full flex-col">
-      {/* Error banner */}
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-white/7 bg-white/[0.015]">
+
+      {/* ── Doc header bar ── */}
+      <div className="flex items-center gap-3 border-b border-white/6 px-5 py-3.5">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600/20 to-blue-600/10 ring-1 ring-white/8">
+          <Brain className="h-4 w-4 text-violet-400" />
+        </div>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-medium">{document.title}</p>
+          <p className="text-[11px] text-muted-foreground">
+            {messages.length > 0
+              ? `${messages.filter((m) => m.role === "user").length} question${messages.filter((m) => m.role === "user").length === 1 ? "" : "s"} asked`
+              : "Ask anything about this document"}
+          </p>
+        </div>
+
+        {/* Status dot */}
+        <div className="ml-auto flex items-center gap-1.5 text-[11px] text-muted-foreground">
+          <span
+            className={`status-dot ${isDocumentReady ? "status-online" : "status-warning"}`}
+          />
+          {isDocumentReady ? "Ready" : "Processing"}
+        </div>
+      </div>
+
+      {/* ── Error banner ── */}
       {error && (
-        <Alert
-          variant="destructive"
-          className="mx-4 mt-4 flex items-center justify-between"
-        >
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6"
-            onClick={clearError}
-          >
-            <X className="h-3 w-3" />
-          </Button>
-        </Alert>
+        <div className="mx-4 mt-3">
+          <Alert className="flex items-center justify-between border-red-500/20 bg-red-500/8 py-2">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-red-400" />
+              <AlertDescription className="text-xs text-red-400">{error}</AlertDescription>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+              onClick={clearError}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </Alert>
+        </div>
       )}
 
-      {/* Messages area */}
-      <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-        {messages.length === 0 ? (
-          <NoMessages />
-        ) : (
-          <div className="space-y-6">
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
-          </div>
-        )}
+      {/* ── Messages ── */}
+      <ScrollArea
+        className="flex-1 scrollbar-thin"
+        ref={scrollAreaRef}
+      >
+        <div className="px-4 py-5">
+          {messages.length === 0 ? (
+            <NoMessages />
+          ) : (
+            <div className="space-y-5">
+              {messages.map((message, i) => (
+                <div
+                  key={message.id}
+                  className="animate-slide-up"
+                  style={{ animationDelay: `${i * 0.04}s` }}
+                >
+                  <MessageBubble message={message} />
+                </div>
+              ))}
+            </div>
+          )}
 
-        {/* Scroll anchor */}
-        <div ref={bottomRef} className="h-4" />
+          {/* Loading indicator */}
+          {isLoading && (
+            <div className="mt-5 flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-600/20 to-blue-600/10 ring-1 ring-white/8">
+                <Brain className="h-4 w-4 text-violet-400" />
+              </div>
+              <div className="flex items-center gap-1 rounded-2xl rounded-tl-sm border border-white/7 bg-white/[0.03] px-4 py-3">
+                <span className="flex gap-1">
+                  {[0, 1, 2].map((i) => (
+                    <span
+                      key={i}
+                      className="h-1.5 w-1.5 rounded-full bg-violet-400 opacity-70"
+                      style={{
+                        animation: "bounce 1.2s ease-in-out infinite",
+                        animationDelay: `${i * 0.2}s`,
+                      }}
+                    />
+                  ))}
+                </span>
+                <span className="ml-2 text-xs text-muted-foreground">
+                  Thinking…
+                </span>
+              </div>
+            </div>
+          )}
+
+          <div ref={bottomRef} className="h-2" />
+        </div>
       </ScrollArea>
 
-      {/* Input area */}
-      <div className="border-t bg-background/80 p-4 backdrop-blur">
+      {/* ── Input area ── */}
+      <div className="border-t border-white/6 bg-background/40 px-4 py-3 backdrop-blur-sm">
         <ChatInput
           onSend={sendMessage}
           isLoading={isLoading}
           disabled={!isDocumentReady}
         />
-
-        <p className="mt-2 text-center text-xs text-muted-foreground">
-          AI can make mistakes. Always verify important information.
+        <p className="mt-2 text-center text-[10px] text-muted-foreground/60">
+          AI can make mistakes — always verify important information with the source
         </p>
       </div>
     </div>

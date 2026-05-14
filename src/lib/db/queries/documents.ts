@@ -208,7 +208,7 @@ export async function getUserDocumentCount(
     .from("documents")
     .select("*", { count: "exact", head: true })
     .eq("user_id", userId)
-    .neq("status", "failed");
+    .neq("status", "error");
 
   if (error) return 0;
   return count ?? 0;
