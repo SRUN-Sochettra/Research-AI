@@ -106,7 +106,6 @@ export function ChatPageClient({
             <div className="flex flex-1 gap-4 overflow-hidden p-4">
                 {/* Conversation sidebar */}
                 <ConversationSidebar
-                    documentId={document.id}
                     conversations={conversations}
                     currentConversationId={currentConversationId}
                     onNewConversation={handleNewConversation}
