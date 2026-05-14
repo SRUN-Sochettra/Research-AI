@@ -268,9 +268,12 @@ export type Message = Tables<"messages">
 export type DocumentStatus = "pending" | "processing" | "completed" | "failed"
 
 export interface Citation {
-  text: string
-  documentId: string
-  pageNumber?: number
+  chunk_id: string;
+  text: string;
+  documentId: string;
+  pageNumber: number | null;
+  similarity: number;
+  snippet: string;
 }
 
 export interface TokenUsage {
