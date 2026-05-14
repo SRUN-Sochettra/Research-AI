@@ -3,6 +3,7 @@ import { getSupabaseServerClient } from "@/lib/db/supabase/server";
 import type {
   Document,
   DocumentStatus,
+  Json
 } from "@/types/database";
 import type { EmbeddedChunk } from "@/lib/agents/embedder";
 
@@ -61,7 +62,7 @@ export async function updateDocumentStatus(
         summary: extra.summary,
       }),
       ...(extra?.metadata !== undefined && {
-        metadata: extra.metadata as any,
+        metadata: extra.metadata as unknown as Json,
       }),
     })
     .eq("id", documentId);
@@ -139,7 +140,7 @@ export async function saveChunks(
     page_number: chunk.pageNumber,
     token_count: chunk.tokenCount,
     embedding: chunk.embedding,
-    metadata: chunk.metadata as any,
+    metadata: chunk.metadata as unknown as Json,
   }));
 
   // Bulk insert in batches of 50 to avoid payload limits

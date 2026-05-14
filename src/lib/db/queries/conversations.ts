@@ -1,6 +1,6 @@
 import { getSupabaseAdminClient } from "@/lib/db/supabase/admin";
 import { getSupabaseServerClient } from "@/lib/db/supabase/server";
-import type { Conversation, Message, Citation, TokenUsage } from "@/types/database";
+import type { Conversation, Message, Citation, TokenUsage, Json } from "@/types/database";
 
 export async function getOrCreateConversation(
   userId: string,
@@ -75,8 +75,8 @@ export async function saveMessage(data: {
       conversation_id: data.conversationId,
       role: data.role,
       content: data.content,
-      citations: (data.citations ?? []) as any,
-      token_usage: (data.tokenUsage ?? null) as any,
+      citations: (data.citations ?? []) as unknown as Json,
+      token_usage: (data.tokenUsage ?? null) as unknown as Json,
       latency_ms: data.latencyMs ?? null,
     })
     .select()

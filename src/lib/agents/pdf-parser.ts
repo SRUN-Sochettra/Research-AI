@@ -1,5 +1,6 @@
-import * as _pdfParse from "pdf-parse";
-const pdf = (_pdfParse as any).default || _pdfParse;
+import * as pdf from "pdf-parse";
+// @ts-ignore - pdf-parse has tricky types
+const pdfParser = pdf.default || pdf;
 
 import { AppError } from "@/lib/utils/errors";
 
@@ -23,10 +24,11 @@ export async function parsePDF(buffer: Buffer): Promise<ParsedPDF> {
     const pages: string[] = [];
     let pageCount = 0;
 
-    const data = await pdf(buffer, {
+    // @ts-ignore
+    const data = await pdfParser(buffer, {
       // Called for each page during parsing
-      pagerender: function (pageData: any) {
-        return pageData.getTextContent().then(function (textContent: any) {
+      pagerender: function (pageData: { getTextContent: () => Promise<{ items: { str: string; transform: number[] }[] }> }) {
+        return pageData.getTextContent().then(function (textContent: { items: { str: string; transform: number[] }[] }) {
           let pageText = "";
           let lastY: number | null = null;
 

@@ -53,7 +53,7 @@ const statusConfig: Record<string, StatusConfigItem> = {
 };
 
 export function DocumentCard({ document }: { document: Document }) {
-  const status = statusConfig[document.status] || statusConfig.pending;
+  const status = statusConfig[document.status] ?? statusConfig["pending"]!;
   const StatusIcon = status.icon;
 
   return (

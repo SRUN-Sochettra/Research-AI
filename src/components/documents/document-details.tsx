@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import { formatDate, formatFileSize } from "@/lib/utils/helpers";
 import { toast } from "sonner";
-import type { Document } from "@/types/database";
+import type { Document, DocumentStatus } from "@/types/database";
 import { useState } from "react";
 
 const processingMessages = [
