@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
-    CardDescription,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
@@ -47,12 +46,12 @@ export function DocumentDetail({ document }: { document: Document }) {
 
     const { status, summary, pageCount } = useDocumentStatus(
         document.id,
-        document.status
+        document.status as any
     );
 
-    const currentStatus = status ?? document.status;
+    const currentStatus = (status ?? document.status) as string;
     const isProcessing =
-        currentStatus === "processing" || currentStatus === "uploaded";
+        currentStatus === "processing" || currentStatus === "pending";
 
     // Cycle through processing messages for UI feedback
     if (isProcessing) {
