@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { ChatInterface } from "./chat-interface";
 import { ConversationSidebar } from "./conversation-sidebar";
 import { Button } from "@/components/ui/button";
@@ -28,12 +27,11 @@ export function ChatPageClient({
     initialMessages,
     initialConversationId,
 }: ChatPageClientProps) {
-    const router = useRouter();
+
     const [currentConversationId, setCurrentConversationId] = useState(
         initialConversationId
     );
-    const [conversations, setConversations] =
-        useState(initialConversations);
+    const [conversations] = useState(initialConversations);
     const [messages, setMessages] = useState(initialMessages);
     const [showSummary, setShowSummary] = useState(false);
 
