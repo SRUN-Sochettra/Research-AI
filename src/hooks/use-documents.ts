@@ -12,7 +12,8 @@ export function useDocuments() {
   };
 
   useEffect(() => {
-    fetchDocuments();
+    // Avoid synchronous setState during render by calling inside effect
+    void fetchDocuments();
   }, []);
 
   return { documents, isLoading, fetchDocuments };

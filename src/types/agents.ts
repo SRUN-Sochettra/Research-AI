@@ -2,7 +2,7 @@ export interface AgentResult<T> {
   success: boolean;
   data?: T;
   error?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ChunkMetadata {

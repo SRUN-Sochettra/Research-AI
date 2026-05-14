@@ -21,27 +21,34 @@ import {
 import { formatDate, formatFileSize } from "@/lib/utils/helpers";
 import type { Document } from "@/types/database";
 
-const statusConfig: Record<string, any> = {
+interface StatusConfigItem {
+  label: string;
+  icon: React.ElementType;
+  variant: "default" | "secondary" | "destructive" | "outline";
+  animate?: boolean;
+}
+
+const statusConfig: Record<string, StatusConfigItem> = {
   pending: {
     label: "Pending",
     icon: Clock,
-    variant: "secondary" as const,
+    variant: "secondary",
   },
   processing: {
     label: "Processing",
     icon: Loader2,
-    variant: "default" as const,
+    variant: "default",
     animate: true,
   },
   completed: {
     label: "Ready",
     icon: CheckCircle2,
-    variant: "default" as const,
+    variant: "default",
   },
   failed: {
     label: "Error",
     icon: AlertCircle,
-    variant: "destructive" as const,
+    variant: "destructive",
   },
 };
 

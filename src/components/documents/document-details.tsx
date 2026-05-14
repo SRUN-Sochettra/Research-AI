@@ -46,7 +46,7 @@ export function DocumentDetail({ document }: { document: Document }) {
 
     const { status, summary, pageCount } = useDocumentStatus(
         document.id,
-        document.status as any
+        document.status as DocumentStatus
     );
 
     const currentStatus = (status ?? document.status) as string;

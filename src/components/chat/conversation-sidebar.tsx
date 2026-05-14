@@ -29,15 +29,22 @@ interface ConversationSidebarProps {
     onSelectConversation: (id: string) => void;
 }
 
-export function ConversationSidebar({
+interface SidebarContentProps {
+    conversations: Conversation[];
+    currentConversationId: string | null;
+    onNewConversation: () => void;
+    onSelectConversation: (id: string) => void;
+    setOpen: (open: boolean) => void;
+}
+
+function SidebarContent({
     conversations,
     currentConversationId,
     onNewConversation,
     onSelectConversation,
-}: ConversationSidebarProps) {
-    const [open, setOpen] = useState(false);
-
-    const SidebarContent = () => (
+    setOpen,
+}: SidebarContentProps) {
+    return (
         <div className="flex h-full flex-col">
             <div className="flex items-center justify-between p-4">
                 <h3 className="text-sm font-semibold">Conversations</h3>
@@ -97,6 +104,15 @@ export function ConversationSidebar({
             </ScrollArea>
         </div>
     );
+}
+
+export function ConversationSidebar({
+    conversations,
+    currentConversationId,
+    onNewConversation,
+    onSelectConversation,
+}: ConversationSidebarProps) {
+    const [open, setOpen] = useState(false);
 
     return (
         <>
@@ -115,14 +131,26 @@ export function ConversationSidebar({
                     <SheetHeader className="sr-only">
                         <SheetTitle>Conversations</SheetTitle>
                     </SheetHeader>
-                    <SidebarContent />
+                    <SidebarContent
+                        conversations={conversations}
+                        currentConversationId={currentConversationId}
+                        onNewConversation={onNewConversation}
+                        onSelectConversation={onSelectConversation}
+                        setOpen={setOpen}
+                    />
                 </SheetContent>
             </Sheet>
 
             {/* Desktop: Inline sidebar */}
             <div className="hidden w-64 shrink-0 rounded-lg border bg-card md:flex md:flex-col">
-                <SidebarContent />
+                <SidebarContent
+                    conversations={conversations}
+                    currentConversationId={currentConversationId}
+                    onNewConversation={onNewConversation}
+                    onSelectConversation={onSelectConversation}
+                    setOpen={setOpen}
+                />
             </div>
         </>
     );
-}
+}

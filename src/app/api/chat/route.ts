@@ -154,7 +154,6 @@ export async function POST(request: NextRequest) {
                   latencyMs,
                 });
 
-                savedMessageId = saved.id;
 
                 // Send citations to client
                 send("citations", {

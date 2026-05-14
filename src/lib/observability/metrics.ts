@@ -2,10 +2,10 @@
  * Custom Metrics
  */
 export const metrics = {
-  trackLlmLatency: (duration: number) => {
+  trackLlmLatency: (_duration: number) => {
     // track metrics
   },
-  trackTokenUsage: (tokens: number) => {
+  trackTokenUsage: (_tokens: number) => {
     // track metrics
   }
 };

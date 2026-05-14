@@ -3,7 +3,7 @@
  * Manages conversation history and AI interactions.
  */
 export class ChatService {
-  static async sendMessage(conversationId: string, content: string) {
+  static async sendMessage(_conversationId: string, _content: string) {
     // 1. Store user message
     // 2. Retrieve context
     // 3. Call AI

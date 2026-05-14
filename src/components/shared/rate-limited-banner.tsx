@@ -14,7 +14,7 @@ export function RateLimitBanner({
     resetTimestamp,
     onExpired,
 }: RateLimitBannerProps) {
-    const [secondsLeft, setSecondsLeft] = useState(
+    const [secondsLeft, setSecondsLeft] = useState(() =>
         Math.ceil((resetTimestamp - Date.now()) / 1000)
     );
 

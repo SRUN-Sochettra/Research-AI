@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { formatConversationHistory } from "@/lib/agents/query-reformulator";
 import type { Message } from "@/types/database";
 
