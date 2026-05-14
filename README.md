@@ -305,7 +305,7 @@ src/
 
 **Your Name**
 - GitHub: [@SRUN-Sochettra](https://github.com/SRUN-Sochettra)
-- LinkedIn: [linkedin.com/in/srunsochettra](https://linkedin.com/in/srunsochettra)
+- LinkedIn: [linkedin.com/in/sochettra-srun-a67466395](https://www.linkedin.com/in/sochettra-srun-a67466395/)
 - Portfolio: [srunsochettra.vecel.app](https://srunsochettra.vercel.app)
 
 ---
