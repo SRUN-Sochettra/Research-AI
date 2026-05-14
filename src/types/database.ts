@@ -49,9 +49,10 @@ export type Database = {
           id: string
           user_id: string
           title: string
+          file_name: string | null        // ← added: exists in DB
           file_path: string
-          file_type: string
-          size: number
+          file_size: number               // ← was: size
+          mime_type: string               // ← was: file_type
           status: string
           summary: string | null
           page_count: number | null
@@ -63,9 +64,10 @@ export type Database = {
           id?: string
           user_id: string
           title: string
+          file_name?: string | null       // ← added
           file_path: string
-          file_type: string
-          size: number
+          file_size: number               // ← was: size
+          mime_type: string               // ← was: file_type
           status?: string
           summary?: string | null
           page_count?: number | null
@@ -77,9 +79,10 @@ export type Database = {
           id?: string
           user_id?: string
           title?: string
+          file_name?: string | null       // ← added
           file_path?: string
-          file_type?: string
-          size?: number
+          file_size?: number              // ← was: size
+          mime_type?: string              // ← was: file_type
           status?: string
           summary?: string | null
           page_count?: number | null
@@ -265,15 +268,15 @@ export type DocumentChunk = Tables<"document_chunks">
 export type Conversation = Tables<"conversations">
 export type Message = Tables<"messages">
 
-export type DocumentStatus = "pending" | "processing" | "completed" | "failed"
+export type DocumentStatus = "uploaded" | "processing" | "ready" | "error";
 
 export interface Citation {
-  chunk_id: string;
-  text: string;
-  documentId: string;
-  pageNumber: number | null;
-  similarity: number;
-  snippet: string;
+  chunk_id: string
+  text: string
+  documentId: string
+  pageNumber: number | null
+  similarity: number
+  snippet: string
 }
 
 export interface TokenUsage {

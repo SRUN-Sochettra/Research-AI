@@ -15,17 +15,12 @@ function createClient() {
     );
   }
 
+  // createBrowserClient handles its own singleton internally via @supabase/ssr
   return createBrowserClient(supabaseUrl, supabaseAnonKey);
 }
 
-// Singleton instance to avoid creating multiple clients
-let client: ReturnType<typeof createClient> | null = null;
-
 export function getSupabaseBrowserClient() {
-  if (!client) {
-    client = createClient();
-  }
-  return client;
+  return createClient();
 }
 
 export { createClient };

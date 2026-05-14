@@ -1,8 +1,8 @@
-// src/middleware.ts  ← keep this file but update export name when Next.js forces it
+// src/proxy.ts
 import { updateSession } from "@/lib/db/supabase/middleware";
 import type { NextRequest } from "next/server";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   return await updateSession(request);
 }
 

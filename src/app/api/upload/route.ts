@@ -167,6 +167,7 @@ export async function POST(
       userId: user.id,
       title,
       filePath,
+      fileName: file.name,    // ← added
       fileSize: file.size,
       fileType: file.type,
     });

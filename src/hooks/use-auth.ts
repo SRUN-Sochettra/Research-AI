@@ -1,7 +1,7 @@
 // src/hooks/use-auth.ts
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/db/supabase/client";
 import type { User } from "@supabase/supabase-js";
@@ -13,16 +13,17 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const supabase = getSupabaseBrowserClient();
+  const supabaseRef = useRef(getSupabaseBrowserClient());
 
   useEffect(() => {
+    const supabase = supabaseRef.current;
+
     const getUser = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
       setUser(user ?? null);
 
-      // Fetch profile if user exists
       if (user) {
         const { data: profileData } = await supabase
           .from("profiles")
@@ -57,15 +58,16 @@ export function useAuth() {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase]);
+  }, []); // ← empty: supabaseRef.current never changes identity
 
-  // ─── Sign Up ────────────────────────────────────────────────────────────────
+  // ─── Sign Up ──────────────────────────────────────────────────────────────
   const signUpWithEmail = useCallback(
     async (
       email: string,
       password: string,
       fullName: string
     ): Promise<{ error: string | null }> => {
+      const supabase = supabaseRef.current;
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -77,15 +79,16 @@ export function useAuth() {
       if (error) return { error: error.message };
       return { error: null };
     },
-    [supabase]
+    [] // ← empty: supabaseRef is stable, .current never changes
   );
 
-  // ─── Sign In with Email ──────────────────────────────────────────────────────
+  // ─── Sign In with Email ───────────────────────────────────────────────────
   const signInWithEmail = useCallback(
     async (
       email: string,
       password: string
     ): Promise<{ error: string | null }> => {
+      const supabase = supabaseRef.current;
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -97,11 +100,12 @@ export function useAuth() {
       router.refresh();
       return { error: null };
     },
-    [supabase, router]
+    [router]
   );
 
-  // ─── Sign In with Google ─────────────────────────────────────────────────────
+  // ─── Sign In with Google ──────────────────────────────────────────────────
   const signInWithGoogle = useCallback(async () => {
+    const supabase = supabaseRef.current;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -112,20 +116,21 @@ export function useAuth() {
     if (error) {
       console.error("Google sign in error:", error.message);
     }
-  }, [supabase]);
+  }, []); // ← empty: supabaseRef is stable
 
-  // ─── Sign Out ────────────────────────────────────────────────────────────────
+  // ─── Sign Out ─────────────────────────────────────────────────────────────
   const signOut = useCallback(async () => {
+    const supabase = supabaseRef.current;
     await supabase.auth.signOut();
     router.push("/login");
     router.refresh();
-  }, [supabase, router]);
+  }, [router]);
 
   return {
     user,
     profile,
     loading,
-    isLoading: loading, // ← alias so login/signup pages work with either name
+    isLoading: loading,
     signUpWithEmail,
     signInWithEmail,
     signInWithGoogle,

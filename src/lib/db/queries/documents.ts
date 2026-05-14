@@ -15,6 +15,7 @@ export async function createDocument(data: {
   userId: string;
   title: string;
   filePath: string;
+  fileName: string;       // ← added
   fileSize: number;
   fileType: string;
 }): Promise<Document> {
@@ -26,9 +27,10 @@ export async function createDocument(data: {
       user_id: data.userId,
       title: data.title,
       file_path: data.filePath,
-      size: data.fileSize,
-      file_type: data.fileType,
-      status: "pending",
+      file_name: data.fileName,
+      file_size: data.fileSize,
+      mime_type: data.fileType,
+      status: "uploaded",   // ← was: "pending"
     })
     .select()
     .single();
