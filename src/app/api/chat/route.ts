@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (document.status !== "ready") {
+  if (document.status !== "completed") {
     return new Response(
       JSON.stringify({
         error: "Document is still processing. Please wait.",
