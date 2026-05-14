@@ -1,11 +1,23 @@
-import { z } from 'zod';
+import { z } from "zod";
+import { LIMITS, SUPPORTED_FILE_TYPES } from "./constants";
 
-export const uploadSchema = z.object({
-  title: z.string().min(1),
-  file: z.any(), // should be validated as File in actual logic
+export const fileValidator = z.object({
+  name: z.string().min(1),
+  size: z.number().max(LIMITS.maxFileSize, "File must be less than 10MB"),
+  type: z.enum(
+    Object.keys(SUPPORTED_FILE_TYPES) as [string, ...string[]],
+    { errorMap: () => ({ message: "Only PDF files are supported" }) }
+  ),
 });
 
-export const chatSchema = z.object({
-  message: z.string().min(1),
-  documentId: z.string().uuid().optional(),
+export const messageValidator = z
+  .string()
+  .min(1, "Message cannot be empty")
+  .max(LIMITS.maxMessageLength, `Message must be under ${LIMITS.maxMessageLength} characters`);
+
+export const uuidValidator = z.string().uuid("Invalid ID format");
+
+export const paginationValidator = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(10),
 });

@@ -1,14 +1,14 @@
+import { Header } from "@/components/layout/header";
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Sidebar will go here */}
-      <main className="flex-1 overflow-y-auto p-8">
-        {children}
-      </main>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="container py-6">{children}</main>
     </div>
   );
 }
