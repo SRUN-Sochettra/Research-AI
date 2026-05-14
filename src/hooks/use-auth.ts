@@ -1,3 +1,4 @@
+// src/hooks/use-auth.ts
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
@@ -6,134 +7,101 @@ import { getSupabaseBrowserClient } from "@/lib/db/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import type { Profile } from "@/types/database";
 
-interface AuthState {
-  user: User | null;
-  profile: Profile | null;
-  isLoading: boolean;
-  error: string | null;
-}
-
 export function useAuth() {
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    profile: null,
-    isLoading: true,
-    error: null,
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+
   const supabase = getSupabaseBrowserClient();
 
-  const fetchProfile = useCallback(
-    async (userId: string) => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
+  useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUser(user ?? null);
 
-      if (error) {
-        console.error("Error fetching profile:", error);
-        return null;
+      // Fetch profile if user exists
+      if (user) {
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+        setProfile(profileData ?? null);
       }
-      return data;
+
+      setLoading(false);
+    };
+
+    getUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setUser(session?.user ?? null);
+
+      if (session?.user) {
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        setProfile(profileData ?? null);
+      } else {
+        setProfile(null);
+      }
+
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase]);
+
+  // ─── Sign Up ────────────────────────────────────────────────────────────────
+  const signUpWithEmail = useCallback(
+    async (
+      email: string,
+      password: string,
+      fullName: string
+    ): Promise<{ error: string | null }> => {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName },
+        },
+      });
+
+      if (error) return { error: error.message };
+      return { error: null };
     },
     [supabase]
   );
 
-  useEffect(() => {
-    const getSession = async () => {
-      try {
-        const {
-          data: { user },
-          error,
-        } = await supabase.auth.getUser();
+  // ─── Sign In with Email ──────────────────────────────────────────────────────
+  const signInWithEmail = useCallback(
+    async (
+      email: string,
+      password: string
+    ): Promise<{ error: string | null }> => {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-        if (error || !user) {
-          setState({ user: null, profile: null, isLoading: false, error: null });
-          return;
-        }
+      if (error) return { error: error.message };
 
-        const profile = await fetchProfile(user.id);
-        setState({ user, profile, isLoading: false, error: null });
-      } catch (err) {
-        setState({
-          user: null,
-          profile: null,
-          isLoading: false,
-          error: err instanceof Error ? err.message : "Failed to get session",
-        });
-      }
-    };
+      router.push("/documents");
+      router.refresh();
+      return { error: null };
+    },
+    [supabase, router]
+  );
 
-    getSession();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_IN" && session?.user) {
-        const profile = await fetchProfile(session.user.id);
-        setState({
-          user: session.user,
-          profile,
-          isLoading: false,
-          error: null,
-        });
-      } else if (event === "SIGNED_OUT") {
-        setState({ user: null, profile: null, isLoading: false, error: null });
-        router.push("/login");
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [supabase, router, fetchProfile]);
-
-  const signInWithEmail = async (email: string, password: string) => {
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setState((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: error.message,
-      }));
-      return { error: error.message };
-    }
-
-    router.push("/documents");
-    return { error: null };
-  };
-
-  const signUpWithEmail = async (
-    email: string,
-    password: string,
-    fullName: string
-  ) => {
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName },
-      },
-    });
-
-    if (error) {
-      setState((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: error.message,
-      }));
-      return { error: error.message };
-    }
-
-    return { error: null };
-  };
-
-  const signInWithGoogle = async () => {
+  // ─── Sign In with Google ─────────────────────────────────────────────────────
+  const signInWithGoogle = useCallback(async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -142,18 +110,24 @@ export function useAuth() {
     });
 
     if (error) {
-      setState((prev) => ({ ...prev, error: error.message }));
+      console.error("Google sign in error:", error.message);
     }
-  };
+  }, [supabase]);
 
-  const signOut = async () => {
+  // ─── Sign Out ────────────────────────────────────────────────────────────────
+  const signOut = useCallback(async () => {
     await supabase.auth.signOut();
-  };
+    router.push("/login");
+    router.refresh();
+  }, [supabase, router]);
 
   return {
-    ...state,
-    signInWithEmail,
+    user,
+    profile,
+    loading,
+    isLoading: loading, // ← alias so login/signup pages work with either name
     signUpWithEmail,
+    signInWithEmail,
     signInWithGoogle,
     signOut,
   };

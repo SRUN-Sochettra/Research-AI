@@ -1,3 +1,4 @@
+// src/lib/db/supabase/middleware.ts
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -9,7 +10,24 @@ export async function updateSession(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+  // Enhanced validation with helpful error messages
   if (!supabaseUrl || !supabaseAnonKey) {
+    console.error(
+      "[Supabase Middleware] Missing environment variables:\n" +
+      `  NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? "✓" : "✗ MISSING"}\n` +
+      `  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${supabaseAnonKey ? "✓" : "✗ MISSING"}`
+    );
+    return supabaseResponse;
+  }
+
+  // Validate URL format before passing to createServerClient
+  try {
+    new URL(supabaseUrl);
+  } catch {
+    console.error(
+      `[Supabase Middleware] Invalid NEXT_PUBLIC_SUPABASE_URL: "${supabaseUrl}"\n` +
+      "  Must be a valid HTTP/HTTPS URL like: https://your-project.supabase.co"
+    );
     return supabaseResponse;
   }
 

@@ -1,3 +1,4 @@
+// src/app/api/upload/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/db/supabase/server";
 import { checkRateLimit } from "@/lib/services/rate-limiter";
@@ -171,9 +172,6 @@ export async function POST(
     });
 
     // ─── 8. Run Pipeline (async, non-blocking) ──────────
-    // We return immediately and process in background
-    // In production, use a queue (Inngest, Trigger.dev, etc.)
-    // For portfolio: sufficient for demo purposes
     runDocumentPipeline({
       documentId: document.id,
       buffer: fileBuffer,
@@ -195,7 +193,7 @@ export async function POST(
             "Document uploaded successfully. AI processing started.",
         },
       },
-      { status: 202 } // 202 Accepted - processing in background
+      { status: 202 }
     );
   } catch (error) {
     const errorResponse = toErrorResponse(error);

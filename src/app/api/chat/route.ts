@@ -114,7 +114,6 @@ export async function POST(request: NextRequest) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      // Helper: send a typed SSE event
       const send = (
         type: string,
         payload: Record<string, unknown>
@@ -124,10 +123,7 @@ export async function POST(request: NextRequest) {
         controller.enqueue(encoder.encode(data));
       };
 
-      // Send conversation ID immediately so client can track it
       send("meta", { conversationId: conversation.id });
-
-      let assistantMessage = "";
 
       try {
         await runQAAgent(
@@ -135,13 +131,10 @@ export async function POST(request: NextRequest) {
           documentId,
           history,
           {
-            // Stream each token
             onToken: (token) => {
-              assistantMessage += token;
               send("token", { content: token });
             },
 
-            // On complete: save to DB, send citations
             onComplete: async (result) => {
               try {
                 const latencyMs = Date.now() - startTime;
@@ -154,8 +147,6 @@ export async function POST(request: NextRequest) {
                   latencyMs,
                 });
 
-
-                // Send citations to client
                 send("citations", {
                   citations: result.citations,
                   messageId: saved.id,
@@ -188,7 +179,6 @@ export async function POST(request: NextRequest) {
               }
             },
 
-            // On error: send error event
             onError: (error) => {
               logger.error(
                 "[ChatAPI] QA agent error",

@@ -1,7 +1,7 @@
+// src/lib/db/supabase/client.ts
 "use client";
 
 import { createBrowserClient } from "@supabase/ssr";
-import type { Database } from "@/types/database";
 
 function createClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -9,14 +9,16 @@ function createClient() {
 
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
-      "Missing Supabase environment variables. Check .env.local"
+      "Missing Supabase environment variables. Check your .env.local file:\n" +
+      `  NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? "✓" : "✗ MISSING"}\n` +
+      `  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${supabaseAnonKey ? "✓" : "✗ MISSING"}`
     );
   }
 
-  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
+  return createBrowserClient(supabaseUrl, supabaseAnonKey);
 }
 
-// Singleton for client-side
+// Singleton instance to avoid creating multiple clients
 let client: ReturnType<typeof createClient> | null = null;
 
 export function getSupabaseBrowserClient() {
@@ -25,3 +27,5 @@ export function getSupabaseBrowserClient() {
   }
   return client;
 }
+
+export { createClient };

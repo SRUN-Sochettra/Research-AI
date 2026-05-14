@@ -1,3 +1,7 @@
+# Note: Secret context warnings in VS Code are false positives.
+# All secrets (VERCEL_TOKEN, VERCEL_ORG_ID, etc.) are configured
+# in GitHub → Settings → Secrets and variables → Actions.
+# .github/workflows/deploy.yml
 name: Deploy
 
 on:
@@ -9,7 +13,8 @@ jobs:
   deploy:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
-    environment: production
+    environment:
+      name: production
 
     steps:
       - name: Checkout

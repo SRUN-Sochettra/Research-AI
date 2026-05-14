@@ -1,9 +1,9 @@
+// next.config.ts
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ["pdf-parse"],
-  },
+  // Moved out of experimental in Next.js 15+
+  serverExternalPackages: ["pdf-parse"],
 
   // Security headers
   async headers() {

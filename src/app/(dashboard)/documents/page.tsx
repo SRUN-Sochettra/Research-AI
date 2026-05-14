@@ -1,3 +1,4 @@
+// src/app/(dashboard)/documents/page.tsx
 import { Suspense } from "react";
 import { getSupabaseServerClient } from "@/lib/db/supabase/server";
 import { DocumentListSkeleton } from "@/components/shared/loading-states";
@@ -5,6 +6,7 @@ import { NoDocuments } from "@/components/shared/empty-states";
 import { DocumentCard } from "@/components/documents/document-card";
 import { UploadButton } from "@/components/documents/upload-button";
 import type { Metadata } from "next";
+import type { Document } from "@/types/database";
 
 export const metadata: Metadata = {
   title: "Documents",
@@ -40,7 +42,7 @@ async function DocumentList() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {documents.map((doc) => (
+      {documents.map((doc: Document) => (
         <DocumentCard key={doc.id} document={doc} />
       ))}
     </div>

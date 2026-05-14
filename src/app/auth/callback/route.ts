@@ -1,14 +1,14 @@
+// src/app/auth/callback/route.ts
+import { createClient } from "@/lib/db/supabase/server";
 import { NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/db/supabase/server";
 
-// Handle OAuth callback from Google
 export async function GET(request: Request) {
     const { searchParams, origin } = new URL(request.url);
     const code = searchParams.get("code");
     const next = searchParams.get("next") ?? "/documents";
 
     if (code) {
-        const supabase = await getSupabaseServerClient();
+        const supabase = await createClient();
         const { error } = await supabase.auth.exchangeCodeForSession(code);
 
         if (!error) {
@@ -16,6 +16,6 @@ export async function GET(request: Request) {
         }
     }
 
-    // If error, redirect to login with error
+    // Return to error page if something went wrong
     return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
 }

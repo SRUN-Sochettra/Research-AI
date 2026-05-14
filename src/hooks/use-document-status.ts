@@ -43,7 +43,7 @@ export function useDocumentStatus(
             }));
 
             return data.status as DocumentStatus;
-        } catch (error) {
+        } catch {
             setState((prev) => ({
                 ...prev,
                 error: "Failed to check status",

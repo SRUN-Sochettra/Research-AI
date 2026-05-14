@@ -1,6 +1,6 @@
-import * as pdf from "pdf-parse";
-// @ts-ignore - pdf-parse has tricky types
-const pdfParser = pdf.default || pdf;
+// src/lib/agents/pdf-parser.ts
+// @ts-expect-error - pdf-parse has no type declarations
+import pdfParse from "pdf-parse";
 
 import { AppError } from "@/lib/utils/errors";
 
@@ -24,35 +24,42 @@ export async function parsePDF(buffer: Buffer): Promise<ParsedPDF> {
     const pages: string[] = [];
     let pageCount = 0;
 
-    // @ts-ignore
-    const data = await pdfParser(buffer, {
+    const data = await pdfParse(buffer, {
       // Called for each page during parsing
-      pagerender: function (pageData: { getTextContent: () => Promise<{ items: { str: string; transform: number[] }[] }> }) {
-        return pageData.getTextContent().then(function (textContent: { items: { str: string; transform: number[] }[] }) {
-          let pageText = "";
-          let lastY: number | null = null;
+      pagerender: function (pageData: {
+        getTextContent: () => Promise<{
+          items: { str: string; transform: number[] }[];
+        }>;
+      }) {
+        return pageData
+          .getTextContent()
+          .then(function (textContent: {
+            items: { str: string; transform: number[] }[];
+          }) {
+            let pageText = "";
+            let lastY: number | null = null;
 
-          for (const item of textContent.items) {
-            const textItem = item as {
-              str: string;
-              transform: number[];
-            };
-            const currentY = textItem.transform[5];
+            for (const item of textContent.items) {
+              const textItem = item as {
+                str: string;
+                transform: number[];
+              };
+              const currentY = textItem.transform[5];
 
-            if (currentY === undefined) continue;
+              if (currentY === undefined) continue;
 
-            // Add newline when Y position changes significantly
-            if (lastY !== null && Math.abs(currentY - lastY) > 5) {
-              pageText += "\n";
+              // Add newline when Y position changes significantly
+              if (lastY !== null && Math.abs(currentY - lastY) > 5) {
+                pageText += "\n";
+              }
+
+              pageText += textItem.str;
+              lastY = currentY ?? null;
             }
 
-            pageText += textItem.str;
-            lastY = currentY ?? null;
-          }
-
-          pages.push(pageText.trim());
-          return pageText;
-        });
+            pages.push(pageText.trim());
+            return pageText;
+          });
       },
     });
 

@@ -1,3 +1,6 @@
+# Note: Secret context warnings in VS Code are false positives.
+# All secrets (VERCEL_TOKEN, VERCEL_ORG_ID, etc.) are configured
+# in GitHub → Settings → Secrets and variables → Actions.
 name: CI
 
 on:
