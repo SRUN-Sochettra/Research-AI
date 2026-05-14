@@ -79,7 +79,7 @@ export function UploadButton() {
             setState("processing");
             setProgress(80);
 
-            const data = await response.json();
+            await response.json();
 
             setProgress(100);
             setState("done");

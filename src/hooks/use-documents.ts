@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import type { Document } from '@/types/database';
 
 export function useDocuments() {
-  const [documents, setDocuments] = useState<any[]>([]);
+  const [documents] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchDocuments = async () => {

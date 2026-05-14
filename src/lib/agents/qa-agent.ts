@@ -99,7 +99,7 @@ export async function runQAAgent(
     }
 
     // ─── Step 5: Build Citations ────────────────────────
-    const citations = buildCitations(chunks, fullAnswer, documentId);
+    const citations = buildCitations(chunks, documentId);
 
     const latencyMs = Date.now() - startTime;
 
@@ -131,7 +131,6 @@ export async function runQAAgent(
 // Build citation objects from retrieved chunks
 function buildCitations(
   chunks: RetrievedChunk[],
-  answer: string,
   documentId: string
 ): QAResult["citations"] {
   return chunks

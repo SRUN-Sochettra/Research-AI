@@ -2,7 +2,6 @@ import { getSupabaseAdminClient } from "@/lib/db/supabase/admin";
 import { getSupabaseServerClient } from "@/lib/db/supabase/server";
 import type {
   Document,
-  DocumentChunk,
   DocumentStatus,
 } from "@/types/database";
 import type { EmbeddedChunk } from "@/lib/agents/embedder";
