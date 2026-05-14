@@ -27,10 +27,10 @@ export function CitationCard({ citation, index }: CitationCardProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          {citation.page_number && (
+          {citation.pageNumber && (
             <Badge variant="outline" className="h-5 gap-1 px-1.5 text-[10px]">
               <Hash className="h-2.5 w-2.5" />
-              Page {citation.page_number}
+              Page {citation.pageNumber}
             </Badge>
           )}
           <Badge
