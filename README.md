@@ -8,7 +8,7 @@
     <img src="https://img.shields.io/badge/Next.js-14-black?logo=next.js" alt="Next.js" />
     <img src="https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript" alt="TypeScript" />
     <img src="https://img.shields.io/badge/LangChain.js-agents-green" alt="LangChain" />
-    <img src="https://img.shields.io/badge/Gemini-1.5_Flash-orange?logo=google" alt="Gemini" />
+    <img src="https://img.shields.io/badge/Gemini-2.5_Flash-orange?logo=google" alt="Gemini" />
     <img src="https://img.shields.io/badge/Supabase-pgvector-emerald?logo=supabase" alt="Supabase" />
     <img src="https://img.shields.io/badge/deployed-Vercel-black?logo=vercel" alt="Vercel" />
   </p>
@@ -304,9 +304,9 @@ src/
 ## 👤 Author
 
 **Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [linkedin.com/in/yourname](https://linkedin.com/in/yourname)
-- Portfolio: [yourportfolio.com](https://yourportfolio.com)
+- GitHub: [@SRUN-Sochettra](https://github.com/SRUN-Sochettra)
+- LinkedIn: [linkedin.com/in/sochettra-srun-a67466395](https://www.linkedin.com/in/sochettra-srun-a67466395/)
+- Portfolio: [srunsochettra.vecel.app](https://srunsochettra.vercel.app)
 
 ---
 
