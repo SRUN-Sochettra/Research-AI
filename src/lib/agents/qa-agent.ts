@@ -10,7 +10,9 @@ export interface QAResult {
   answer: string;
   citations: {
     chunk_id: string;
-    page_number: number | null;
+    text: string;
+    documentId: string;
+    pageNumber: number | null;
     snippet: string;
     similarity: number;
   }[];
@@ -97,7 +99,7 @@ export async function runQAAgent(
     }
 
     // ─── Step 5: Build Citations ────────────────────────
-    const citations = buildCitations(chunks, fullAnswer);
+    const citations = buildCitations(chunks, fullAnswer, documentId);
 
     const latencyMs = Date.now() - startTime;
 
@@ -129,13 +131,16 @@ export async function runQAAgent(
 // Build citation objects from retrieved chunks
 function buildCitations(
   chunks: RetrievedChunk[],
-  answer: string
+  answer: string,
+  documentId: string
 ): QAResult["citations"] {
   return chunks
-    .filter((chunk) => chunk.similarity > 0.65) // Only cite relevant chunks
+    .filter((chunk) => chunk.similarity > 0.6) // Only cite relevant chunks
     .map((chunk) => ({
       chunk_id: chunk.id,
-      page_number: chunk.pageNumber,
+      text: chunk.content,
+      documentId,
+      pageNumber: chunk.pageNumber,
       // Extract a meaningful snippet (first 200 chars)
       snippet: chunk.content
         .slice(0, 200)
