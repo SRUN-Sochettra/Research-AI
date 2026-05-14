@@ -165,10 +165,9 @@ export async function POST(
     const document = await createDocument({
       userId: user.id,
       title,
-      fileName: file.name,
       filePath,
       fileSize: file.size,
-      mimeType: file.type,
+      fileType: file.type,
     });
 
     // ─── 8. Run Pipeline (async, non-blocking) ──────────
