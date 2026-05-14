@@ -76,7 +76,7 @@ export async function runDocumentPipeline(
     log("summarizing", "Summary generated");
 
     // ─── DONE ────────────────────────────────────────────
-    await updateDocumentStatus(documentId, "ready", {
+    await updateDocumentStatus(documentId, "completed", {
       pageCount: parsed.pageCount,
       summary,
       metadata: {
@@ -101,7 +101,7 @@ export async function runDocumentPipeline(
     console.error(`[Pipeline:${documentId}] Error:`, error);
 
     // Mark document as failed
-    await updateDocumentStatus(documentId, "error", {
+    await updateDocumentStatus(documentId, "failed", {
       metadata: {
         error: errorMessage,
         failedAt: new Date().toISOString(),

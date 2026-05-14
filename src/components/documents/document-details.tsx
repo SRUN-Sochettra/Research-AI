@@ -107,7 +107,6 @@ export function DocumentDetail({ document }: { document: Document }) {
                             </div>
                             <div>
                                 <CardTitle className="text-xl">{document.title}</CardTitle>
-                                <CardDescription>{document.file_name}</CardDescription>
                             </div>
                         </div>
 
@@ -133,7 +132,7 @@ export function DocumentDetail({ document }: { document: Document }) {
                     )}
 
                     {/* Error state */}
-                    {currentStatus === "error" && (
+                    {currentStatus === "failed" && (
                         <Alert variant="destructive">
                             <AlertCircle className="h-4 w-4" />
                             <AlertDescription>
@@ -148,7 +147,7 @@ export function DocumentDetail({ document }: { document: Document }) {
                         <MetaItem
                             icon={HardDrive}
                             label="File Size"
-                            value={formatFileSize(document.file_size)}
+                            value={formatFileSize(document.size)}
                         />
                         {(pageCount ?? document.page_count) && (
                             <MetaItem
@@ -176,7 +175,7 @@ export function DocumentDetail({ document }: { document: Document }) {
                         </div>
                     )}
 
-                    {currentStatus === "ready" && !summary && !document.summary && (
+                    {currentStatus === "completed" && !summary && !document.summary && (
                         <div className="text-sm text-muted-foreground">
                             Summary generation in progress...
                         </div>
@@ -200,7 +199,7 @@ export function DocumentDetail({ document }: { document: Document }) {
                             Delete Document
                         </Button>
 
-                        {currentStatus === "ready" && (
+                        {currentStatus === "completed" && (
                             <Button asChild>
                                 <Link href={`/chat/${document.id}`}>
                                     <MessageSquare className="mr-2 h-4 w-4" />
@@ -237,20 +236,20 @@ function MetaItem({
 
 function StatusBadge({ status }: { status: string }) {
     const config = {
-        uploaded: { label: "Uploaded", variant: "secondary" as const },
+        pending: { label: "Pending", variant: "secondary" as const },
         processing: { label: "Processing", variant: "default" as const },
-        ready: { label: "Ready", variant: "default" as const },
-        error: { label: "Error", variant: "destructive" as const },
+        completed: { label: "Ready", variant: "default" as const },
+        failed: { label: "Error", variant: "destructive" as const },
     };
 
-    const current = config[status as keyof typeof config] ?? config.uploaded;
+    const current = config[status as keyof typeof config] ?? config.pending;
 
     return (
         <Badge variant={current.variant}>
             {status === "processing" && (
                 <Loader2 className="mr-1 h-3 w-3 animate-spin" />
             )}
-            {status === "ready" && (
+            {status === "completed" && (
                 <CheckCircle2 className="mr-1 h-3 w-3" />
             )}
             {current.label}
