@@ -431,19 +431,6 @@ src/
 
 ---
 
-## 🧠 Lessons Learned
-
-This project required debugging real-world issues that show up in production AI systems:
-
-- **CJS/ESM interop** — `pdf-parse` v2 uses class-based exports under Turbopack; required `require()` workaround
-- **Vector dimension mismatches** — Gemini embedding models output 3072 dims; pgvector column must match exactly
-- **Rate limit handling** — Free tier quotas vary per model; built a fallback chain that gracefully degrades
-- **Schema drift** — TypeScript types and DB schema can diverge; always treat DB as source of truth
-- **Next.js 16 migration** — `middleware.ts` → `proxy.ts`, `serverComponentsExternalPackages` → `serverExternalPackages`
-- **Singleton pitfalls** — Module-level singletons break under SSR/hydration; use library's built-in deduplication
-
----
-
 ## 🗺️ What I'd Add With More Time
 
 - [ ] **Background job queue** (Trigger.dev/Inngest) for truly async processing
