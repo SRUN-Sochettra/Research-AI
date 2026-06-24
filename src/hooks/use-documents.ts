@@ -13,6 +13,7 @@ export function useDocuments() {
 
   useEffect(() => {
     // Avoid synchronous setState during render by calling inside effect
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchDocuments();
   }, []);
 
