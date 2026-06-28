@@ -1,3 +1,4 @@
+import { CallbackHandler } from "langfuse-langchain";
 import { getChatModel } from "@/lib/ai/gemini";
 import { QUERY_REFORMULATION_PROMPT } from "@/lib/ai/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
@@ -32,10 +33,11 @@ export async function reformulateQuery(
             .map((msg) => `${msg.role === "user" ? "Human" : "Assistant"}: ${msg.content}`)
             .join("\n");
 
+        const langfuseHandler = new CallbackHandler({ tags: ["query-reformulation"] });
         const reformulated = await chain.invoke({
             chat_history: recentHistory,
             question,
-        });
+        }, { callbacks: [langfuseHandler] });
 
         logger.debug("[QueryReformulator] Reformulated query", {
             original: question,

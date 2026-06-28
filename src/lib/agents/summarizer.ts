@@ -1,3 +1,4 @@
+import { CallbackHandler } from "langfuse-langchain";
 // src/lib/agents/summarizer.ts
 import {
   getChatModel,
@@ -104,8 +105,9 @@ async function directSummarize(
   text: string,
   outputParser: StringOutputParser
 ): Promise<string> {
+  const langfuseHandler = new CallbackHandler({ tags: ["summarize", "direct"] });
   const result = await invokeWithRetry(
-    (model) => SUMMARY_PROMPT.pipe(model).pipe(outputParser).invoke({ content: text }),
+    (model) => SUMMARY_PROMPT.pipe(model).pipe(outputParser).invoke({ content: text }, { callbacks: [langfuseHandler] }),
     "direct summary"
   );
   return result?.trim() ?? "Summary unavailable.";
@@ -119,11 +121,12 @@ async function mapReduceSummarize(
   const mappedSummaries: string[] = [];
 
   for (const chunk of sampledChunks) {
+    const langfuseMapHandler = new CallbackHandler({ tags: ["summarize", "map"] });
     const summary = await invokeWithRetry(
       (model) =>
         MAP_PROMPT.pipe(model).pipe(outputParser).invoke({
           content: chunk.content,
-        }),
+        }, { callbacks: [langfuseMapHandler] }),
       `chunk ${chunk.chunkIndex}`
     );
 
@@ -145,11 +148,12 @@ async function mapReduceSummarize(
   // Reset model selection for reduce phase
   resetModelSelection();
 
+  const langfuseReduceHandler = new CallbackHandler({ tags: ["summarize", "reduce"] });
   const finalSummary = await invokeWithRetry(
     (model) =>
       REDUCE_PROMPT.pipe(model).pipe(outputParser).invoke({
         content: mappedSummaries.join("\n\n---\n\n"),
-      }),
+      }, { callbacks: [langfuseReduceHandler] }),
     "reduce phase"
   );
 

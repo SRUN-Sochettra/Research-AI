@@ -9,6 +9,7 @@ import {
     ArrowLeft,
     FileText,
     BookOpen,
+    Download,
 } from "lucide-react";
 import Link from "next/link";
 import { truncateText } from "@/lib/utils/helpers";
@@ -34,6 +35,41 @@ export function ChatPageClient({
     const [conversations] = useState(initialConversations);
     const [messages, setMessages] = useState(initialMessages);
     const [showSummary, setShowSummary] = useState(false);
+
+
+    const handleDownload = () => {
+        if (messages.length === 0) return;
+
+        let markdown = `# Conversation about ${document.title}\n\n`;
+
+        messages.forEach((msg) => {
+            const role = msg.role === "user" ? "## User" : "## Assistant";
+            markdown += `${role}\n\n${msg.content}\n\n`;
+
+            // Add citations if any
+            if (msg.role === "assistant" && (msg.citations as any[])?.length > 0) {
+                markdown += `*Citations:*\n`;
+                (msg.citations as any[]).forEach((cite: any, i: number) => {
+                    const page = cite.pageNumber ? ` (Page ${cite.pageNumber})` : '';
+                    markdown += `${i + 1}. [Source${page}]: ${cite.snippet.replace(/\n/g, ' ')}\n`;
+                });
+                markdown += `\n`;
+            }
+
+            markdown += `---\n\n`;
+        });
+
+        const blob = new Blob([markdown], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = window.document.createElement('a');
+        a.href = url;
+        const date = new Date().toISOString().split('T')[0];
+        a.download = `chat-${document.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${date}.md`;
+        window.document.body.appendChild(a);
+        a.click();
+        window.document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
 
     const handleNewConversation = () => {
         // Clear messages and conversation ID
@@ -78,17 +114,27 @@ export function ChatPageClient({
                 </div>
 
                 {/* Summary toggle */}
-                {document.summary && (
+                <div className="flex items-center gap-2">
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setShowSummary((p) => !p)}
+                        onClick={handleDownload}
+                        disabled={messages.length === 0}
                     >
-                        <BookOpen className="mr-2 h-4 w-4" />
-                        {showSummary ? "Hide" : "Show"} Summary
+                        <Download className="mr-2 h-4 w-4" />
+                        Export
                     </Button>
-                )}
-            </div>
+                    {document.summary && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowSummary((p) => !p)}
+                        >
+                            <BookOpen className="mr-2 h-4 w-4" />
+                            {showSummary ? "Hide" : "Show"} Summary
+                        </Button>
+                    )}
+                </div>            </div>
 
             {/* Summary panel */}
             {showSummary && document.summary && (

@@ -1,3 +1,4 @@
+import { CallbackHandler } from "langfuse-langchain";
 import { getChatModel } from "@/lib/ai/gemini";
 import { QA_PROMPT } from "@/lib/ai/prompts";
 import { retrieveRelevantChunks, formatChunksAsContext } from "./retriever";
@@ -83,12 +84,18 @@ export async function runQAAgent(
 
     let fullAnswer = "";
 
+const langfuseHandler = new CallbackHandler({
+      sessionId: documentId,
+      userId: "user", // Ideally we'd pass this in, but we can hardcode for now or omit
+      tags: ["qa"]
+    });
+
     // Stream tokens to client
     const stream = await chain.stream({
       context,
       chat_history: chatHistory,
       question,
-    });
+    }, { callbacks: [langfuseHandler] });
 
     for await (const chunk of stream) {
       const token = chunk.content as string;
