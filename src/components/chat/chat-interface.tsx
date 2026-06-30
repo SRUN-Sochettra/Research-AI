@@ -7,7 +7,7 @@ import { ChatInput } from "./chat-input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { NoMessages } from "@/components/shared/empty-states";
-import { AlertTriangle, X, Brain } from "lucide-react";
+import { AlertTriangle, X, Brain, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Document, Message, Citation } from "@/types/database";
 import type { ChatMessage } from "@/hooks/use-chat";
@@ -25,7 +25,7 @@ function toDisplayMessages(messages: Message[]): ChatMessage[] {
     content: msg.content,
     citations: (msg.citations as unknown as Citation[]) ?? [],
     latencyMs: msg.latency_ms ?? undefined,
-    createdAt: new Date(msg.created_at),
+    createdAt: msg.created_at ? new Date(msg.created_at) : new Date(),
   }));
 }
 
@@ -42,6 +42,39 @@ export function ChatInterface({
     initialMessages: toDisplayMessages(initialMessages),
     initialConversationId,
   });
+
+  const handleExport = () => {
+    if (messages.length === 0) return;
+
+    let markdown = `# Conversation about ${document.title}\n\n`;
+    markdown += `*Generated on ${new Date().toLocaleString()}*\n\n---\n\n`;
+
+    messages.forEach((msg) => {
+      const role = msg.role === "user" ? "**You:**" : "**Assistant:**";
+      markdown += `${role}\n\n${msg.content}\n\n`;
+
+      if (msg.citations && msg.citations.length > 0) {
+        markdown += `*Sources:*\n`;
+        msg.citations.forEach((citation, idx) => {
+          markdown += `- [${idx + 1}] Page ${citation.pageNumber || 'N/A'}\n`;
+        });
+        markdown += `\n`;
+      }
+
+      markdown += `---\n\n`;
+    });
+
+    const blob = new Blob([markdown], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = window.document.createElement("a");
+    link.href = url;
+    link.download = `${document.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}-conversation.md`;
+    window.document.body.appendChild(link);
+    link.click();
+    window.document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -73,6 +106,21 @@ export function ChatInterface({
           />
           {isDocumentReady ? "Ready" : "Processing"}
         </div>
+
+        {/* Export Button */}
+        {messages.length > 0 && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="ml-2 h-7 w-7 text-muted-foreground hover:text-foreground"
+            onClick={handleExport}
+            title="Export conversation as Markdown"
+          >
+            <Download className="h-4 w-4" />
+            <span className="sr-only">Export conversation</span>
+          </Button>
+        )}
+
       </div>
 
       {/* ── Error banner ── */}

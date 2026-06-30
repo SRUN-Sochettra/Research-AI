@@ -5,10 +5,7 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import { logger } from "@/lib/observability/logger";
 import type { Message } from "@/types/database";
 
-export async function reformulateQuery(
-    question: string,
-    conversationHistory: Message[]
-): Promise<string> {
+export async function reformulateQuery(question: string, conversationHistory: Message[], userId: string, conversationId: string): Promise<string> {
     // If no history, no need to reformulate
     if (conversationHistory.length === 0) {
         return question;
@@ -33,7 +30,7 @@ export async function reformulateQuery(
             .map((msg) => `${msg.role === "user" ? "Human" : "Assistant"}: ${msg.content}`)
             .join("\n");
 
-        const langfuseHandler = new CallbackHandler({ tags: ["query-reformulation"] });
+        const langfuseHandler = new CallbackHandler({ tags: ["query-reformulation"], userId, sessionId: conversationId });
         const reformulated = await chain.invoke({
             chat_history: recentHistory,
             question,

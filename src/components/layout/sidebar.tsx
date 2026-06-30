@@ -7,10 +7,16 @@ import {
   FileText,
   LayoutDashboard,
   Settings,
-  ChevronRight,
+  ChevronRight, GitCompare,
 } from "lucide-react";
 
 const navItems = [
+  {
+    href: "/compare",
+    label: "Compare",
+    icon: GitCompare,
+    description: "Diff two PDFs",
+  },
   {
     href: "/documents",
     label: "Documents",

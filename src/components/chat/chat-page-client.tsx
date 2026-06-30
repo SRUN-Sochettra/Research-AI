@@ -47,9 +47,10 @@ export function ChatPageClient({
             markdown += `${role}\n\n${msg.content}\n\n`;
 
             // Add citations if any
-            if (msg.role === "assistant" && (msg.citations as any[])?.length > 0) {
+            if (msg.role === "assistant" && (msg.citations as unknown[])?.length > 0) {
                 markdown += `*Citations:*\n`;
-                (msg.citations as any[]).forEach((cite: any, i: number) => {
+                (msg.citations as unknown[]).forEach((c: unknown, i: number) => {
+                    const cite = c as { pageNumber?: number; snippet: string };
                     const page = cite.pageNumber ? ` (Page ${cite.pageNumber})` : '';
                     markdown += `${i + 1}. [Source${page}]: ${cite.snippet.replace(/\n/g, ' ')}\n`;
                 });

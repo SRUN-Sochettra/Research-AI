@@ -15,9 +15,7 @@ const MAX_CHUNK_TOKENS_FOR_MAP = 500;
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 30000;
 
-export async function summarizeDocument(
-  chunks: TextChunk[]
-): Promise<string> {
+export async function summarizeDocument(chunks: TextChunk[], userId: string, documentId: string): Promise<string> {
   // Reset to primary model at the start of each summarization
   resetModelSelection();
 
@@ -29,13 +27,10 @@ export async function summarizeDocument(
   );
 
   if (totalTokens <= MAX_DIRECT_SUMMARY_TOKENS) {
-    return await directSummarize(
-      chunks.map((c) => c.content).join("\n\n"),
-      outputParser
-    );
+    return await directSummarize(chunks.map((c) => c.content).join("\n\n"), outputParser, userId, documentId);
   }
 
-  return await mapReduceSummarize(chunks, outputParser);
+  return await mapReduceSummarize(chunks, outputParser, userId, documentId);
 }
 
 // Invoke with retry + automatic model fallback on 429
@@ -101,11 +96,8 @@ async function invokeWithRetry<T>(
   return null;
 }
 
-async function directSummarize(
-  text: string,
-  outputParser: StringOutputParser
-): Promise<string> {
-  const langfuseHandler = new CallbackHandler({ tags: ["summarize", "direct"] });
+async function directSummarize(text: string, outputParser: StringOutputParser, userId: string, documentId: string): Promise<string> {
+  const langfuseHandler = new CallbackHandler({ tags: ["summarize", "direct"], userId, sessionId: documentId });
   const result = await invokeWithRetry(
     (model) => SUMMARY_PROMPT.pipe(model).pipe(outputParser).invoke({ content: text }, { callbacks: [langfuseHandler] }),
     "direct summary"
@@ -113,15 +105,12 @@ async function directSummarize(
   return result?.trim() ?? "Summary unavailable.";
 }
 
-async function mapReduceSummarize(
-  chunks: TextChunk[],
-  outputParser: StringOutputParser
-): Promise<string> {
+async function mapReduceSummarize(chunks: TextChunk[], outputParser: StringOutputParser, userId: string, documentId: string): Promise<string> {
   const sampledChunks = sampleChunks(chunks, MAX_CHUNK_TOKENS_FOR_MAP);
   const mappedSummaries: string[] = [];
 
   for (const chunk of sampledChunks) {
-    const langfuseMapHandler = new CallbackHandler({ tags: ["summarize", "map"] });
+    const langfuseMapHandler = new CallbackHandler({ tags: ["summarize", "map"], userId, sessionId: documentId });
     const summary = await invokeWithRetry(
       (model) =>
         MAP_PROMPT.pipe(model).pipe(outputParser).invoke({
@@ -148,7 +137,7 @@ async function mapReduceSummarize(
   // Reset model selection for reduce phase
   resetModelSelection();
 
-  const langfuseReduceHandler = new CallbackHandler({ tags: ["summarize", "reduce"] });
+  const langfuseReduceHandler = new CallbackHandler({ tags: ["summarize", "reduce"], userId, sessionId: documentId });
   const finalSummary = await invokeWithRetry(
     (model) =>
       REDUCE_PROMPT.pipe(model).pipe(outputParser).invoke({

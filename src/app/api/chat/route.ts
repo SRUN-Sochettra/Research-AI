@@ -126,11 +126,7 @@ export async function POST(request: NextRequest) {
       send("meta", { conversationId: conversation.id });
 
       try {
-        await runQAAgent(
-          message,
-          documentId,
-          history,
-          {
+        await runQAAgent(message, documentId, user.id, conversation.id, history, {
             onToken: (token) => {
               send("token", { content: token });
             },

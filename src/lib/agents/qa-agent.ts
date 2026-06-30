@@ -33,10 +33,7 @@ export interface QAStreamCallbacks {
 }
 
 export async function runQAAgent(
-  question: string,
-  documentId: string,
-  conversationHistory: Message[],
-  callbacks: QAStreamCallbacks
+  question: string, documentId: string, userId: string, conversationId: string, conversationHistory: Message[], callbacks: QAStreamCallbacks
 ): Promise<void> {
   const startTime = Date.now();
 
@@ -48,10 +45,7 @@ export async function runQAAgent(
     });
 
     // ─── Step 1: Reformulate Query ─────────────────────
-    const reformulatedQuery = await reformulateQuery(
-      question,
-      conversationHistory
-    );
+    const reformulatedQuery = await reformulateQuery(question, conversationHistory, userId, conversationId);
 
     // ─── Step 2: Retrieve Relevant Chunks ──────────────
     const { chunks } = await retrieveRelevantChunks(
@@ -84,11 +78,7 @@ export async function runQAAgent(
 
     let fullAnswer = "";
 
-const langfuseHandler = new CallbackHandler({
-      sessionId: documentId,
-      userId: "user", // Ideally we'd pass this in, but we can hardcode for now or omit
-      tags: ["qa"]
-    });
+const langfuseHandler = new CallbackHandler({ sessionId: conversationId, userId: userId, tags: ["qa"] });
 
     // Stream tokens to client
     const stream = await chain.stream({
