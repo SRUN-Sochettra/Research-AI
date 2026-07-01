@@ -7,11 +7,7 @@ import {
   saveChunks,
 } from "@/lib/db/queries/documents";
 
-export interface PipelineOptions {
-  documentId: string;
-  buffer: Buffer;
-  onProgress?: (stage: PipelineStage, message: string) => void;
-}
+export interface PipelineOptions { documentId: string; userId: string; buffer: Buffer; onProgress?: (stage: PipelineStage, message: string) => void; }
 
 export type PipelineStage =
   | "parsing"
@@ -33,7 +29,7 @@ export interface PipelineResult {
 export async function runDocumentPipeline(
   options: PipelineOptions
 ): Promise<PipelineResult> {
-  const { documentId, buffer, onProgress } = options;
+  const { documentId, userId, buffer, onProgress } = options;
 
   const log = (stage: PipelineStage, message: string) => {
     console.log(`[Pipeline:${documentId}] [${stage}] ${message}`);
@@ -72,7 +68,7 @@ export async function runDocumentPipeline(
     // ─── STAGE 5: Summarize ──────────────────────────────
     log("summarizing", "Generating document summary...");
 
-    const summary = await summarizeDocument(chunks);
+    const summary = await summarizeDocument(chunks, userId, documentId);
     log("summarizing", "Summary generated");
 
     // ─── DONE ────────────────────────────────────────────
