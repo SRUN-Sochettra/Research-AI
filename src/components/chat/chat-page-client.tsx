@@ -5,6 +5,7 @@ import { ChatInterface } from "./chat-interface";
 import { ConversationSidebar } from "./conversation-sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import {
     ArrowLeft,
     FileText,
@@ -32,7 +33,7 @@ export function ChatPageClient({
     const [currentConversationId, setCurrentConversationId] = useState(
         initialConversationId
     );
-    const [conversations] = useState(initialConversations);
+    const [conversations, setConversations] = useState(initialConversations);
     const [messages, setMessages] = useState(initialMessages);
     const [showSummary, setShowSummary] = useState(false);
 
@@ -89,6 +90,42 @@ export function ChatPageClient({
         if (response.ok) {
             const data = await response.json();
             setMessages(data.messages ?? []);
+        }
+    };
+
+    const handleRenameConversation = async (id: string, newTitle: string) => {
+        try {
+            const res = await fetch(`/api/conversations/${id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title: newTitle }),
+            });
+
+            if (!res.ok) throw new Error("Failed to rename conversation");
+
+            setConversations(prev => prev.map(conv => conv.id === id ? { ...conv, title: newTitle } : conv));
+            toast.success("Conversation renamed");
+        } catch (_error) {
+            toast.error("Failed to rename conversation");
+        }
+    };
+
+    const handleDeleteConversation = async (id: string) => {
+        try {
+            const res = await fetch(`/api/conversations/${id}`, {
+                method: "DELETE",
+            });
+
+            if (!res.ok) throw new Error("Failed to delete conversation");
+
+            setConversations(prev => prev.filter(conv => conv.id !== id));
+            toast.success("Conversation deleted");
+
+            if (currentConversationId === id) {
+                handleNewConversation();
+            }
+        } catch (_error) {
+            toast.error("Failed to delete conversation");
         }
     };
 
@@ -158,6 +195,8 @@ export function ChatPageClient({
                     currentConversationId={currentConversationId}
                     onNewConversation={handleNewConversation}
                     onSelectConversation={handleSelectConversation}
+                    onRenameConversation={handleRenameConversation}
+                    onDeleteConversation={handleDeleteConversation}
                 />
 
                 {/* Chat area */}
