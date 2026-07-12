@@ -18,7 +18,8 @@ import {
   Moon,
   LogOut,
   FileText,
-  User,
+
+  Settings,
   ChevronDown,
 } from "lucide-react";
 
@@ -127,11 +128,11 @@ export function Header() {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link
-                    href="/profile"
+                    href="/settings"
                     className="flex cursor-pointer items-center rounded-lg px-3 py-2 text-sm transition-colors hover:bg-white/5"
                   >
-                    <User className="mr-2.5 h-4 w-4 text-blue-400" />
-                    Profile
+                    <Settings className="mr-2.5 h-4 w-4 text-blue-400" />
+                    Settings
                   </Link>
                 </DropdownMenuItem>
 

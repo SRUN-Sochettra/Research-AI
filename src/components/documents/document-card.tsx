@@ -1,7 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   FileText,
   MessageSquare,
@@ -12,6 +21,8 @@ import {
   HardDrive,
   BookOpen,
   ArrowRight,
+  MoreVertical,
+  Trash2,
 } from "lucide-react";
 import { formatDate, formatFileSize } from "@/lib/utils/helpers";
 import type { Document } from "@/types/database";
@@ -53,6 +64,23 @@ const statusConfig: Record<string, StatusConfig> = {
 };
 
 export function DocumentCard({ document }: { document: Document }) {
+  const router = useRouter();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this document?")) return;
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/documents/${document.id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Delete failed");
+      toast.success("Document deleted");
+      router.refresh();
+    } catch {
+      toast.error("Failed to delete document");
+      setIsDeleting(false);
+    }
+  };
+
   const status = statusConfig[document.status] ?? statusConfig["uploaded"]!;
   const StatusIcon = status.icon;
   const isReady = document.status === "ready";
@@ -73,7 +101,7 @@ export function DocumentCard({ document }: { document: Document }) {
 
         {/* ── Header ── */}
         <div className="mb-4 flex items-start justify-between gap-3">
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-3 w-full pr-8">
             {/* File icon */}
             <div className="relative mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600/15 to-blue-600/10 ring-1 ring-white/8">
               <FileText className="h-4.5 w-4.5 text-violet-400" />
@@ -85,9 +113,11 @@ export function DocumentCard({ document }: { document: Document }) {
             </div>
 
             <div className="min-w-0">
-              <h3 className="line-clamp-1 text-sm font-semibold leading-snug text-foreground">
-                {document.title}
-              </h3>
+              <Link href={`/documents/${document.id}`} className="hover:underline">
+                <h3 className="line-clamp-1 text-sm font-semibold leading-snug text-foreground">
+                  {document.title}
+                </h3>
+              </Link>
               <div className="mt-0.5 flex items-center gap-2 text-[11px] text-muted-foreground">
                 <Clock className="h-3 w-3" />
                 {formatDate(document.created_at)}
@@ -95,15 +125,31 @@ export function DocumentCard({ document }: { document: Document }) {
             </div>
           </div>
 
-          {/* Status badge */}
-          <span
-            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium ${status.badgeClass}`}
-          >
-            <StatusIcon
-              className={`h-3 w-3 ${status.animate ? "animate-spin" : ""}`}
-            />
-            {status.label}
-          </span>
+          {/* Status badge and actions */}
+          <div className="flex shrink-0 items-center gap-2 absolute right-5 top-5">
+            <span
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium ${status.badgeClass}`}
+            >
+              <StatusIcon
+                className={`h-3 w-3 ${status.animate ? "animate-spin" : ""}`}
+              />
+              {status.label}
+            </span>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {isDeleting ? <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /> : <MoreVertical className="h-4 w-4 text-muted-foreground" />}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDelete(); }} className="text-red-600 focus:text-red-600 cursor-pointer" disabled={isDeleting}>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         {/* ── Meta strip ── */}

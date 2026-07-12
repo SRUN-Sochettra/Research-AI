@@ -38,6 +38,77 @@ export function ChatPageClient({
     const [showSummary, setShowSummary] = useState(false);
 
 
+    const handleDownloadPdf = async () => {
+        if (messages.length === 0) return;
+
+        const html2pdf = (await import('html2pdf.js')).default;
+
+        const container = window.document.createElement('div');
+        container.style.padding = '20px';
+        container.style.fontFamily = 'sans-serif';
+        container.style.color = '#000';
+        container.style.backgroundColor = '#fff';
+
+        const header = window.document.createElement('h1');
+        header.textContent = `Conversation about ${document.title}`;
+        container.appendChild(header);
+
+        const subHeader = window.document.createElement('p');
+        subHeader.textContent = `Generated on ${new Date().toLocaleString()}`;
+        subHeader.style.color = '#666';
+        container.appendChild(subHeader);
+
+        container.appendChild(window.document.createElement('hr'));
+
+        messages.forEach((msg) => {
+            const msgDiv = window.document.createElement('div');
+            msgDiv.style.marginBottom = '20px';
+
+            const role = window.document.createElement('strong');
+            role.textContent = msg.role === 'user' ? 'You:' : 'Assistant:';
+            role.style.display = 'block';
+            role.style.marginBottom = '8px';
+            msgDiv.appendChild(role);
+
+            const text = window.document.createElement('div');
+            text.textContent = msg.content;
+            text.style.whiteSpace = 'pre-wrap';
+            msgDiv.appendChild(text);
+
+            if (msg.role === 'assistant' && (msg.citations as unknown[])?.length > 0) {
+                const citeHeader = window.document.createElement('em');
+                citeHeader.textContent = 'Sources:';
+                citeHeader.style.display = 'block';
+                citeHeader.style.marginTop = '8px';
+                msgDiv.appendChild(citeHeader);
+
+                const list = window.document.createElement('ul');
+                list.style.marginTop = '4px';
+                (msg.citations as unknown[]).forEach((c: unknown) => {
+                    const cite = c as { pageNumber?: number; snippet: string };
+                    const page = cite.pageNumber ? ` (Page ${cite.pageNumber})` : '';
+                    const li = window.document.createElement('li');
+                    li.textContent = `[Source${page}]: ${cite.snippet.replace(/\n/g, ' ')}`;
+                    list.appendChild(li);
+                });
+                msgDiv.appendChild(list);
+            }
+
+            container.appendChild(msgDiv);
+            container.appendChild(window.document.createElement('hr'));
+        });
+
+        const opt = {
+            margin:       1,
+            filename:     `chat-${document.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`,
+            image:        { type: 'jpeg' as const, quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' as const }
+        };
+
+        html2pdf().set(opt).from(container).save();
+    };
+
     const handleDownload = () => {
         if (messages.length === 0) return;
 
@@ -50,10 +121,10 @@ export function ChatPageClient({
             // Add citations if any
             if (msg.role === "assistant" && (msg.citations as unknown[])?.length > 0) {
                 markdown += `*Citations:*\n`;
-                (msg.citations as unknown[]).forEach((c: unknown, i: number) => {
+                (msg.citations as unknown[]).forEach((c: unknown) => {
                     const cite = c as { pageNumber?: number; snippet: string };
                     const page = cite.pageNumber ? ` (Page ${cite.pageNumber})` : '';
-                    markdown += `${i + 1}. [Source${page}]: ${cite.snippet.replace(/\n/g, ' ')}\n`;
+                    markdown += `- [Source${page}]: ${cite.snippet.replace(/\n/g, ' ')}\n`;
                 });
                 markdown += `\n`;
             }
@@ -156,11 +227,20 @@ export function ChatPageClient({
                     <Button
                         variant="outline"
                         size="sm"
+                        onClick={handleDownloadPdf}
+                        disabled={messages.length === 0}
+                    >
+                        <Download className="mr-2 h-4 w-4" />
+                        Export PDF
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
                         onClick={handleDownload}
                         disabled={messages.length === 0}
                     >
                         <Download className="mr-2 h-4 w-4" />
-                        Export
+                        Export MD
                     </Button>
                     {document.summary && (
                         <Button

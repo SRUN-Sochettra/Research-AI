@@ -4,21 +4,45 @@ import { DocumentListSkeleton } from "@/components/shared/loading-states";
 import { NoDocuments } from "@/components/shared/empty-states";
 import { DocumentCard } from "@/components/documents/document-card";
 import { UploadButton } from "@/components/documents/upload-button";
+import { DocumentFilters } from "@/components/documents/document-filters";
 import type { Metadata } from "next";
 import type { Document } from "@/types/database";
 
 export const metadata: Metadata = { title: "Documents" };
 
-async function DocumentList() {
+interface DocumentListProps {
+  query?: string;
+  sort?: string;
+}
+
+async function DocumentList({ query, sort }: DocumentListProps) {
   const supabase = await getSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: documents, error } = await supabase
-    .from("documents")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+  let dbQuery = supabase.from("documents").select("*").eq("user_id", user.id);
+
+  if (query) {
+    dbQuery = dbQuery.ilike("title", `%${query}%`);
+  }
+
+  switch (sort) {
+    case "oldest":
+      dbQuery = dbQuery.order("created_at", { ascending: true });
+      break;
+    case "largest":
+      dbQuery = dbQuery.order("file_size", { ascending: false });
+      break;
+    case "smallest":
+      dbQuery = dbQuery.order("file_size", { ascending: true });
+      break;
+    case "newest":
+    default:
+      dbQuery = dbQuery.order("created_at", { ascending: false });
+      break;
+  }
+
+  const { data: documents, error } = await dbQuery;
 
   if (error) {
     return (
@@ -28,7 +52,19 @@ async function DocumentList() {
     );
   }
 
-  if (!documents || documents.length === 0) return <NoDocuments />;
+  if (!documents || documents.length === 0) {
+    if (query) {
+       return (
+         <div className="flex flex-col items-center justify-center p-12 text-center border rounded-xl border-dashed bg-muted/20">
+           <h3 className="mt-4 text-lg font-semibold">No results found</h3>
+           <p className="mt-2 text-sm text-muted-foreground">
+             No documents matched your search query &quot;{query}&quot;.
+           </p>
+         </div>
+       );
+    }
+    return <NoDocuments />;
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -39,7 +75,15 @@ async function DocumentList() {
   );
 }
 
-export default function DocumentsPage() {
+interface DocumentsPageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function DocumentsPage(props: DocumentsPageProps) {
+  const searchParams = await props.searchParams;
+  const query = typeof searchParams.query === 'string' ? searchParams.query : undefined;
+  const sort = typeof searchParams.sort === 'string' ? searchParams.sort : undefined;
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -56,9 +100,11 @@ export default function DocumentsPage() {
         <UploadButton />
       </div>
 
+      <DocumentFilters />
+
       {/* Grid */}
-      <Suspense fallback={<DocumentListSkeleton />}>
-        <DocumentList />
+      <Suspense fallback={<DocumentListSkeleton />} key={`${query}-${sort}`}>
+        <DocumentList query={query} sort={sort} />
       </Suspense>
     </div>
   );
