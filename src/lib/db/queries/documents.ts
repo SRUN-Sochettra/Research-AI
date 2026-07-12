@@ -213,3 +213,20 @@ export async function getUserDocumentCount(
   if (error) return 0;
   return count ?? 0;
 }
+export async function updateDocumentTitle(
+  documentId: string,
+  userId: string,
+  newTitle: string
+): Promise<void> {
+  const supabase = getSupabaseAdminClient();
+
+  const { error } = await supabase
+    .from("documents")
+    .update({ title: newTitle, updated_at: new Date().toISOString() })
+    .eq("id", documentId)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error(`Failed to update document title: ${error.message}`);
+  }
+}

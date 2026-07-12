@@ -10,6 +10,8 @@ import {
   ChevronDown,
   ChevronUp,
   Clock,
+  Copy,
+  Check,
 } from "lucide-react";
 import type { ChatMessage } from "@/hooks/use-chat";
 
@@ -21,6 +23,13 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   const [showCitations, setShowCitations] = useState(false);
   const isUser = message.role === "user";
   const hasCitations = message.citations.length > 0;
+  const [hasCopied, setHasCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(message.content);
+    setHasCopied(true);
+    setTimeout(() => setHasCopied(false), 2000);
+  };
 
   return (
     <div
@@ -76,6 +85,20 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         {/* Footer: citations toggle + latency */}
         {!isUser && !message.isStreaming && (
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-muted-foreground hover:text-foreground"
+              onClick={handleCopy}
+              title="Copy to clipboard"
+            >
+              {hasCopied ? (
+                <Check className="h-3 w-3 text-emerald-400" />
+              ) : (
+                <Copy className="h-3 w-3" />
+              )}
+              <span className="sr-only">Copy message</span>
+            </Button>
             {hasCitations && (
               <Button
                 variant="ghost"

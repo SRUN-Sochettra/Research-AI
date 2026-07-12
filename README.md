@@ -180,6 +180,9 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ### 3. Database Setup
 
+> **Note:** View the [Entity-Relationship Diagram (ERD)](docs/ERD.md) for a complete map of the database schema.
+
+
 In your Supabase project, go to **SQL Editor** and run the following:
 
 #### Enable pgvector and create tables
@@ -433,13 +436,13 @@ src/
 
 ## 🗺️ What I'd Add With More Time
 
-- [ ] **Background job queue** (Trigger.dev/Inngest) for truly async processing
+- [x] **Background job queue** (Trigger.dev/Inngest) for truly async processing
 - [ ] **Multi-document chat** — Ask questions across multiple PDFs
 - [ ] **Langfuse integration** — Full LLM observability dashboard
-- [ ] **Export conversations** — Download Q&A as PDF/markdown
+- [x] **Export conversations** — Download Q&A as PDF/markdown
 - [ ] **OCR support** — Process scanned PDFs via Google Vision API
 - [ ] **Collaborative workspaces** — Share documents with team
-- [ ] **Document comparison** — Side-by-side diff of two PDFs
+- [x] **Document comparison** — Side-by-side diff of two PDFs
 
 ---
 

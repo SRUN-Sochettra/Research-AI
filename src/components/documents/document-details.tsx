@@ -14,10 +14,14 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
 import {
     FileText,
     MessageSquare,
     ArrowLeft,
+    Pencil,
+    X,
+    Check,
     Trash2,
     Loader2,
     CheckCircle2,
@@ -25,6 +29,7 @@ import {
     Calendar,
     HardDrive,
     BookOpen,
+    Download,
 } from "lucide-react";
 import { formatDate, formatFileSize } from "@/lib/utils/helpers";
 import { toast } from "sonner";
@@ -43,6 +48,9 @@ export function DocumentDetail({ document }: { document: Document }) {
     const router = useRouter();
     const [isDeleting, setIsDeleting] = useState(false);
     const [processingStep, setProcessingStep] = useState(0);
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [title, setTitle] = useState(document.title);
+    const [isSavingTitle, setIsSavingTitle] = useState(false);
 
     const { status, summary, pageCount } = useDocumentStatus(
         document.id,
@@ -59,6 +67,35 @@ export function DocumentDetail({ document }: { document: Document }) {
             setProcessingStep((p) => (p + 1) % processingMessages.length);
         }, 3000);
     }
+
+
+    const handleSaveTitle = async () => {
+        if (!title.trim() || title === document.title) {
+            setIsEditingTitle(false);
+            setTitle(document.title);
+            return;
+        }
+
+        setIsSavingTitle(true);
+        try {
+            const response = await fetch(`/api/documents/${document.id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title: title.trim() }),
+            });
+
+            if (!response.ok) throw new Error("Failed to update title");
+
+            toast.success("Document title updated");
+            setIsEditingTitle(false);
+            router.refresh();
+        } catch {
+            toast.error("Failed to update document title");
+            setTitle(document.title);
+        } finally {
+            setIsSavingTitle(false);
+        }
+    };
 
     const handleDelete = async () => {
         if (
@@ -104,8 +141,53 @@ export function DocumentDetail({ document }: { document: Document }) {
                             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                                 <FileText className="h-5 w-5 text-primary" />
                             </div>
-                            <div>
-                                <CardTitle className="text-xl">{document.title}</CardTitle>
+                            <div className="flex-1 min-w-0 flex items-center gap-2">
+                                {isEditingTitle ? (
+                                    <div className="flex items-center gap-2 w-full max-w-sm">
+                                        <Input
+                                            value={title}
+                                            onChange={(e) => setTitle(e.target.value)}
+                                            className="h-8"
+                                            disabled={isSavingTitle}
+                                            autoFocus
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') handleSaveTitle();
+                                                if (e.key === 'Escape') {
+                                                    setTitle(document.title);
+                                                    setIsEditingTitle(false);
+                                                }
+                                            }}
+                                        />
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10"
+                                            onClick={handleSaveTitle}
+                                            disabled={isSavingTitle || !title.trim() || title === document.title}
+                                        >
+                                            {isSavingTitle ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                            onClick={() => {
+                                                setTitle(document.title);
+                                                setIsEditingTitle(false);
+                                            }}
+                                            disabled={isSavingTitle}
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2 group cursor-pointer" onClick={() => setIsEditingTitle(true)}>
+                                        <CardTitle className="text-xl truncate">{document.title}</CardTitle>
+                                        <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Pencil className="h-3 w-3 text-muted-foreground" />
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -198,14 +280,23 @@ export function DocumentDetail({ document }: { document: Document }) {
                             Delete Document
                         </Button>
 
-                        {currentStatus === "ready" && (
-                            <Button asChild>
-                                <Link href={`/chat/${document.id}`}>
-                                    <MessageSquare className="mr-2 h-4 w-4" />
-                                    Start Chatting
-                                </Link>
+                        <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm" asChild>
+                                <a href={`/api/documents/${document.id}/download`}>
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Original PDF
+                                </a>
                             </Button>
-                        )}
+
+                            {currentStatus === "ready" && (
+                                <Button asChild>
+                                    <Link href={`/chat/${document.id}`}>
+                                        <MessageSquare className="mr-2 h-4 w-4" />
+                                        Start Chatting
+                                    </Link>
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 </CardContent>
             </Card>

@@ -1,5 +1,6 @@
 // src/app/api/upload/route.ts
 import { NextRequest, NextResponse } from "next/server";
+import { waitUntil } from "@vercel/functions";
 import { getSupabaseServerClient } from "@/lib/db/supabase/server";
 import { checkRateLimit } from "@/lib/services/rate-limiter";
 import { createDocument, getUserDocumentCount } from "@/lib/db/queries/documents";
@@ -173,12 +174,14 @@ export async function POST(
     });
 
     // ─── 8. Run Pipeline (async, non-blocking) ──────────
-    runDocumentPipeline({ documentId: document.id, userId: user.id, buffer: fileBuffer, }).catch((err) => {
-      console.error(
-        `Background pipeline failed for document ${document.id}:`,
-        err
-      );
-    });
+    waitUntil(
+      runDocumentPipeline({ documentId: document.id, userId: user.id, buffer: fileBuffer, }).catch((err) => {
+        console.error(
+          `Background pipeline failed for document ${document.id}:`,
+          err
+        );
+      })
+    );
 
     // ─── 9. Return Success ──────────────────────────────
     return NextResponse.json(

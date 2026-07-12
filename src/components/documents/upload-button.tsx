@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useRef, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -26,6 +26,15 @@ export function UploadButton() {
     const [open, setOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    useEffect(() => {
+        if (searchParams.get("upload") === "true") {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setOpen(true);
+            router.replace("/documents");
+        }
+    }, [searchParams, router]);
 
     const resetState = () => {
         setState("idle");

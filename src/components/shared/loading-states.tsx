@@ -17,7 +17,7 @@ export function PageLoader() {
 
 export function CardSkeleton() {
   return (
-    <div className="glass rounded-2xl border border-white/10 p-5">
+    <div className="glass rounded-2xl border border-white/10 p-5 animate-pulse">
       <div className="mb-4 flex items-center gap-3">
         <Skeleton className="h-10 w-10 rounded-xl bg-white/5" />
         <Skeleton className="h-4 w-2/3 bg-white/5" />

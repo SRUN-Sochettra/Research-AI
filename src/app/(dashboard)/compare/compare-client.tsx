@@ -8,6 +8,7 @@ import { formatDate } from "@/lib/utils/helpers";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { NoDocuments } from "@/components/shared/empty-states";
+import { DiffViewer } from "@/components/documents/diff-viewer";
 
 function formatBytes(bytes: number, decimals = 2) {
   if (!+bytes) return '0 Bytes'
@@ -49,6 +50,10 @@ export default function CompareClient({ documents }: { documents: Document[] }) 
         <DocumentDetailCard doc={doc1} />
         <DocumentDetailCard doc={doc2} />
       </div>
+
+      {(doc1?.summary && doc2?.summary) && (
+        <DiffViewer oldText={doc1.summary} newText={doc2.summary} />
+      )}
     </div>
   );
 }
