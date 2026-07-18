@@ -18,6 +18,7 @@ import type { Document, Conversation, Message } from "@/types/database";
 
 interface ChatPageClientProps {
     document: Document;
+    documentIds?: string[];
     conversations: Conversation[];
     initialMessages: Message[];
     initialConversationId: string | null;
@@ -25,6 +26,7 @@ interface ChatPageClientProps {
 
 export function ChatPageClient({
     document,
+    documentIds,
     conversations: initialConversations,
     initialMessages,
     initialConversationId,
@@ -283,6 +285,7 @@ export function ChatPageClient({
                 <div className="flex flex-1 flex-col overflow-hidden rounded-lg border bg-card">
                     <ChatInterface
                         document={document}
+                        documentIds={documentIds}
                         initialMessages={messages}
                         initialConversationId={currentConversationId ?? undefined}
                     />

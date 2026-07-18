@@ -7,10 +7,16 @@ import {
   FileText,
   LayoutDashboard,
   Settings,
-  ChevronRight, GitCompare,
+  ChevronRight, GitCompare, Layers
 } from "lucide-react";
 
 const navItems = [
+  {
+    href: "/chat/multi",
+    label: "Multi-doc Chat",
+    icon: Layers,
+    description: "Chat across PDFs",
+  },
   {
     href: "/compare",
     label: "Compare",

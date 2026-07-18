@@ -1,7 +1,7 @@
 import { CallbackHandler } from "langfuse-langchain";
 import { getChatModel } from "@/lib/ai/gemini";
 import { QA_PROMPT } from "@/lib/ai/prompts";
-import { retrieveRelevantChunks, formatChunksAsContext } from "./retriever";
+import { retrieveRelevantChunks, retrieveMultipleDocumentsChunks, formatChunksAsContext } from "./retriever";
 import { reformulateQuery, formatConversationHistory } from "./query-reformulator";
 import { logger } from "@/lib/observability/logger";
 import type { RetrievedChunk } from "./retriever";
@@ -33,13 +33,19 @@ export interface QAStreamCallbacks {
 }
 
 export async function runQAAgent(
-  question: string, documentId: string, userId: string, conversationId: string, conversationHistory: Message[], callbacks: QAStreamCallbacks
+  question: string,
+  userId: string,
+  conversationId: string,
+  conversationHistory: Message[],
+  callbacks: QAStreamCallbacks,
+  documentId?: string,
+  documentIds?: string[]
 ): Promise<void> {
   const startTime = Date.now();
 
   try {
     logger.info("[QAAgent] Starting QA pipeline", {
-      documentId,
+      documentId: documentId || documentIds?.[0],
       questionLength: question.length,
       historyLength: conversationHistory.length,
     });
@@ -48,20 +54,41 @@ export async function runQAAgent(
     const reformulatedQuery = await reformulateQuery(question, conversationHistory, userId, conversationId);
 
     // ─── Step 2: Retrieve Relevant Chunks ──────────────
-    const { chunks } = await retrieveRelevantChunks(
-      reformulatedQuery,
-      documentId
-    );
-
-    if (chunks.length === 0) {
-      // Fallback: try with lower threshold
-      logger.warn("[QAAgent] No chunks found, retrying with lower threshold");
-      const fallback = await retrieveRelevantChunks(
+    let chunks: RetrievedChunk[] = [];
+    if (documentIds && documentIds.length > 0) {
+      const result = await retrieveMultipleDocumentsChunks(
         reformulatedQuery,
-        documentId,
-        { threshold: 0.5, count: 3 }
+        documentIds
       );
-      chunks.push(...fallback.chunks);
+      chunks = result.chunks;
+
+      if (chunks.length === 0) {
+        logger.warn("[QAAgent] No chunks found, retrying with lower threshold");
+        const fallback = await retrieveMultipleDocumentsChunks(
+          reformulatedQuery,
+          documentIds,
+          { threshold: 0.5, count: 3 }
+        );
+        chunks.push(...fallback.chunks);
+      }
+    } else if (documentId) {
+      const result = await retrieveRelevantChunks(
+        reformulatedQuery,
+        documentId as string
+      );
+      chunks = result.chunks;
+
+      if (chunks.length === 0) {
+        logger.warn("[QAAgent] No chunks found, retrying with lower threshold");
+        const fallback = await retrieveRelevantChunks(
+          reformulatedQuery,
+          documentId as string,
+          { threshold: 0.5, count: 3 }
+        );
+        chunks.push(...fallback.chunks);
+      }
+    } else {
+      throw new Error("Either documentId or documentIds must be provided");
     }
 
     // ─── Step 3: Format Context ─────────────────────────
@@ -96,12 +123,12 @@ const langfuseHandler = new CallbackHandler({ sessionId: conversationId, userId:
     }
 
     // ─── Step 5: Build Citations ────────────────────────
-    const citations = buildCitations(chunks, documentId);
+    const citations = buildCitations(chunks, (documentId || documentIds?.[0] || "") as string);
 
     const latencyMs = Date.now() - startTime;
 
     logger.info("[QAAgent] Pipeline complete", {
-      documentId,
+      documentId: documentId || documentIds?.[0] || "",
       latencyMs,
       citationCount: citations.length,
       answerLength: fullAnswer.length,
@@ -117,7 +144,7 @@ const langfuseHandler = new CallbackHandler({ sessionId: conversationId, userId:
     logger.error(
       "[QAAgent] Pipeline failed",
       error instanceof Error ? error : new Error("Unknown error"),
-      { documentId }
+      { documentId: documentId || documentIds?.[0] }
     );
     callbacks.onError(
       error instanceof Error ? error : new Error("QA pipeline failed")
@@ -128,14 +155,14 @@ const langfuseHandler = new CallbackHandler({ sessionId: conversationId, userId:
 // Build citation objects from retrieved chunks
 function buildCitations(
   chunks: RetrievedChunk[],
-  documentId: string
+  defaultDocumentId: string
 ): QAResult["citations"] {
   return chunks
     .filter((chunk) => chunk.similarity > 0.6) // Only cite relevant chunks
     .map((chunk) => ({
       chunk_id: chunk.id,
       text: chunk.content,
-      documentId,
+      documentId: chunk.documentId || defaultDocumentId,
       pageNumber: chunk.pageNumber,
       // Extract a meaningful snippet (first 200 chars)
       snippet: chunk.content

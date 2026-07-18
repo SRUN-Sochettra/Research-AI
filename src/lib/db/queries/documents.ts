@@ -230,3 +230,36 @@ export async function updateDocumentTitle(
     throw new Error(`Failed to update document title: ${error.message}`);
   }
 }
+
+
+export async function searchMultipleSimilarChunks(
+  documentIds: string[],
+  queryEmbedding: number[],
+  options?: {
+    threshold?: number;
+    count?: number;
+  }
+): Promise<
+  {
+    id: string;
+    document_id: string;
+    content: string;
+    page_number: number | null;
+    similarity: number;
+  }[]
+> {
+  const supabase = getSupabaseAdminClient();
+
+  const { data, error } = await supabase.rpc("match_multiple_document_chunks", {
+    query_embedding: queryEmbedding,
+    match_document_ids: documentIds,
+    match_threshold: options?.threshold ?? 0.7,
+    match_count: options?.count ?? 5,
+  });
+
+  if (error) {
+    throw new Error(`Vector multiple search failed: ${error.message}`);
+  }
+
+  return data ?? [];
+}

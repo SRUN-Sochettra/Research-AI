@@ -4,8 +4,9 @@ import type { Conversation, Message, Citation, TokenUsage, Json } from "@/types/
 
 export async function getOrCreateConversation(
   userId: string,
-  documentId: string,
-  conversationId?: string
+  documentId?: string,
+  conversationId?: string,
+  documentIds?: string[]
 ): Promise<Conversation> {
   const supabase = getSupabaseAdminClient();
 
@@ -26,7 +27,8 @@ export async function getOrCreateConversation(
     .from("conversations")
     .insert({
       user_id: userId,
-      document_id: documentId,
+      document_id: documentId ?? null,
+      document_ids: documentIds ?? null,
       title: "New Conversation",
     })
     .select()

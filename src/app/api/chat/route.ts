@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { message, documentId, conversationId } = parsed.data;
+  const { message, documentId, documentIds, conversationId } = parsed.data;
 
   // ─── 3. Rate Limit ──────────────────────────────────────
   const rateLimit = await checkRateLimit(`chat:${user.id}`);
@@ -71,29 +71,48 @@ export async function POST(request: NextRequest) {
   }
 
   // ─── 4. Verify Document Exists & is Ready ───────────────
-  const document = await getDocumentById(documentId, user.id);
-
-  if (!document) {
-    return new Response(
-      JSON.stringify({ error: "Document not found" }),
-      { status: 404, headers: { "Content-Type": "application/json" } }
-    );
-  }
-
-  if (document.status !== "ready") {
-    return new Response(
-      JSON.stringify({
-        error: "Document is still processing. Please wait.",
-      }),
-      { status: 409, headers: { "Content-Type": "application/json" } }
-    );
+  if (documentId) {
+    const document = await getDocumentById(documentId, user.id);
+    if (!document) {
+      return new Response(
+        JSON.stringify({ error: "Document not found" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+    if (document.status !== "ready") {
+      return new Response(
+        JSON.stringify({
+          error: "Document is still processing. Please wait.",
+        }),
+        { status: 409, headers: { "Content-Type": "application/json" } }
+      );
+    }
+  } else if (documentIds) {
+    for (const dId of documentIds) {
+      const document = await getDocumentById(dId, user.id);
+      if (!document) {
+        return new Response(
+          JSON.stringify({ error: "One or more documents not found" }),
+          { status: 404, headers: { "Content-Type": "application/json" } }
+        );
+      }
+      if (document.status !== "ready") {
+        return new Response(
+          JSON.stringify({
+            error: "One or more documents are still processing. Please wait.",
+          }),
+          { status: 409, headers: { "Content-Type": "application/json" } }
+        );
+      }
+    }
   }
 
   // ─── 5. Get or Create Conversation ──────────────────────
   const conversation = await getOrCreateConversation(
     user.id,
     documentId,
-    conversationId
+    conversationId,
+    documentIds
   );
 
   // ─── 6. Load Conversation History ───────────────────────
@@ -126,7 +145,7 @@ export async function POST(request: NextRequest) {
       send("meta", { conversationId: conversation.id });
 
       try {
-        await runQAAgent(message, documentId, user.id, conversation.id, history, {
+        await runQAAgent(message, user.id, conversation.id, history, {
             onToken: (token) => {
               send("token", { content: token });
             },
@@ -155,7 +174,7 @@ export async function POST(request: NextRequest) {
                 });
 
                 logger.info("[ChatAPI] Stream complete", {
-                  documentId,
+                  documentId, documentIds,
                   conversationId: conversation.id,
                   latencyMs,
                   citationCount: result.citations.length,
@@ -187,7 +206,7 @@ export async function POST(request: NextRequest) {
               });
               controller.close();
             },
-          }
+          }, documentId, documentIds
         );
       } catch (error) {
         logger.error(
