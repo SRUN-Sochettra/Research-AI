@@ -148,7 +148,8 @@ export type Database = {
         Row: {
           id: string
           user_id: string
-          document_id: string
+          document_id?: string | null
+          document_ids?: string[] | null
           title: string
           created_at: string
           updated_at: string
@@ -156,7 +157,8 @@ export type Database = {
         Insert: {
           id?: string
           user_id: string
-          document_id: string
+          document_id?: string | null
+          document_ids?: string[] | null
           title: string
           created_at?: string
           updated_at?: string
@@ -164,7 +166,8 @@ export type Database = {
         Update: {
           id?: string
           user_id?: string
-          document_id?: string
+          document_id?: string | null
+          document_ids?: string[] | null
           title?: string
           created_at?: string
           updated_at?: string
@@ -232,6 +235,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      match_multiple_document_chunks: {
+        Args: {
+          query_embedding: number[]
+          match_document_ids: string[]
+          match_threshold: number
+          match_count: number
+        }
+        Returns: {
+          id: string
+          document_id: string
+          content: string
+          page_number: number | null
+          similarity: number
+        }[]
+      }
       match_document_chunks: {
         Args: {
           query_embedding: number[]

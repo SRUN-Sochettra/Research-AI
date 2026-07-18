@@ -14,6 +14,7 @@ import type { ChatMessage } from "@/hooks/use-chat";
 
 interface ChatInterfaceProps {
   document: Document;
+  documentIds?: string[];
   initialMessages?: Message[];
   initialConversationId?: string;
 }
@@ -31,6 +32,7 @@ function toDisplayMessages(messages: Message[]): ChatMessage[] {
 
 export function ChatInterface({
   document,
+  documentIds,
   initialMessages = [],
   initialConversationId,
 }: ChatInterfaceProps) {
@@ -38,7 +40,8 @@ export function ChatInterface({
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const { messages, isLoading, error, sendMessage, clearError } = useChat({
-    documentId: document.id,
+    documentId: documentIds && documentIds.length > 0 ? undefined : document.id,
+    documentIds: documentIds && documentIds.length > 0 ? documentIds : undefined,
     initialMessages: toDisplayMessages(initialMessages),
     initialConversationId,
   });

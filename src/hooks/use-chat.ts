@@ -14,7 +14,8 @@ export interface ChatMessage {
 }
 
 interface UseChatOptions {
-  documentId: string;
+  documentId?: string;
+  documentIds?: string[];
   initialMessages?: ChatMessage[];
   initialConversationId?: string;
 }
@@ -30,6 +31,7 @@ interface UseChatReturn {
 
 export function useChat({
   documentId,
+  documentIds,
   initialMessages = [],
   initialConversationId,
 }: UseChatOptions): UseChatReturn {
@@ -164,6 +166,7 @@ export function useChat({
           body: JSON.stringify({
             message: content.trim(),
             documentId,
+            documentIds,
             conversationId,
           }),
           signal: abortControllerRef.current.signal,
@@ -231,7 +234,7 @@ export function useChat({
         streamingIdRef.current = null;
       }
     },
-    [documentId, conversationId, isLoading, handleSSEEvent]
+    [documentId, documentIds, conversationId, isLoading, handleSSEEvent]
   );
 
   return {
