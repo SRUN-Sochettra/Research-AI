@@ -440,7 +440,7 @@ src/
 - [x] **Multi-document chat** — Ask questions across multiple PDFs
 - [x] **Langfuse integration** — Full LLM observability dashboard
 - [x] **Export conversations** — Download Q&A as PDF/markdown
-- [ ] **OCR support** — Process scanned PDFs via Google Vision API
+- [x] **OCR support** — Process scanned PDFs via Google Vision API
 - [ ] **Collaborative workspaces** — Share documents with team
 - [x] **Document comparison** — Side-by-side diff of two PDFs
 

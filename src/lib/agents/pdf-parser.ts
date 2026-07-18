@@ -39,7 +39,7 @@ export async function parsePDF(buffer: Buffer): Promise<ParsedPDF> {
 
     if (!fullText || fullText.length < 50) {
       try {
-        const ocrText = await extractTextWithGemini(buffer);
+        const ocrText = await extractTextWithVision(buffer);
         const cleanOcrText = cleanPDFText(ocrText);
         if (!cleanOcrText || cleanOcrText.length < 50) throw new AppError("Invalid PDF", "INVALID_PDF_CONTENT", 400);
         return { text: cleanOcrText, pageCount: pageCount > 0 ? pageCount : 1, pages: [cleanOcrText], metadata: {} };
@@ -67,6 +67,45 @@ export async function parsePDF(buffer: Buffer): Promise<ParsedPDF> {
   }
 }
 
+
+async function extractTextWithVision(buffer: Buffer): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const vision = require("@google-cloud/vision");
+  const client = new vision.ImageAnnotatorClient();
+
+  const request = {
+    requests: [
+      {
+        inputConfig: {
+          mimeType: "application/pdf",
+          content: buffer.toString("base64"),
+        },
+        features: [{ type: "DOCUMENT_TEXT_DETECTION" }],
+      },
+    ],
+  };
+
+  try {
+    const [result] = await client.batchAnnotateFiles(request);
+    const responses = result.responses?.[0]?.responses || [];
+
+    let fullText = "";
+    for (const response of responses) {
+      if (response.fullTextAnnotation?.text) {
+        fullText += response.fullTextAnnotation.text + "\n\n";
+      }
+    }
+
+    if (fullText.trim().length > 0) {
+      return fullText.trim();
+    }
+  } catch (error) {
+    console.warn("Google Vision API failed, falling back to Gemini:", error);
+  }
+
+  // Fallback to Gemini if Vision fails or returns no text
+  return await extractTextWithGemini(buffer);
+}
 
 async function extractTextWithGemini(buffer: Buffer): Promise<string> {
   const apiKey = process.env.GOOGLE_API_KEY;
