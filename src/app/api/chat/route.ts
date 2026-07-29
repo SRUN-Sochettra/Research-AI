@@ -25,10 +25,10 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    return new Response(
-      JSON.stringify({ error: "Authentication required" }),
-      { status: 401, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Authentication required" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   // ─── 2. Validate Request Body ───────────────────────────
@@ -36,10 +36,10 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return new Response(
-      JSON.stringify({ error: "Invalid JSON body" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const parsed = chatSchema.safeParse(body);
@@ -74,10 +74,10 @@ export async function POST(request: NextRequest) {
   if (documentId) {
     const document = await getDocumentById(documentId, user.id);
     if (!document) {
-      return new Response(
-        JSON.stringify({ error: "Document not found" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Document not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
     }
     if (document.status !== "ready") {
       return new Response(
@@ -133,19 +133,20 @@ export async function POST(request: NextRequest) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      const send = (
-        type: string,
-        payload: Record<string, unknown>
-      ) => {
-        const data =
-          `data: ${JSON.stringify({ type, ...payload })}\n\n`;
+      const send = (type: string, payload: Record<string, unknown>) => {
+        const data = `data: ${JSON.stringify({ type, ...payload })}\n\n`;
         controller.enqueue(encoder.encode(data));
       };
 
       send("meta", { conversationId: conversation.id });
 
       try {
-        await runQAAgent(message, user.id, conversation.id, history, {
+        await runQAAgent(
+          message,
+          user.id,
+          conversation.id,
+          history,
+          {
             onToken: (token) => {
               send("token", { content: token });
             },
@@ -174,7 +175,8 @@ export async function POST(request: NextRequest) {
                 });
 
                 logger.info("[ChatAPI] Stream complete", {
-                  documentId, documentIds,
+                  documentId,
+                  documentIds,
                   conversationId: conversation.id,
                   latencyMs,
                   citationCount: result.citations.length,
@@ -195,25 +197,20 @@ export async function POST(request: NextRequest) {
             },
 
             onError: (error) => {
-              logger.error(
-                "[ChatAPI] QA agent error",
-                error,
-                { documentId }
-              );
+              logger.error("[ChatAPI] QA agent error", error, { documentId });
               send("error", {
-                message:
-                  "Failed to generate response. Please try again.",
+                message: "Failed to generate response. Please try again.",
               });
               controller.close();
             },
-          }, documentId, documentIds
+          },
+          documentId,
+          documentIds
         );
       } catch (error) {
         logger.error(
           "[ChatAPI] Unexpected error",
-          error instanceof Error
-            ? error
-            : new Error("Unknown"),
+          error instanceof Error ? error : new Error("Unknown"),
           { documentId }
         );
         send("error", { message: "Unexpected error occurred." });

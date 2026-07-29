@@ -18,7 +18,6 @@ import {
   Moon,
   LogOut,
   FileText,
-
   Settings,
   ChevronDown,
 } from "lucide-react";
@@ -39,37 +38,34 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full">
       {/* Backdrop */}
-      <div className="absolute inset-0 border-b border-white/5 bg-background/70 backdrop-blur-xl" />
+      <div className="bg-background/70 absolute inset-0 border-b border-white/5 backdrop-blur-xl" />
 
-      <div className="container relative flex h-16 items-center justify-between px-4">
-
+      <div className="relative container flex h-16 items-center justify-between px-4">
         {/* ── Logo ── */}
         <Link
           href="/"
           className="group flex items-center gap-2.5 transition-opacity hover:opacity-90"
         >
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-blue-600 shadow-md shadow-violet-500/20 transition-all duration-200 group-hover:shadow-violet-500/40 group-hover:scale-105">
+          <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-blue-600 shadow-md shadow-violet-500/20 transition-all duration-200 group-hover:scale-105 group-hover:shadow-violet-500/40">
             <Brain className="h-4 w-4 text-white" />
           </div>
           <span className="text-sm font-bold tracking-tight">
-            Research{" "}
-            <span className="gradient-text">AI</span>
+            Research <span className="gradient-text">AI</span>
           </span>
         </Link>
 
         {/* ── Right controls ── */}
         <div className="flex items-center gap-1.5">
-
           {/* Theme toggle */}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             aria-label="Toggle theme"
-            className="h-8 w-8 rounded-lg text-muted-foreground transition-colors hover:bg-white/6 hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground h-8 w-8 rounded-lg transition-colors hover:bg-white/6"
           >
-            <Sun className="h-[15px] w-[15px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-[15px] w-[15px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <Sun className="h-[15px] w-[15px] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+            <Moon className="absolute h-[15px] w-[15px] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
           </Button>
 
           {user ? (
@@ -77,7 +73,7 @@ export function Header() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="group flex h-8 items-center gap-2 rounded-xl px-2 text-muted-foreground transition-all hover:bg-white/6 hover:text-foreground data-[state=open]:bg-white/6"
+                  className="group text-muted-foreground hover:text-foreground flex h-8 items-center gap-2 rounded-xl px-2 transition-all hover:bg-white/6 data-[state=open]:bg-white/6"
                 >
                   <Avatar className="h-6 w-6 ring-1 ring-violet-500/30 transition-all group-hover:ring-violet-500/50">
                     <AvatarFallback className="bg-gradient-to-br from-violet-600 to-blue-600 text-[10px] font-bold text-white">
@@ -85,7 +81,8 @@ export function Header() {
                     </AvatarFallback>
                   </Avatar>
                   <span className="hidden text-xs font-medium sm:block">
-                    {profile?.full_name?.split(" ")[0] || user.email?.split("@")[0]}
+                    {profile?.full_name?.split(" ")[0] ||
+                      user.email?.split("@")[0]}
                   </span>
                   <ChevronDown className="h-3 w-3 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                 </Button>
@@ -109,7 +106,7 @@ export function Header() {
                         {profile.full_name}
                       </p>
                     )}
-                    <p className="truncate text-xs text-muted-foreground">
+                    <p className="text-muted-foreground truncate text-xs">
                       {user.email}
                     </p>
                   </div>
@@ -148,19 +145,19 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="flex items-center gap-2 ml-1">
+            <div className="ml-1 flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="sm"
                 asChild
-                className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground hover:bg-white/6"
+                className="text-muted-foreground hover:text-foreground h-8 px-3 text-xs hover:bg-white/6"
               >
                 <Link href="/login">Log in</Link>
               </Button>
               <Button
                 size="sm"
                 asChild
-                className="h-8 bg-gradient-to-r from-violet-600 to-blue-600 px-4 text-xs font-semibold text-white shadow-md shadow-violet-500/20 hover:shadow-violet-500/35 hover:scale-[1.02] transition-all animate-gradient"
+                className="animate-gradient h-8 bg-gradient-to-r from-violet-600 to-blue-600 px-4 text-xs font-semibold text-white shadow-md shadow-violet-500/20 transition-all hover:scale-[1.02] hover:shadow-violet-500/35"
               >
                 <Link href="/signup">Sign up</Link>
               </Button>

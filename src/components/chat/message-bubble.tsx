@@ -32,12 +32,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   };
 
   return (
-    <div
-      className={cn(
-        "flex gap-3",
-        isUser ? "flex-row-reverse" : "flex-row"
-      )}
-    >
+    <div className={cn("flex gap-3", isUser ? "flex-row-reverse" : "flex-row")}>
       {/* Avatar */}
       <div
         className={cn(
@@ -47,11 +42,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             : "bg-muted text-muted-foreground"
         )}
       >
-        {isUser ? (
-          <User className="h-4 w-4" />
-        ) : (
-          <Brain className="h-4 w-4" />
-        )}
+        {isUser ? <User className="h-4 w-4" /> : <Brain className="h-4 w-4" />}
       </div>
 
       {/* Message content */}
@@ -66,8 +57,8 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           className={cn(
             "rounded-2xl px-4 py-3 text-sm leading-relaxed",
             isUser
-              ? "rounded-tr-sm bg-primary text-primary-foreground"
-              : "rounded-tl-sm bg-muted text-foreground"
+              ? "bg-primary text-primary-foreground rounded-tr-sm"
+              : "bg-muted text-foreground rounded-tl-sm"
           )}
         >
           {message.isStreaming && message.content === "" ? (
@@ -88,7 +79,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground h-6 w-6"
               onClick={handleCopy}
               title="Copy to clipboard"
             >
@@ -103,7 +94,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground h-6 px-2 text-xs"
                 onClick={() => setShowCitations((prev) => !prev)}
               >
                 {showCitations ? (
@@ -117,7 +108,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             )}
 
             {message.latencyMs && (
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <span className="text-muted-foreground flex items-center gap-1 text-xs">
                 <Clock className="h-3 w-3" />
                 {(message.latencyMs / 1000).toFixed(1)}s
               </span>
@@ -153,10 +144,7 @@ function MessageContent({ content }: { content: string }) {
         if (line === "") return <br key={i} />;
 
         // Bold text
-        const formatted = line.replace(
-          /\*\*(.*?)\*\*/g,
-          "<strong>$1</strong>"
-        );
+        const formatted = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 
         // Bullet points
         if (line.startsWith("- ") || line.startsWith("• ")) {
@@ -187,12 +175,7 @@ function MessageContent({ content }: { content: string }) {
           );
         }
 
-        return (
-          <p
-            key={i}
-            dangerouslySetInnerHTML={{ __html: formatted }}
-          />
-        );
+        return <p key={i} dangerouslySetInnerHTML={{ __html: formatted }} />;
       })}
     </div>
   );

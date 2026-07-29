@@ -41,7 +41,8 @@ export function ChatInterface({
 
   const { messages, isLoading, error, sendMessage, clearError } = useChat({
     documentId: documentIds && documentIds.length > 0 ? undefined : document.id,
-    documentIds: documentIds && documentIds.length > 0 ? documentIds : undefined,
+    documentIds:
+      documentIds && documentIds.length > 0 ? documentIds : undefined,
     initialMessages: toDisplayMessages(initialMessages),
     initialConversationId,
   });
@@ -59,7 +60,7 @@ export function ChatInterface({
       if (msg.citations && msg.citations.length > 0) {
         markdown += `*Sources:*\n`;
         msg.citations.forEach((citation, idx) => {
-          markdown += `- [${idx + 1}] Page ${citation.pageNumber || 'N/A'}\n`;
+          markdown += `- [${idx + 1}] Page ${citation.pageNumber || "N/A"}\n`;
         });
         markdown += `\n`;
       }
@@ -71,13 +72,12 @@ export function ChatInterface({
     const url = URL.createObjectURL(blob);
     const link = window.document.createElement("a");
     link.href = url;
-    link.download = `${document.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}-conversation.md`;
+    link.download = `${document.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}-conversation.md`;
     window.document.body.appendChild(link);
     link.click();
     window.document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -87,7 +87,6 @@ export function ChatInterface({
 
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-white/7 bg-white/[0.015]">
-
       {/* ── Doc header bar ── */}
       <div className="flex items-center gap-3 border-b border-white/6 px-5 py-3.5">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600/20 to-blue-600/10 ring-1 ring-white/8">
@@ -95,7 +94,7 @@ export function ChatInterface({
         </div>
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{document.title}</p>
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-muted-foreground text-[11px]">
             {messages.length > 0
               ? `${messages.filter((m) => m.role === "user").length} question${messages.filter((m) => m.role === "user").length === 1 ? "" : "s"} asked`
               : "Ask anything about this document"}
@@ -103,7 +102,7 @@ export function ChatInterface({
         </div>
 
         {/* Status dot */}
-        <div className="ml-auto flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        <div className="text-muted-foreground ml-auto flex items-center gap-1.5 text-[11px]">
           <span
             className={`status-dot ${isDocumentReady ? "status-online" : "status-warning"}`}
           />
@@ -115,7 +114,7 @@ export function ChatInterface({
           <Button
             variant="ghost"
             size="icon"
-            className="ml-2 h-7 w-7 text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground ml-2 h-7 w-7"
             onClick={handleExport}
             title="Export conversation as Markdown"
           >
@@ -123,7 +122,6 @@ export function ChatInterface({
             <span className="sr-only">Export conversation</span>
           </Button>
         )}
-
       </div>
 
       {/* ── Error banner ── */}
@@ -132,7 +130,9 @@ export function ChatInterface({
           <Alert className="flex items-center justify-between border-red-500/20 bg-red-500/8 py-2">
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-red-400" />
-              <AlertDescription className="text-xs text-red-400">{error}</AlertDescription>
+              <AlertDescription className="text-xs text-red-400">
+                {error}
+              </AlertDescription>
             </div>
             <Button
               variant="ghost"
@@ -147,10 +147,7 @@ export function ChatInterface({
       )}
 
       {/* ── Messages ── */}
-      <ScrollArea
-        className="flex-1 scrollbar-thin"
-        ref={scrollAreaRef}
-      >
+      <ScrollArea className="flex-1 scrollbar-thin" ref={scrollAreaRef}>
         <div className="px-4 py-5">
           {messages.length === 0 ? (
             <NoMessages />
@@ -187,7 +184,7 @@ export function ChatInterface({
                     />
                   ))}
                 </span>
-                <span className="ml-2 text-xs text-muted-foreground">
+                <span className="text-muted-foreground ml-2 text-xs">
                   Thinking…
                 </span>
               </div>
@@ -199,14 +196,15 @@ export function ChatInterface({
       </ScrollArea>
 
       {/* ── Input area ── */}
-      <div className="border-t border-white/6 bg-background/40 px-4 py-3 backdrop-blur-sm">
+      <div className="bg-background/40 border-t border-white/6 px-4 py-3 backdrop-blur-sm">
         <ChatInput
           onSend={sendMessage}
           isLoading={isLoading}
           disabled={!isDocumentReady}
         />
-        <p className="mt-2 text-center text-[10px] text-muted-foreground/60">
-          AI can make mistakes — always verify important information with the source
+        <p className="text-muted-foreground/60 mt-2 text-center text-[10px]">
+          AI can make mistakes — always verify important information with the
+          source
         </p>
       </div>
     </div>

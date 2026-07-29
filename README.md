@@ -1,4 +1,3 @@
-
 # 🧠 Research AI
 
 **Autonomous AI agents that read PDFs, summarize content, and answer questions with citations.**
@@ -89,16 +88,16 @@ User asks: "What are the key findings?"
 
 ### Key Technical Decisions
 
-| Decision | Choice | Rationale |
-| --- | --- | --- |
-| Vector DB | Supabase pgvector | Avoids extra service, RLS applies to vectors too |
-| LLM | Gemini 3.1 Flash Lite (with fallback chain) | 500 RPD free tier + auto-fallback to 2.5 Flash if rate limited |
-| Embeddings | gemini-embedding-001 (3072 dims) | Latest stable embedding model with high accuracy |
-| Chunking strategy | Per-page + recursive | Preserves page citations for accuracy |
-| Summarization | Map-reduce with sampling | Handles documents of any length within rate limits |
-| Streaming | SSE over WebSocket | Simpler, works with Next.js serverless |
-| Auth | Supabase RLS | Row-level isolation — each user's data is isolated at DB level |
-| Rate limit recovery | Multi-model fallback chain | Pipeline never crashes — degrades gracefully through model tiers |
+| Decision            | Choice                                      | Rationale                                                        |
+| ------------------- | ------------------------------------------- | ---------------------------------------------------------------- |
+| Vector DB           | Supabase pgvector                           | Avoids extra service, RLS applies to vectors too                 |
+| LLM                 | Gemini 3.1 Flash Lite (with fallback chain) | 500 RPD free tier + auto-fallback to 2.5 Flash if rate limited   |
+| Embeddings          | gemini-embedding-001 (3072 dims)            | Latest stable embedding model with high accuracy                 |
+| Chunking strategy   | Per-page + recursive                        | Preserves page citations for accuracy                            |
+| Summarization       | Map-reduce with sampling                    | Handles documents of any length within rate limits               |
+| Streaming           | SSE over WebSocket                          | Simpler, works with Next.js serverless                           |
+| Auth                | Supabase RLS                                | Row-level isolation — each user's data is isolated at DB level   |
+| Rate limit recovery | Multi-model fallback chain                  | Pipeline never crashes — degrades gracefully through model tiers |
 
 ---
 
@@ -181,7 +180,6 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ### 3. Database Setup
 
 > **Note:** View the [Entity-Relationship Diagram (ERD)](docs/ERD.md) for a complete map of the database schema.
-
 
 In your Supabase project, go to **SQL Editor** and run the following:
 
@@ -424,13 +422,13 @@ src/
 
 ## 💰 Cost (Portfolio = $0/month)
 
-| Service | Free Tier | This Project Uses |
-| --- | --- | --- |
-| Vercel | 100GB bandwidth | ~1GB/mo |
-| Supabase | 500MB DB, 1GB storage | ~50MB |
-| Gemini API (3.1 Flash Lite) | 500 RPD | ~50/day |
-| Upstash | 10k cmds/day | ~500/day |
-| **Total** | **—** | **$0.00** |
+| Service                     | Free Tier             | This Project Uses |
+| --------------------------- | --------------------- | ----------------- |
+| Vercel                      | 100GB bandwidth       | ~1GB/mo           |
+| Supabase                    | 500MB DB, 1GB storage | ~50MB             |
+| Gemini API (3.1 Flash Lite) | 500 RPD               | ~50/day           |
+| Upstash                     | 10k cmds/day          | ~500/day          |
+| **Total**                   | **—**                 | **$0.00**         |
 
 ---
 
@@ -461,7 +459,9 @@ Built to demonstrate AI engineering, RAG pipelines, and full-stack architecture.
 ⭐ Star this repo if it helped you learn something!
 
 #### Multi-Document Chat Support
+
 To enable querying multiple documents at once, run the following SQL:
+
 ```sql
 -- Add document_ids to conversations table
 alter table public.conversations alter column document_id drop not null;

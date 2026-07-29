@@ -17,7 +17,9 @@ interface DocumentListProps {
 
 async function DocumentList({ query, sort }: DocumentListProps) {
   const supabase = await getSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return null;
 
   let dbQuery = supabase.from("documents").select("*").eq("user_id", user.id);
@@ -54,14 +56,14 @@ async function DocumentList({ query, sort }: DocumentListProps) {
 
   if (!documents || documents.length === 0) {
     if (query) {
-       return (
-         <div className="flex flex-col items-center justify-center p-12 text-center border rounded-xl border-dashed bg-muted/20">
-           <h3 className="mt-4 text-lg font-semibold">No results found</h3>
-           <p className="mt-2 text-sm text-muted-foreground">
-             No documents matched your search query &quot;{query}&quot;.
-           </p>
-         </div>
-       );
+      return (
+        <div className="bg-muted/20 flex flex-col items-center justify-center rounded-xl border border-dashed p-12 text-center">
+          <h3 className="mt-4 text-lg font-semibold">No results found</h3>
+          <p className="text-muted-foreground mt-2 text-sm">
+            No documents matched your search query &quot;{query}&quot;.
+          </p>
+        </div>
+      );
     }
     return <NoDocuments />;
   }
@@ -81,8 +83,10 @@ interface DocumentsPageProps {
 
 export default async function DocumentsPage(props: DocumentsPageProps) {
   const searchParams = await props.searchParams;
-  const query = typeof searchParams.query === 'string' ? searchParams.query : undefined;
-  const sort = typeof searchParams.sort === 'string' ? searchParams.sort : undefined;
+  const query =
+    typeof searchParams.query === "string" ? searchParams.query : undefined;
+  const sort =
+    typeof searchParams.sort === "string" ? searchParams.sort : undefined;
 
   return (
     <div className="space-y-8">
@@ -90,10 +94,9 @@ export default async function DocumentsPage(props: DocumentsPageProps) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            My{" "}
-            <span className="gradient-text">Documents</span>
+            My <span className="gradient-text">Documents</span>
           </h1>
-          <p className="mt-1 text-muted-foreground">
+          <p className="text-muted-foreground mt-1">
             Upload PDFs and start asking questions
           </p>
         </div>

@@ -6,7 +6,7 @@ import { DocumentSelector } from "@/components/chat/document-selector";
 import type { Metadata } from "next";
 
 interface PageProps {
-  searchParams: Promise<{ docs?: string | string[], conversationId?: string }>;
+  searchParams: Promise<{ docs?: string | string[]; conversationId?: string }>;
 }
 
 export const metadata: Metadata = {
@@ -24,7 +24,9 @@ export default async function MultiChatPage({ searchParams }: PageProps) {
   }
 
   const supabase = await getSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) return notFound();
 

@@ -6,10 +6,7 @@ export const dynamic = "force-dynamic";
 async function checkSupabase(): Promise<boolean> {
   try {
     const supabase = getSupabaseAdminClient();
-    const { error } = await supabase
-      .from("profiles")
-      .select("id")
-      .limit(1);
+    const { error } = await supabase.from("profiles").select("id").limit(1);
     return !error;
   } catch {
     return false;
@@ -19,14 +16,10 @@ async function checkSupabase(): Promise<boolean> {
 export async function GET() {
   const startTime = Date.now();
 
-  const [supabaseHealthy] = await Promise.allSettled([
-    checkSupabase(),
-  ]);
+  const [supabaseHealthy] = await Promise.allSettled([checkSupabase()]);
 
   const services = {
-    supabase:
-      supabaseHealthy.status === "fulfilled" &&
-      supabaseHealthy.value,
+    supabase: supabaseHealthy.status === "fulfilled" && supabaseHealthy.value,
     gemini: !!process.env.GOOGLE_API_KEY,
     upstash: !!process.env.UPSTASH_REDIS_REST_URL,
   };

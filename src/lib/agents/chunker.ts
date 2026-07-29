@@ -1,4 +1,4 @@
-import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { AI_CONFIG } from "@/lib/utils/constants";
 import type { ParsedPDF } from "./pdf-parser";
 
@@ -33,12 +33,15 @@ export async function chunkDocument(
 
       if (!pageText || pageText.trim().length < 20) continue;
 
-      const pageChunks = await splitter.createDocuments([pageText], [
-        {
-          pageNumber: pageIndex + 1,
-          documentId,
-        },
-      ]);
+      const pageChunks = await splitter.createDocuments(
+        [pageText],
+        [
+          {
+            pageNumber: pageIndex + 1,
+            documentId,
+          },
+        ]
+      );
 
       for (const chunk of pageChunks) {
         if (chunk.pageContent.trim().length < 20) continue;
@@ -77,9 +80,7 @@ export async function chunkDocument(
   }
 
   if (allChunks.length === 0) {
-    throw new Error(
-      "No usable chunks could be extracted from this document."
-    );
+    throw new Error("No usable chunks could be extracted from this document.");
   }
 
   return allChunks;

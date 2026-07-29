@@ -16,14 +16,14 @@ export function DiffViewer({ oldText, newText }: DiffViewerProps) {
         <CardTitle className="text-xl">Summary Comparison Diff</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col overflow-hidden p-4">
-        <ScrollArea className="flex-1 max-h-96 pr-4">
-          <div className="prose prose-sm prose-invert max-w-none text-muted-foreground whitespace-pre-wrap leading-relaxed">
+        <ScrollArea className="max-h-96 flex-1 pr-4">
+          <div className="prose prose-sm prose-invert text-muted-foreground max-w-none leading-relaxed whitespace-pre-wrap">
             {differences.map((part, index) => {
               const colorClass = part.added
                 ? "bg-emerald-500/20 text-emerald-400"
                 : part.removed
-                ? "bg-red-500/20 text-red-400 line-through"
-                : "text-muted-foreground";
+                  ? "bg-red-500/20 text-red-400 line-through"
+                  : "text-muted-foreground";
 
               return (
                 <span key={index} className={colorClass}>

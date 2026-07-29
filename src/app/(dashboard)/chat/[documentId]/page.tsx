@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/db/supabase/server";
-import { getConversationsByDocument, getConversationMessages } from "@/lib/db/queries/conversations";
+import {
+  getConversationsByDocument,
+  getConversationMessages,
+} from "@/lib/db/queries/conversations";
 import { ChatPageClient } from "@/components/chat/chat-page-client";
 import type { Metadata } from "next";
 
@@ -26,10 +29,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function ChatPage({
-  params,
-  searchParams,
-}: PageProps) {
+export default async function ChatPage({ params, searchParams }: PageProps) {
   const { documentId } = await params;
   const { conversationId } = await searchParams;
 
@@ -52,14 +52,10 @@ export default async function ChatPage({
   if (!document) return notFound();
 
   // Fetch all conversations for this document
-  const conversations = await getConversationsByDocument(
-    documentId,
-    user.id
-  );
+  const conversations = await getConversationsByDocument(documentId, user.id);
 
   // Load messages for the selected (or most recent) conversation
-  const activeConversationId =
-    conversationId ?? conversations[0]?.id ?? null;
+  const activeConversationId = conversationId ?? conversations[0]?.id ?? null;
 
   const initialMessages = activeConversationId
     ? await getConversationMessages(activeConversationId, 50)

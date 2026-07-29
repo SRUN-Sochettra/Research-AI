@@ -108,5 +108,5 @@ Conversation history:
 
 Follow-up question: {question}
 
-Standalone search query (output ONLY the query, nothing else):`,
+Standalone search query (output ONLY the query, nothing else):`
 );

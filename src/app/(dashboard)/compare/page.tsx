@@ -7,7 +7,9 @@ export const metadata: Metadata = { title: "Compare Documents" };
 
 export default async function ComparePage() {
   const supabase = await getSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) redirect("/");
 
@@ -32,7 +34,9 @@ export default async function ComparePage() {
           <h1 className="text-3xl font-bold tracking-tight">
             Compare <span className="gradient-text">Documents</span>
           </h1>
-          <p className="mt-1 text-muted-foreground">View details and summaries of two documents side-by-side</p>
+          <p className="text-muted-foreground mt-1">
+            View details and summaries of two documents side-by-side
+          </p>
         </div>
       </div>
       <CompareClient documents={documents || []} />

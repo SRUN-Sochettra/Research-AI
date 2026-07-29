@@ -42,7 +42,9 @@ export default function SignUpPage() {
   ];
   const strengthScore = strength.filter(Boolean).length;
   const strengthLabel = ["", "Weak", "Fair", "Strong"][strengthScore];
-  const strengthColor = ["", "bg-red-500", "bg-amber-500", "bg-emerald-500"][strengthScore];
+  const strengthColor = ["", "bg-red-500", "bg-amber-500", "bg-emerald-500"][
+    strengthScore
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,27 +67,27 @@ export default function SignUpPage() {
   /* ── Success state ── */
   if (success) {
     return (
-      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
+      <div className="bg-background relative flex min-h-screen items-center justify-center overflow-hidden px-4">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-emerald-600/12 blur-[120px]" />
           <div className="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-teal-600/12 blur-[120px]" />
         </div>
 
-        <div className="relative w-full max-w-[400px] animate-slide-up">
+        <div className="animate-slide-up relative w-full max-w-[400px]">
           <div className="rounded-2xl border border-white/8 bg-white/[0.025] p-10 text-center shadow-2xl backdrop-blur-xl">
             <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25">
               <CheckCircle2 className="h-8 w-8 text-white" />
             </div>
             <h2 className="text-xl font-bold">Check your inbox</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-2 text-sm">
               We sent a confirmation link to{" "}
-              <span className="font-medium text-foreground">{email}</span>.
+              <span className="text-foreground font-medium">{email}</span>.
               Click it to activate your account.
             </p>
             <Button
               variant="ghost"
               asChild
-              className="mt-6 text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground mt-6"
             >
               <Link href="/login">← Back to sign in</Link>
             </Button>
@@ -96,8 +98,7 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-12">
-
+    <div className="bg-background relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12">
       {/* ── Background ── */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-violet-600/12 blur-[120px]" />
@@ -105,12 +106,11 @@ export default function SignUpPage() {
         <div className="grid-pattern absolute inset-0 opacity-40" />
       </div>
 
-      <div className="relative w-full max-w-[400px] animate-slide-up">
-
+      <div className="animate-slide-up relative w-full max-w-[400px]">
         {/* Back to home */}
         <Link
           href="/"
-          className="mb-8 flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground mb-8 flex items-center gap-1.5 text-xs transition-colors"
         >
           <Brain className="h-3.5 w-3.5" />
           Research AI
@@ -118,11 +118,12 @@ export default function SignUpPage() {
 
         {/* ── Card ── */}
         <div className="rounded-2xl border border-white/8 bg-white/[0.025] p-8 shadow-2xl shadow-black/40 backdrop-blur-xl">
-
           {/* Header */}
           <div className="mb-6 space-y-1">
-            <h1 className="text-2xl font-bold tracking-tight">Create account</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="text-2xl font-bold tracking-tight">
+              Create account
+            </h1>
+            <p className="text-muted-foreground text-sm">
               Start analyzing documents with AI — free
             </p>
           </div>
@@ -130,7 +131,10 @@ export default function SignUpPage() {
           {/* Perks */}
           <div className="mb-6 space-y-1.5">
             {perks.map((perk) => (
-              <div key={perk} className="flex items-center gap-2 text-xs text-muted-foreground">
+              <div
+                key={perk}
+                className="text-muted-foreground flex items-center gap-2 text-xs"
+              >
                 <Check className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
                 {perk}
               </div>
@@ -140,7 +144,7 @@ export default function SignUpPage() {
           {/* Google */}
           <Button
             variant="outline"
-            className="mb-6 w-full border-white/10 bg-white/4 py-5 text-sm font-medium hover:bg-white/8 hover:border-white/16 transition-all"
+            className="mb-6 w-full border-white/10 bg-white/4 py-5 text-sm font-medium transition-all hover:border-white/16 hover:bg-white/8"
             onClick={signInWithGoogle}
             disabled={isSubmitting}
           >
@@ -154,7 +158,7 @@ export default function SignUpPage() {
               <span className="w-full border-t border-white/8" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-transparent px-3 text-[11px] uppercase tracking-wider text-muted-foreground">
+              <span className="text-muted-foreground bg-transparent px-3 text-[11px] tracking-wider uppercase">
                 or email
               </span>
             </div>
@@ -165,12 +169,17 @@ export default function SignUpPage() {
             {error && (
               <Alert className="border-red-500/20 bg-red-500/8">
                 <AlertTriangle className="h-4 w-4 text-red-400" />
-                <AlertDescription className="text-red-400">{error}</AlertDescription>
+                <AlertDescription className="text-red-400">
+                  {error}
+                </AlertDescription>
               </Alert>
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="fullName" className="text-xs font-medium text-muted-foreground">
+              <Label
+                htmlFor="fullName"
+                className="text-muted-foreground text-xs font-medium"
+              >
                 Full name
               </Label>
               <Input
@@ -182,12 +191,15 @@ export default function SignUpPage() {
                 required
                 autoComplete="name"
                 disabled={isSubmitting}
-                className="h-10 border-white/8 bg-white/4 text-sm placeholder:text-muted-foreground/50 focus-visible:border-violet-500/40 focus-visible:ring-violet-500/15"
+                className="placeholder:text-muted-foreground/50 h-10 border-white/8 bg-white/4 text-sm focus-visible:border-violet-500/40 focus-visible:ring-violet-500/15"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-xs font-medium text-muted-foreground">
+              <Label
+                htmlFor="email"
+                className="text-muted-foreground text-xs font-medium"
+              >
                 Email address
               </Label>
               <Input
@@ -199,12 +211,15 @@ export default function SignUpPage() {
                 required
                 autoComplete="email"
                 disabled={isSubmitting}
-                className="h-10 border-white/8 bg-white/4 text-sm placeholder:text-muted-foreground/50 focus-visible:border-violet-500/40 focus-visible:ring-violet-500/15"
+                className="placeholder:text-muted-foreground/50 h-10 border-white/8 bg-white/4 text-sm focus-visible:border-violet-500/40 focus-visible:ring-violet-500/15"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-xs font-medium text-muted-foreground">
+              <Label
+                htmlFor="password"
+                className="text-muted-foreground text-xs font-medium"
+              >
                 Password
               </Label>
               <div className="relative">
@@ -218,12 +233,12 @@ export default function SignUpPage() {
                   autoComplete="new-password"
                   disabled={isSubmitting}
                   minLength={6}
-                  className="h-10 border-white/8 bg-white/4 pr-10 text-sm placeholder:text-muted-foreground/50 focus-visible:border-violet-500/40 focus-visible:ring-violet-500/15"
+                  className="placeholder:text-muted-foreground/50 h-10 border-white/8 bg-white/4 pr-10 text-sm focus-visible:border-violet-500/40 focus-visible:ring-violet-500/15"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/60 transition-colors hover:text-muted-foreground"
+                  className="text-muted-foreground/60 hover:text-muted-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
                   tabIndex={-1}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
@@ -249,10 +264,15 @@ export default function SignUpPage() {
                     ))}
                   </div>
                   {strengthLabel && (
-                    <p className={`text-[11px] font-medium ${
-                      strengthScore === 3 ? "text-emerald-400" :
-                      strengthScore === 2 ? "text-amber-400" : "text-red-400"
-                    }`}>
+                    <p
+                      className={`text-[11px] font-medium ${
+                        strengthScore === 3
+                          ? "text-emerald-400"
+                          : strengthScore === 2
+                            ? "text-amber-400"
+                            : "text-red-400"
+                      }`}
+                    >
                       {strengthLabel} password
                     </p>
                   )}
@@ -262,7 +282,7 @@ export default function SignUpPage() {
 
             <Button
               type="submit"
-              className="group w-full bg-gradient-to-r from-violet-600 to-blue-600 py-5 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 transition-all hover:shadow-violet-500/35 hover:scale-[1.01] animate-gradient"
+              className="group animate-gradient w-full bg-gradient-to-r from-violet-600 to-blue-600 py-5 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 transition-all hover:scale-[1.01] hover:shadow-violet-500/35"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -280,19 +300,25 @@ export default function SignUpPage() {
           </form>
 
           {/* Terms micro-copy */}
-          <p className="mt-4 text-center text-[11px] text-muted-foreground/60">
+          <p className="text-muted-foreground/60 mt-4 text-center text-[11px]">
             By creating an account you agree to our{" "}
-            <Link href="/terms" className="underline hover:text-muted-foreground">
+            <Link
+              href="/terms"
+              className="hover:text-muted-foreground underline"
+            >
               Terms
             </Link>{" "}
             and{" "}
-            <Link href="/privacy" className="underline hover:text-muted-foreground">
+            <Link
+              href="/privacy"
+              className="hover:text-muted-foreground underline"
+            >
               Privacy Policy
             </Link>
           </p>
 
           {/* Sign in link */}
-          <p className="mt-4 text-center text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-4 text-center text-xs">
             Already have an account?{" "}
             <Link
               href="/login"
@@ -310,10 +336,22 @@ export default function SignUpPage() {
 function GoogleIcon() {
   return (
     <svg className="mr-2.5 h-4 w-4 shrink-0" viewBox="0 0 24 24">
-      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
-      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+      <path
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+        fill="#4285F4"
+      />
+      <path
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+        fill="#34A853"
+      />
+      <path
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+        fill="#FBBC05"
+      />
+      <path
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+        fill="#EA4335"
+      />
     </svg>
   );
 }

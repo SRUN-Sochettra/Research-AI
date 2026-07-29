@@ -1,73 +1,66 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/db/supabase/server";
-import { deleteDocument, updateDocumentTitle } from "@/lib/db/queries/documents";
-import { toErrorResponse } from "@/lib/utils/errors";
-import { z } from "zod";
+import { checkRateLimit } from "@/lib/services/rate-limiter";
 
-const updateSchema = z.object({
-  title: z.string().min(1, "Title is required").max(255),
-});
-
-export async function DELETE(
-    _request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-    try {
-        const { id } = await params;
+  try {
+    const { id } = await params;
 
-        const supabase = await getSupabaseServerClient();
-        const {
-            data: { user },
-        } = await supabase.auth.getUser();
+    const supabase = await getSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-        if (!user) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
-        }
-
-        await deleteDocument(id, user.id);
-
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        const err = toErrorResponse(error);
-        return NextResponse.json(
-            { error: err.message },
-            { status: err.statusCode }
-        );
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-}
 
-export async function PATCH(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-) {
-    try {
-        const { id } = await params;
-        const body = await request.json();
-        const { title } = updateSchema.parse(body);
-
-        const supabase = await getSupabaseServerClient();
-        const {
-            data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
+    const rateLimit = await checkRateLimit(`documents:download:${user.id}`);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please wait a minute." },
+        {
+          status: 429,
+          headers: { "X-RateLimit-Reset": String(rateLimit.reset) },
         }
-
-        await updateDocumentTitle(id, user.id, title);
-
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        const err = toErrorResponse(error);
-        return NextResponse.json(
-            { error: err.message },
-            { status: err.statusCode }
-        );
+      );
     }
+
+    const { data: doc, error: docError } = await supabase
+      .from("documents")
+      .select("file_path, file_name, title")
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single();
+
+    if (docError || !doc) {
+      return NextResponse.json(
+        { error: "Document not found" },
+        { status: 404 }
+      );
+    }
+
+    const { data, error: storageError } = await supabase.storage
+      .from("documents")
+      .createSignedUrl(doc.file_path, 60, {
+        download: doc.file_name || doc.title,
+      });
+
+    if (storageError || !data?.signedUrl) {
+      return NextResponse.json(
+        { error: "Failed to generate download URL" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.redirect(data.signedUrl);
+  } catch (_error) {
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }

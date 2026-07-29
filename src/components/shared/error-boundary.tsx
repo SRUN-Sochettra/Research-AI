@@ -16,9 +16,9 @@ export default function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
 
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 p-4">
-      <AlertTriangle className="h-12 w-12 text-destructive" />
+      <AlertTriangle className="text-destructive h-12 w-12" />
       <h2 className="text-xl font-semibold">Something went wrong</h2>
-      <p className="max-w-md text-center text-muted-foreground">
+      <p className="text-muted-foreground max-w-md text-center">
         An unexpected error occurred. Please try again.
       </p>
       <Button onClick={reset} variant="outline">

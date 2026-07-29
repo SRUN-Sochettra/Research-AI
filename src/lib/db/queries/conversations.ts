@@ -1,6 +1,12 @@
 import { getSupabaseAdminClient } from "@/lib/db/supabase/admin";
 import { getSupabaseServerClient } from "@/lib/db/supabase/server";
-import type { Conversation, Message, Citation, TokenUsage, Json } from "@/types/database";
+import type {
+  Conversation,
+  Message,
+  Citation,
+  TokenUsage,
+  Json,
+} from "@/types/database";
 
 export async function getOrCreateConversation(
   userId: string,

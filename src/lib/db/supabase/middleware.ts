@@ -14,8 +14,8 @@ export async function updateSession(request: NextRequest) {
   if (!supabaseUrl || !supabaseAnonKey) {
     console.error(
       "[Supabase Middleware] Missing environment variables:\n" +
-      `  NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? "✓" : "✗ MISSING"}\n` +
-      `  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${supabaseAnonKey ? "✓" : "✗ MISSING"}`
+        `  NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? "✓" : "✗ MISSING"}\n` +
+        `  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${supabaseAnonKey ? "✓" : "✗ MISSING"}`
     );
     return supabaseResponse;
   }
@@ -26,7 +26,7 @@ export async function updateSession(request: NextRequest) {
   } catch {
     console.error(
       `[Supabase Middleware] Invalid NEXT_PUBLIC_SUPABASE_URL: "${supabaseUrl}"\n` +
-      "  Must be a valid HTTP/HTTPS URL like: https://your-project.supabase.co"
+        "  Must be a valid HTTP/HTTPS URL like: https://your-project.supabase.co"
     );
     return supabaseResponse;
   }

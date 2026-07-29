@@ -49,10 +49,7 @@ export function useChat({
 
   // Handle individual SSE events
   const handleSSEEvent = useCallback(
-    (
-      event: Record<string, unknown>,
-      assistantMessageId: string
-    ) => {
+    (event: Record<string, unknown>, assistantMessageId: string) => {
       switch (event.type) {
         case "meta":
           // Set conversation ID from server
@@ -67,9 +64,9 @@ export function useChat({
             prev.map((msg) =>
               msg.id === assistantMessageId
                 ? {
-                  ...msg,
-                  content: msg.content + (event.content as string),
-                }
+                    ...msg,
+                    content: msg.content + (event.content as string),
+                  }
                 : msg
             )
           );
@@ -81,10 +78,10 @@ export function useChat({
             prev.map((msg) =>
               msg.id === assistantMessageId
                 ? {
-                  ...msg,
-                  citations: event.citations as Citation[],
-                  latencyMs: event.latencyMs as number,
-                }
+                    ...msg,
+                    citations: event.citations as Citation[],
+                    latencyMs: event.latencyMs as number,
+                  }
                 : msg
             )
           );
@@ -96,21 +93,18 @@ export function useChat({
             prev.map((msg) =>
               msg.id === assistantMessageId
                 ? {
-                  ...msg,
-                  isStreaming: false,
-                  // Update ID to match DB record
-                  id: (event.messageId as string) || msg.id,
-                }
+                    ...msg,
+                    isStreaming: false,
+                    // Update ID to match DB record
+                    id: (event.messageId as string) || msg.id,
+                  }
                 : msg
             )
           );
           break;
 
         case "error":
-          setError(
-            (event.message as string) ||
-            "An error occurred"
-          );
+          setError((event.message as string) || "An error occurred");
           // Remove streaming placeholder
           setMessages((prev) =>
             prev.filter((m) => m.id !== assistantMessageId)
@@ -219,16 +213,12 @@ export function useChat({
         }
 
         const errorMessage =
-          err instanceof Error
-            ? err.message
-            : "Failed to send message";
+          err instanceof Error ? err.message : "Failed to send message";
 
         setError(errorMessage);
 
         // Remove streaming placeholder on error
-        setMessages((prev) =>
-          prev.filter((m) => m.id !== assistantMessageId)
-        );
+        setMessages((prev) => prev.filter((m) => m.id !== assistantMessageId));
       } finally {
         setIsLoading(false);
         streamingIdRef.current = null;

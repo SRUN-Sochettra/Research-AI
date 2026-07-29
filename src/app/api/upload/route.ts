@@ -3,7 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { waitUntil } from "@vercel/functions";
 import { getSupabaseServerClient } from "@/lib/db/supabase/server";
 import { checkRateLimit } from "@/lib/services/rate-limiter";
-import { createDocument, getUserDocumentCount } from "@/lib/db/queries/documents";
+import {
+  createDocument,
+  getUserDocumentCount,
+} from "@/lib/db/queries/documents";
 import { runDocumentPipeline } from "@/lib/agents/orchestrator";
 import { toErrorResponse } from "@/lib/utils/errors";
 import { generateTitle } from "@/lib/utils/helpers";
@@ -161,21 +164,24 @@ export async function POST(
 
     // ─── 7. Create Document Record ──────────────────────
     const title =
-      (formData.get("title") as string | null) ||
-      generateTitle(file.name);
+      (formData.get("title") as string | null) || generateTitle(file.name);
 
     const document = await createDocument({
       userId: user.id,
       title,
       filePath,
-      fileName: file.name,    // ← added
+      fileName: file.name, // ← added
       fileSize: file.size,
       fileType: file.type,
     });
 
     // ─── 8. Run Pipeline (async, non-blocking) ──────────
     waitUntil(
-      runDocumentPipeline({ documentId: document.id, userId: user.id, buffer: fileBuffer, }).catch((err) => {
+      runDocumentPipeline({
+        documentId: document.id,
+        userId: user.id,
+        buffer: fileBuffer,
+      }).catch((err) => {
         console.error(
           `Background pipeline failed for document ${document.id}:`,
           err
@@ -190,8 +196,7 @@ export async function POST(
         data: {
           documentId: document.id,
           status: "processing",
-          message:
-            "Document uploaded successfully. AI processing started.",
+          message: "Document uploaded successfully. AI processing started.",
         },
       },
       { status: 202 }

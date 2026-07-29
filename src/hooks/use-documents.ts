@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import type { Document } from '@/types/database';
+import { useState, useEffect } from "react";
+import type { Document } from "@/types/database";
 
 export function useDocuments() {
   const [documents] = useState<Document[]>([]);

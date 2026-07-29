@@ -89,19 +89,22 @@ const steps = [
     step: "01",
     icon: Upload,
     title: "Upload your PDF",
-    description: "Drag & drop or browse. Up to 10MB. Processing starts instantly.",
+    description:
+      "Drag & drop or browse. Up to 10MB. Processing starts instantly.",
   },
   {
     step: "02",
     icon: Brain,
     title: "AI indexes the content",
-    description: "Multi-agent pipeline chunks, embeds, and stores your document.",
+    description:
+      "Multi-agent pipeline chunks, embeds, and stores your document.",
   },
   {
     step: "03",
     icon: Search,
     title: "Ask anything",
-    description: "Natural language questions. Cited answers in under 3 seconds.",
+    description:
+      "Natural language questions. Cited answers in under 3 seconds.",
   },
 ];
 
@@ -125,8 +128,7 @@ const stats = [
 
 export default function HomePage() {
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-background">
-
+    <div className="bg-background relative min-h-screen overflow-x-hidden">
       {/* ── Global ambient background ── */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         {/* Top-right orb */}
@@ -134,7 +136,7 @@ export default function HomePage() {
         {/* Bottom-left orb */}
         <div className="absolute -bottom-48 -left-48 h-[500px] w-[500px] rounded-full bg-blue-600/10 blur-[130px]" />
         {/* Center subtle orb */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[800px] w-[800px] rounded-full bg-indigo-600/5 blur-[150px]" />
+        <div className="absolute top-1/2 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-600/5 blur-[150px]" />
         {/* Grid */}
         <div className="grid-pattern absolute inset-0 opacity-100" />
         {/* Vignette */}
@@ -145,7 +147,6 @@ export default function HomePage() {
 
       {/* ━━━━━━━━━━━━━━ HERO ━━━━━━━━━━━━━━ */}
       <section className="relative container flex flex-col items-center justify-center gap-8 px-4 py-24 text-center md:py-36">
-
         {/* Badge */}
         <div className="animate-fade-in inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/8 px-4 py-1.5 text-xs font-medium text-violet-300 backdrop-blur-sm">
           <Sparkles className="h-3 w-3 text-violet-400" />
@@ -157,12 +158,12 @@ export default function HomePage() {
 
         {/* Headline */}
         <div className="animate-slide-up stagger-1 space-y-3">
-          <h1 className="text-balance max-w-4xl text-5xl font-extrabold leading-[1.08] tracking-[-0.03em] sm:text-6xl md:text-7xl">
+          <h1 className="max-w-4xl text-5xl leading-[1.08] font-extrabold tracking-[-0.03em] text-balance sm:text-6xl md:text-7xl">
             Research smarter
             <br />
             <span className="gradient-text glow-text">with AI agents</span>
           </h1>
-          <p className="text-pretty mx-auto max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
+          <p className="text-muted-foreground mx-auto max-w-lg text-base leading-relaxed text-pretty sm:text-lg">
             Upload PDFs, ask questions in plain English, and get accurate
             answers with citations — powered by an autonomous RAG pipeline.
           </p>
@@ -173,7 +174,7 @@ export default function HomePage() {
           <Button
             size="lg"
             asChild
-            className="group relative h-12 overflow-hidden bg-gradient-to-r from-violet-600 to-blue-600 px-7 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all hover:shadow-violet-500/40 hover:scale-[1.02] animate-gradient"
+            className="group animate-gradient relative h-12 overflow-hidden bg-gradient-to-r from-violet-600 to-blue-600 px-7 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all hover:scale-[1.02] hover:shadow-violet-500/40"
           >
             <Link href="/signup">
               Start for free
@@ -184,14 +185,14 @@ export default function HomePage() {
             size="lg"
             variant="outline"
             asChild
-            className="h-12 border-white/8 bg-white/3 px-7 text-sm font-medium backdrop-blur-sm hover:bg-white/7 hover:border-white/15"
+            className="h-12 border-white/8 bg-white/3 px-7 text-sm font-medium backdrop-blur-sm hover:border-white/15 hover:bg-white/7"
           >
             <Link href="/login">Sign in</Link>
           </Button>
         </div>
 
         {/* Social proof micro-copy */}
-        <p className="animate-fade-in stagger-3 flex items-center gap-2 text-xs text-muted-foreground">
+        <p className="animate-fade-in stagger-3 text-muted-foreground flex items-center gap-2 text-xs">
           <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />
           No credit card · Free to get started · Built with production-grade AI
         </p>
@@ -206,10 +207,12 @@ export default function HomePage() {
               <div className="gradient-text text-2xl font-extrabold tracking-tight">
                 {stat.value}
               </div>
-              <div className="mt-0.5 text-[11px] font-medium text-foreground/70">
+              <div className="text-foreground/70 mt-0.5 text-[11px] font-medium">
                 {stat.label}
               </div>
-              <div className="text-[10px] text-muted-foreground">{stat.sub}</div>
+              <div className="text-muted-foreground text-[10px]">
+                {stat.sub}
+              </div>
             </div>
           ))}
         </div>
@@ -219,10 +222,10 @@ export default function HomePage() {
       <section className="relative container px-4 py-20">
         {/* Section label */}
         <div className="mb-14 text-center">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-[0.2em] uppercase">
             How it works
           </p>
-          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
             From PDF to insights{" "}
             <span className="gradient-text">in seconds</span>
           </h2>
@@ -231,14 +234,14 @@ export default function HomePage() {
         {/* Steps */}
         <div className="relative grid gap-6 sm:grid-cols-3">
           {/* Connector line — desktop only */}
-          <div className="pointer-events-none absolute top-[52px] left-[calc(16.67%+1rem)] right-[calc(16.67%+1rem)] hidden h-px sm:block">
+          <div className="pointer-events-none absolute top-[52px] right-[calc(16.67%+1rem)] left-[calc(16.67%+1rem)] hidden h-px sm:block">
             <div className="h-full w-full bg-gradient-to-r from-violet-500/30 via-blue-500/30 to-cyan-500/30" />
           </div>
 
           {steps.map((step, i) => (
             <div
               key={step.step}
-              className={`glass card-interactive group relative flex flex-col items-center rounded-2xl border border-white/7 p-7 text-center animate-slide-up stagger-${i + 1}`}
+              className={`glass card-interactive group animate-slide-up relative flex flex-col items-center rounded-2xl border border-white/7 p-7 text-center stagger-${i + 1}`}
             >
               {/* Step number */}
               <div className="mb-5 flex flex-col items-center gap-3">
@@ -251,7 +254,7 @@ export default function HomePage() {
                 </div>
               </div>
               <h3 className="mb-2 text-base font-semibold">{step.title}</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 {step.description}
               </p>
             </div>
@@ -262,14 +265,14 @@ export default function HomePage() {
       {/* ━━━━━━━━━━━━━━ FEATURES ━━━━━━━━━━━━━━ */}
       <section className="relative container px-4 py-20">
         <div className="mb-14 text-center">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-[0.2em] uppercase">
             Features
           </p>
-          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
             Everything you need to{" "}
             <span className="gradient-text">research smarter</span>
           </h2>
-          <p className="mt-3 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-3 text-sm">
             Production-grade AI infrastructure, not a toy demo.
           </p>
         </div>
@@ -290,10 +293,10 @@ export default function HomePage() {
                 <feature.icon className={`h-5 w-5 ${feature.iconColor}`} />
               </div>
 
-              <h3 className="mb-2 text-base font-semibold leading-snug">
+              <h3 className="mb-2 text-base leading-snug font-semibold">
                 {feature.title}
               </h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 {feature.description}
               </p>
             </div>
@@ -304,14 +307,14 @@ export default function HomePage() {
       {/* ━━━━━━━━━━━━━━ TECH STACK ━━━━━━━━━━━━━━ */}
       <section className="relative border-y border-white/5 py-14">
         <div className="container px-4 text-center">
-          <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
+          <p className="text-muted-foreground mb-6 text-[11px] font-semibold tracking-[0.25em] uppercase">
             Built with
           </p>
           <div className="flex flex-wrap items-center justify-center gap-2">
             {techStack.map((tech) => (
               <span
                 key={tech.name}
-                className={`rounded-full border border-white/8 bg-white/3 px-4 py-1.5 text-xs font-medium ${tech.color} transition-all duration-200 hover:border-violet-500/25 hover:bg-violet-500/5 hover:text-foreground`}
+                className={`rounded-full border border-white/8 bg-white/3 px-4 py-1.5 text-xs font-medium ${tech.color} hover:text-foreground transition-all duration-200 hover:border-violet-500/25 hover:bg-violet-500/5`}
               >
                 {tech.name}
               </span>
@@ -323,7 +326,7 @@ export default function HomePage() {
       {/* ━━━━━━━━━━━━━━ CTA ━━━━━━━━━━━━━━ */}
       <section className="relative container px-4 py-24">
         <div className="border-gradient relative overflow-hidden rounded-3xl p-px">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-950/60 via-background to-blue-950/60 px-8 py-16 text-center sm:px-16">
+          <div className="via-background relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-950/60 to-blue-950/60 px-8 py-16 text-center sm:px-16">
             {/* Inner glows */}
             <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-violet-500/15 blur-[80px]" />
             <div className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-blue-500/15 blur-[80px]" />
@@ -331,16 +334,16 @@ export default function HomePage() {
 
             <div className="relative">
               {/* Icon */}
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-blue-600 shadow-lg shadow-violet-500/30 glow-md">
+              <div className="glow-md mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-blue-600 shadow-lg shadow-violet-500/30">
                 <Brain className="h-8 w-8 text-white" />
               </div>
 
-              <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
                 Ready to transform
                 <br />
                 <span className="gradient-text">your research workflow?</span>
               </h2>
-              <p className="mt-3 text-sm text-muted-foreground">
+              <p className="text-muted-foreground mt-3 text-sm">
                 Free to start. No credit card. Cancel anytime.
               </p>
 
@@ -348,7 +351,7 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   asChild
-                  className="group h-12 bg-gradient-to-r from-violet-600 to-blue-600 px-8 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:scale-[1.02] transition-all animate-gradient"
+                  className="group animate-gradient h-12 bg-gradient-to-r from-violet-600 to-blue-600 px-8 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all hover:scale-[1.02] hover:shadow-violet-500/40"
                 >
                   <Link href="/signup">
                     Start analyzing for free
@@ -359,7 +362,7 @@ export default function HomePage() {
                   size="lg"
                   variant="ghost"
                   asChild
-                  className="h-12 px-6 text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground h-12 px-6"
                 >
                   <Link href="/login">Already have an account →</Link>
                 </Button>
@@ -371,18 +374,20 @@ export default function HomePage() {
 
       {/* ━━━━━━━━━━━━━━ FOOTER ━━━━━━━━━━━━━━ */}
       <footer className="relative border-t border-white/5 py-8">
-        <div className="container flex flex-col items-center justify-between gap-4 px-4 text-xs text-muted-foreground sm:flex-row">
+        <div className="text-muted-foreground container flex flex-col items-center justify-between gap-4 px-4 text-xs sm:flex-row">
           <Link href="/" className="group flex items-center gap-2.5">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-blue-600 shadow-sm shadow-violet-500/20 transition-shadow group-hover:shadow-violet-500/40">
               <Brain className="h-3.5 w-3.5 text-white" />
             </div>
-            <span className="font-semibold text-foreground/80">Research AI</span>
+            <span className="text-foreground/80 font-semibold">
+              Research AI
+            </span>
           </Link>
 
           <div className="flex items-center gap-6">
             <span>Built as a portfolio project</span>
-            <span className="hidden sm:block text-white/20">·</span>
-            <span className="hidden sm:flex items-center gap-1.5">
+            <span className="hidden text-white/20 sm:block">·</span>
+            <span className="hidden items-center gap-1.5 sm:flex">
               <span className="status-dot status-online" />
               All systems operational
             </span>

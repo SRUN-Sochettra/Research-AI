@@ -71,7 +71,9 @@ export function DocumentCard({ document }: { document: Document }) {
     if (!confirm("Are you sure you want to delete this document?")) return;
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/documents/${document.id}`, { method: "DELETE" });
+      const response = await fetch(`/api/documents/${document.id}`, {
+        method: "DELETE",
+      });
       if (!response.ok) throw new Error("Delete failed");
       toast.success("Document deleted");
       router.refresh();
@@ -88,37 +90,38 @@ export function DocumentCard({ document }: { document: Document }) {
 
   return (
     <div className="card-interactive group relative flex flex-col overflow-hidden rounded-2xl border border-white/7 bg-white/[0.02] transition-all duration-300 hover:border-white/12 hover:bg-white/[0.03]">
-
       {/* Top gradient accent — visible on hover */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
       {/* Processing shimmer */}
       {isProcessing && (
-        <div className="absolute inset-x-0 top-0 h-px shimmer" />
+        <div className="shimmer absolute inset-x-0 top-0 h-px" />
       )}
 
       <div className="flex flex-1 flex-col p-5">
-
         {/* ── Header ── */}
         <div className="mb-4 flex items-start justify-between gap-3">
-          <div className="flex items-start gap-3 w-full pr-8">
+          <div className="flex w-full items-start gap-3 pr-8">
             {/* File icon */}
             <div className="relative mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600/15 to-blue-600/10 ring-1 ring-white/8">
               <FileText className="h-4.5 w-4.5 text-violet-400" />
               {isProcessing && (
-                <div className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-blue-400">
-                  <div className="absolute inset-0 rounded-full bg-blue-400 opacity-60 animate-ping" />
+                <div className="border-background absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 bg-blue-400">
+                  <div className="absolute inset-0 animate-ping rounded-full bg-blue-400 opacity-60" />
                 </div>
               )}
             </div>
 
             <div className="min-w-0">
-              <Link href={`/documents/${document.id}`} className="hover:underline">
-                <h3 className="line-clamp-1 text-sm font-semibold leading-snug text-foreground">
+              <Link
+                href={`/documents/${document.id}`}
+                className="hover:underline"
+              >
+                <h3 className="text-foreground line-clamp-1 text-sm leading-snug font-semibold">
                   {document.title}
                 </h3>
               </Link>
-              <div className="mt-0.5 flex items-center gap-2 text-[11px] text-muted-foreground">
+              <div className="text-muted-foreground mt-0.5 flex items-center gap-2 text-[11px]">
                 <Clock className="h-3 w-3" />
                 {formatDate(document.created_at)}
               </div>
@@ -126,7 +129,7 @@ export function DocumentCard({ document }: { document: Document }) {
           </div>
 
           {/* Status badge and actions */}
-          <div className="flex shrink-0 items-center gap-2 absolute right-5 top-5">
+          <div className="absolute top-5 right-5 flex shrink-0 items-center gap-2">
             <span
               className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium ${status.badgeClass}`}
             >
@@ -138,12 +141,27 @@ export function DocumentCard({ document }: { document: Document }) {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {isDeleting ? <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /> : <MoreVertical className="h-4 w-4 text-muted-foreground" />}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  {isDeleting ? (
+                    <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+                  ) : (
+                    <MoreVertical className="text-muted-foreground h-4 w-4" />
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDelete(); }} className="text-red-600 focus:text-red-600 cursor-pointer" disabled={isDeleting}>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete();
+                  }}
+                  className="cursor-pointer text-red-600 focus:text-red-600"
+                  disabled={isDeleting}
+                >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete
                 </DropdownMenuItem>
@@ -153,7 +171,7 @@ export function DocumentCard({ document }: { document: Document }) {
         </div>
 
         {/* ── Meta strip ── */}
-        <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
+        <div className="text-muted-foreground mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
           <span className="flex items-center gap-1">
             <HardDrive className="h-3 w-3" />
             {formatFileSize(document.file_size)}
@@ -161,14 +179,15 @@ export function DocumentCard({ document }: { document: Document }) {
           {document.page_count != null && (
             <span className="flex items-center gap-1">
               <BookOpen className="h-3 w-3" />
-              {document.page_count} {document.page_count === 1 ? "page" : "pages"}
+              {document.page_count}{" "}
+              {document.page_count === 1 ? "page" : "pages"}
             </span>
           )}
         </div>
 
         {/* ── Summary ── */}
         {document.summary && (
-          <p className="mb-4 line-clamp-2 flex-1 text-xs leading-relaxed text-muted-foreground">
+          <p className="text-muted-foreground mb-4 line-clamp-2 flex-1 text-xs leading-relaxed">
             {document.summary}
           </p>
         )}
@@ -181,7 +200,7 @@ export function DocumentCard({ document }: { document: Document }) {
           <Button
             asChild
             size="sm"
-            className="group/btn w-full bg-gradient-to-r from-violet-600 to-blue-600 text-xs font-semibold text-white shadow-md shadow-violet-500/15 transition-all hover:shadow-violet-500/30 hover:scale-[1.01]"
+            className="group/btn w-full bg-gradient-to-r from-violet-600 to-blue-600 text-xs font-semibold text-white shadow-md shadow-violet-500/15 transition-all hover:scale-[1.01] hover:shadow-violet-500/30"
           >
             <Link href={`/chat/${document.id}`}>
               <MessageSquare className="mr-1.5 h-3.5 w-3.5" />

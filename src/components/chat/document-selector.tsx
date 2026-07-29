@@ -24,20 +24,24 @@ export function DocumentSelector({ documents }: { documents: Document[] }) {
   const handleStartChat = () => {
     if (selected.size === 0) return;
     const params = new URLSearchParams();
-    selected.forEach(id => params.append("docs", id));
+    selected.forEach((id) => params.append("docs", id));
     router.push(`/chat/multi?${params.toString()}`);
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto p-6">
+    <div className="mx-auto max-w-4xl space-y-6 p-6">
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Select Documents</h2>
-        <p className="text-muted-foreground">Choose multiple documents to chat with them simultaneously.</p>
+        <p className="text-muted-foreground">
+          Choose multiple documents to chat with them simultaneously.
+        </p>
       </div>
 
       {documents.length === 0 ? (
-        <div className="p-12 text-center border rounded-xl border-dashed bg-muted/20">
-          <p className="text-sm text-muted-foreground">No documents found. Please upload some first.</p>
+        <div className="bg-muted/20 rounded-xl border border-dashed p-12 text-center">
+          <p className="text-muted-foreground text-sm">
+            No documents found. Please upload some first.
+          </p>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -48,22 +52,24 @@ export function DocumentSelector({ documents }: { documents: Document[] }) {
               <div
                 key={doc.id}
                 onClick={() => isReady && toggleSelection(doc.id)}
-                className={`relative p-4 rounded-xl border transition-all cursor-pointer ${
+                className={`relative cursor-pointer rounded-xl border p-4 transition-all ${
                   isSelected
                     ? "border-violet-500 bg-violet-500/10"
                     : "border-white/10 bg-white/[0.02] hover:border-white/20"
-                } ${!isReady ? "opacity-50 cursor-not-allowed" : ""}`}
+                } ${!isReady ? "cursor-not-allowed opacity-50" : ""}`}
               >
                 <div className="flex items-start gap-3">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="line-clamp-1 text-sm font-medium text-foreground">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-foreground line-clamp-1 text-sm font-medium">
                       {doc.title}
                     </h3>
-                    <p className="mt-1 text-xs text-muted-foreground">
+                    <p className="text-muted-foreground mt-1 text-xs">
                       {formatDate(doc.created_at)}
                     </p>
                   </div>
-                  {isSelected && <CheckCircle2 className="h-5 w-5 text-violet-500 shrink-0" />}
+                  {isSelected && (
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-violet-500" />
+                  )}
                 </div>
               </div>
             );
@@ -71,11 +77,11 @@ export function DocumentSelector({ documents }: { documents: Document[] }) {
         </div>
       )}
 
-      <div className="flex justify-end pt-4 border-t border-white/10">
+      <div className="flex justify-end border-t border-white/10 pt-4">
         <Button
           onClick={handleStartChat}
           disabled={selected.size === 0}
-          className="bg-violet-600 hover:bg-violet-700 text-white"
+          className="bg-violet-600 text-white hover:bg-violet-700"
         >
           Start Chat ({selected.size})
         </Button>

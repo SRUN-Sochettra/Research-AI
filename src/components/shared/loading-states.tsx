@@ -9,7 +9,7 @@ export function PageLoader() {
           <div className="absolute inset-0 rounded-full bg-violet-500/20 blur-lg" />
           <Loader2 className="relative h-10 w-10 animate-spin text-violet-400" />
         </div>
-        <p className="text-sm text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground text-sm">Loading...</p>
       </div>
     </div>
   );
@@ -17,7 +17,7 @@ export function PageLoader() {
 
 export function CardSkeleton() {
   return (
-    <div className="glass rounded-2xl border border-white/10 p-5 animate-pulse">
+    <div className="glass animate-pulse rounded-2xl border border-white/10 p-5">
       <div className="mb-4 flex items-center gap-3">
         <Skeleton className="h-10 w-10 rounded-xl bg-white/5" />
         <Skeleton className="h-4 w-2/3 bg-white/5" />

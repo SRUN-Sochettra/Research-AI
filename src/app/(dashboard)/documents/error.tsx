@@ -3,11 +3,11 @@
 import ErrorBoundary from "@/components/shared/error-boundary";
 
 export default function DocumentsError({
-    error,
-    reset,
+  error,
+  reset,
 }: {
-    error: Error & { digest?: string };
-    reset: () => void;
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
-    return <ErrorBoundary error={error} reset={reset} />;
+  return <ErrorBoundary error={error} reset={reset} />;
 }

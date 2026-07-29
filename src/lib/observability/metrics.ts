@@ -7,5 +7,5 @@ export const metrics = {
   },
   trackTokenUsage: (_tokens: number) => {
     // track metrics
-  }
+  },
 };

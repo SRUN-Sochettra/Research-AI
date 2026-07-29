@@ -45,9 +45,8 @@ export async function embedChunks(
 
     if (!embeddings) {
       throw new Error(
-        `Failed to embed chunks after ${MAX_RETRIES} attempts: ${lastError instanceof Error
-          ? lastError.message
-          : "Unknown error"
+        `Failed to embed chunks after ${MAX_RETRIES} attempts: ${
+          lastError instanceof Error ? lastError.message : "Unknown error"
         }`
       );
     }

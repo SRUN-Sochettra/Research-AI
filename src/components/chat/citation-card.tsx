@@ -13,15 +13,15 @@ export function CitationCard({ citation, index }: CitationCardProps) {
   const relevancePercent = Math.round(citation.similarity * 100);
 
   return (
-    <div className="rounded-lg border bg-card p-3 text-xs shadow-sm transition-shadow hover:shadow-md">
+    <div className="bg-card rounded-lg border p-3 text-xs shadow-sm transition-shadow hover:shadow-md">
       {/* Header */}
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <div className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+          <div className="bg-primary text-primary-foreground flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold">
             {index}
           </div>
-          <FileText className="h-3 w-3 text-muted-foreground" />
-          <span className="font-medium text-muted-foreground">
+          <FileText className="text-muted-foreground h-3 w-3" />
+          <span className="text-muted-foreground font-medium">
             Source {index}
           </span>
         </div>
@@ -33,17 +33,14 @@ export function CitationCard({ citation, index }: CitationCardProps) {
               Page {citation.pageNumber}
             </Badge>
           )}
-          <Badge
-            variant="secondary"
-            className="h-5 px-1.5 text-[10px]"
-          >
+          <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
             {relevancePercent}% match
           </Badge>
         </div>
       </div>
 
       {/* Snippet */}
-      <p className="line-clamp-3 leading-relaxed text-muted-foreground">
+      <p className="text-muted-foreground line-clamp-3 leading-relaxed">
         &ldquo;{citation.snippet}&rdquo;
       </p>
     </div>

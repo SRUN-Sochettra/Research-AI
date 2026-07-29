@@ -1,8 +1,15 @@
-import { CallbackHandler } from "langfuse-langchain";
-import { getChatModel } from "@/lib/ai/gemini";
+import { CallbackHandler } from "@/lib/observability/langfuse-callback";
+import { getChatModel, createChatModelSelector } from "@/lib/ai/gemini";
 import { QA_PROMPT } from "@/lib/ai/prompts";
-import { retrieveRelevantChunks, retrieveMultipleDocumentsChunks, formatChunksAsContext } from "./retriever";
-import { reformulateQuery, formatConversationHistory } from "./query-reformulator";
+import {
+  retrieveRelevantChunks,
+  retrieveMultipleDocumentsChunks,
+  formatChunksAsContext,
+} from "./retriever";
+import {
+  reformulateQuery,
+  formatConversationHistory,
+} from "./query-reformulator";
 import { logger } from "@/lib/observability/logger";
 import type { RetrievedChunk } from "./retriever";
 import type { Message } from "@/types/database";
@@ -32,6 +39,15 @@ export interface QAStreamCallbacks {
   onError: (error: Error) => void;
 }
 
+function isRateLimitError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    (error.message.includes("429") ||
+      error.message.includes("Too Many Requests") ||
+      error.message.includes("quota"))
+  );
+}
+
 export async function runQAAgent(
   question: string,
   userId: string,
@@ -51,7 +67,12 @@ export async function runQAAgent(
     });
 
     // ─── Step 1: Reformulate Query ─────────────────────
-    const reformulatedQuery = await reformulateQuery(question, conversationHistory, userId, conversationId);
+    const reformulatedQuery = await reformulateQuery(
+      question,
+      conversationHistory,
+      userId,
+      conversationId
+    );
 
     // ─── Step 2: Retrieve Relevant Chunks ──────────────
     let chunks: RetrievedChunk[] = [];
@@ -95,35 +116,74 @@ export async function runQAAgent(
     const context = formatChunksAsContext(chunks);
     const chatHistory = formatConversationHistory(conversationHistory);
 
-    // ─── Step 4: Stream LLM Response ───────────────────
-    const model = getChatModel({
-      temperature: 0.3,
-      streaming: true,
+    // ─── Step 4: Stream LLM Response (with model fallback) ─────
+    //
+    // Mirrors the summarizer's resilience: on a 429 we advance the fallback
+    // chain and retry. A model swap is only safe BEFORE any token has been
+    // emitted to the client — once we've started streaming a partial answer we
+    // can't cleanly restart with a different model, so at that point a failure
+    // surfaces as onError (the client keeps whatever it received).
+    const langfuseHandler = new CallbackHandler({
+      sessionId: conversationId,
+      userId: userId,
+      tags: ["qa"],
     });
 
-    const chain = QA_PROMPT.pipe(model);
-
+    const selector = createChatModelSelector();
     let fullAnswer = "";
 
-const langfuseHandler = new CallbackHandler({ sessionId: conversationId, userId: userId, tags: ["qa"] });
+    while (true) {
+      const model = getChatModel({
+        temperature: 0.3,
+        streaming: true,
+        modelOverride: selector.current(),
+      });
 
-    // Stream tokens to client
-    const stream = await chain.stream({
-      context,
-      chat_history: chatHistory,
-      question,
-    }, { callbacks: [langfuseHandler] });
+      const chain = QA_PROMPT.pipe(model);
+      let tokensEmitted = false;
 
-    for await (const chunk of stream) {
-      const token = chunk.content as string;
-      if (token) {
-        fullAnswer += token;
-        callbacks.onToken(token);
+      try {
+        const stream = await chain.stream(
+          {
+            context,
+            chat_history: chatHistory,
+            question,
+          },
+          { callbacks: [langfuseHandler] }
+        );
+
+        for await (const chunk of stream) {
+          const token = chunk.content as string;
+          if (token) {
+            tokensEmitted = true;
+            fullAnswer += token;
+            callbacks.onToken(token);
+          }
+        }
+
+        break; // stream completed successfully
+      } catch (error) {
+        // Only safe to fail over if nothing has been sent to the client yet.
+        if (isRateLimitError(error) && !tokensEmitted) {
+          const nextModel = selector.next();
+          if (nextModel) {
+            logger.warn("[QAAgent] Chat hit rate limit, switching model", {
+              nextModel,
+            });
+            fullAnswer = "";
+            continue;
+          }
+          logger.warn("[QAAgent] All chat models exhausted");
+        }
+        throw error;
       }
     }
 
     // ─── Step 5: Build Citations ────────────────────────
-    const citations = buildCitations(chunks, (documentId || documentIds?.[0] || "") as string);
+    const citations = buildCitations(
+      chunks,
+      (documentId || documentIds?.[0] || "") as string
+    );
 
     const latencyMs = Date.now() - startTime;
 
@@ -165,10 +225,7 @@ function buildCitations(
       documentId: chunk.documentId || defaultDocumentId,
       pageNumber: chunk.pageNumber,
       // Extract a meaningful snippet (first 200 chars)
-      snippet: chunk.content
-        .slice(0, 200)
-        .trim()
-        .replace(/\s+/g, " "),
+      snippet: chunk.content.slice(0, 200).trim().replace(/\s+/g, " "),
       similarity: Math.round(chunk.similarity * 100) / 100,
     }));
 }

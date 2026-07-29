@@ -1,10 +1,6 @@
 import { getSupabaseAdminClient } from "@/lib/db/supabase/admin";
 import { getSupabaseServerClient } from "@/lib/db/supabase/server";
-import type {
-  Document,
-  DocumentStatus,
-  Json
-} from "@/types/database";
+import type { Document, DocumentStatus, Json } from "@/types/database";
 import type { EmbeddedChunk } from "@/lib/agents/embedder";
 
 // ============================================
@@ -15,7 +11,7 @@ export async function createDocument(data: {
   userId: string;
   title: string;
   filePath: string;
-  fileName: string;       // ← added
+  fileName: string; // ← added
   fileSize: number;
   fileType: string;
 }): Promise<Document> {
@@ -30,7 +26,7 @@ export async function createDocument(data: {
       file_name: data.fileName,
       file_size: data.fileSize,
       mime_type: data.fileType,
-      status: "uploaded",   // ← was: "pending"
+      status: "uploaded", // ← was: "pending"
     })
     .select()
     .single();
@@ -107,9 +103,7 @@ export async function deleteDocument(
 
   if (doc?.file_path) {
     // Delete from storage
-    await supabase.storage
-      .from("documents")
-      .remove([doc.file_path]);
+    await supabase.storage.from("documents").remove([doc.file_path]);
   }
 
   // Delete document (cascades to chunks, conversations, messages)
@@ -151,9 +145,7 @@ export async function saveChunks(
   for (let i = 0; i < rows.length; i += BATCH_SIZE) {
     const batch = rows.slice(i, i + BATCH_SIZE);
 
-    const { error } = await supabase
-      .from("document_chunks")
-      .insert(batch);
+    const { error } = await supabase.from("document_chunks").insert(batch);
 
     if (error) {
       throw new Error(
@@ -199,9 +191,7 @@ export async function searchSimilarChunks(
 // User document count (enforce limits)
 // ============================================
 
-export async function getUserDocumentCount(
-  userId: string
-): Promise<number> {
+export async function getUserDocumentCount(userId: string): Promise<number> {
   const supabase = getSupabaseAdminClient();
 
   const { count, error } = await supabase
@@ -230,7 +220,6 @@ export async function updateDocumentTitle(
     throw new Error(`Failed to update document title: ${error.message}`);
   }
 }
-
 
 export async function searchMultipleSimilarChunks(
   documentIds: string[],

@@ -1,10 +1,9 @@
-import { CallbackHandler } from "langfuse-langchain";
+import { CallbackHandler } from "@/lib/observability/langfuse-callback";
 // src/lib/agents/summarizer.ts
 import {
   getChatModel,
-  switchToNextModel,
-  resetModelSelection,
-  getCurrentChatModelName,
+  createChatModelSelector,
+  type ChatModelSelector,
 } from "@/lib/ai/gemini";
 import { MAP_PROMPT, REDUCE_PROMPT, SUMMARY_PROMPT } from "@/lib/ai/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
@@ -15,34 +14,51 @@ const MAX_CHUNK_TOKENS_FOR_MAP = 500;
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 30000;
 
-export async function summarizeDocument(chunks: TextChunk[], userId: string, documentId: string): Promise<string> {
-  // Reset to primary model at the start of each summarization
-  resetModelSelection();
+export async function summarizeDocument(
+  chunks: TextChunk[],
+  userId: string,
+  documentId: string
+): Promise<string> {
+  // Each summarization run gets its own model selector (no shared global state).
+  const selector = createChatModelSelector();
 
   const outputParser = new StringOutputParser();
 
-  const totalTokens = chunks.reduce(
-    (sum, chunk) => sum + chunk.tokenCount,
-    0
-  );
+  const totalTokens = chunks.reduce((sum, chunk) => sum + chunk.tokenCount, 0);
 
   if (totalTokens <= MAX_DIRECT_SUMMARY_TOKENS) {
-    return await directSummarize(chunks.map((c) => c.content).join("\n\n"), outputParser, userId, documentId);
+    return await directSummarize(
+      chunks.map((c) => c.content).join("\n\n"),
+      outputParser,
+      selector,
+      userId,
+      documentId
+    );
   }
 
-  return await mapReduceSummarize(chunks, outputParser, userId, documentId);
+  return await mapReduceSummarize(
+    chunks,
+    outputParser,
+    selector,
+    userId,
+    documentId
+  );
 }
 
 // Invoke with retry + automatic model fallback on 429
 async function invokeWithRetry<T>(
   fn: (model: ReturnType<typeof getChatModel>) => Promise<T>,
-  label: string
+  label: string,
+  selector: ChatModelSelector
 ): Promise<T | null> {
   let totalAttempts = 0;
   const maxTotalAttempts = MAX_RETRIES * 3; // across all model fallbacks
 
   while (totalAttempts < maxTotalAttempts) {
-    const model = getChatModel({ temperature: 0.3 });
+    const model = getChatModel({
+      temperature: 0.3,
+      modelOverride: selector.current(),
+    });
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       totalAttempts++;
@@ -61,33 +77,27 @@ async function invokeWithRetry<T>(
         }
 
         console.warn(
-          `[Summarizer] ${label} hit rate limit on ${getCurrentChatModelName()} ` +
-          `(attempt ${attempt}/${MAX_RETRIES})`
+          `[Summarizer] ${label} hit rate limit on ${selector.current()} ` +
+            `(attempt ${attempt}/${MAX_RETRIES})`
         );
 
         // On last retry for this model, try switching models
         if (attempt === MAX_RETRIES) {
-          const nextModel = switchToNextModel();
+          const nextModel = selector.next();
           if (nextModel) {
-            console.warn(
-              `[Summarizer] Switching to fallback: ${nextModel}`
-            );
+            console.warn(`[Summarizer] Switching to fallback: ${nextModel}`);
             // Small delay before trying new model
             await sleep(3000);
             break; // Break inner loop, continue outer while
           } else {
-            console.warn(
-              `[Summarizer] All models exhausted for ${label}`
-            );
+            console.warn(`[Summarizer] All models exhausted for ${label}`);
             return null;
           }
         }
 
         // Wait before retrying same model
         const waitMs = RETRY_DELAY_MS * attempt;
-        console.warn(
-          `[Summarizer] Waiting ${waitMs / 1000}s before retry...`
-        );
+        console.warn(`[Summarizer] Waiting ${waitMs / 1000}s before retry...`);
         await sleep(waitMs);
       }
     }
@@ -96,27 +106,57 @@ async function invokeWithRetry<T>(
   return null;
 }
 
-async function directSummarize(text: string, outputParser: StringOutputParser, userId: string, documentId: string): Promise<string> {
-  const langfuseHandler = new CallbackHandler({ tags: ["summarize", "direct"], userId, sessionId: documentId });
+async function directSummarize(
+  text: string,
+  outputParser: StringOutputParser,
+  selector: ChatModelSelector,
+  userId: string,
+  documentId: string
+): Promise<string> {
+  const langfuseHandler = new CallbackHandler({
+    tags: ["summarize", "direct"],
+    userId,
+    sessionId: documentId,
+  });
   const result = await invokeWithRetry(
-    (model) => SUMMARY_PROMPT.pipe(model).pipe(outputParser).invoke({ content: text }, { callbacks: [langfuseHandler] }),
-    "direct summary"
+    (model) =>
+      SUMMARY_PROMPT.pipe(model)
+        .pipe(outputParser)
+        .invoke({ content: text }, { callbacks: [langfuseHandler] }),
+    "direct summary",
+    selector
   );
   return result?.trim() ?? "Summary unavailable.";
 }
 
-async function mapReduceSummarize(chunks: TextChunk[], outputParser: StringOutputParser, userId: string, documentId: string): Promise<string> {
+async function mapReduceSummarize(
+  chunks: TextChunk[],
+  outputParser: StringOutputParser,
+  selector: ChatModelSelector,
+  userId: string,
+  documentId: string
+): Promise<string> {
   const sampledChunks = sampleChunks(chunks, MAX_CHUNK_TOKENS_FOR_MAP);
   const mappedSummaries: string[] = [];
 
   for (const chunk of sampledChunks) {
-    const langfuseMapHandler = new CallbackHandler({ tags: ["summarize", "map"], userId, sessionId: documentId });
+    const langfuseMapHandler = new CallbackHandler({
+      tags: ["summarize", "map"],
+      userId,
+      sessionId: documentId,
+    });
     const summary = await invokeWithRetry(
       (model) =>
-        MAP_PROMPT.pipe(model).pipe(outputParser).invoke({
-          content: chunk.content,
-        }, { callbacks: [langfuseMapHandler] }),
-      `chunk ${chunk.chunkIndex}`
+        MAP_PROMPT.pipe(model)
+          .pipe(outputParser)
+          .invoke(
+            {
+              content: chunk.content,
+            },
+            { callbacks: [langfuseMapHandler] }
+          ),
+      `chunk ${chunk.chunkIndex}`,
+      selector
     );
 
     if (summary) {
@@ -135,15 +175,25 @@ async function mapReduceSummarize(chunks: TextChunk[], outputParser: StringOutpu
   }
 
   // Reset model selection for reduce phase
-  resetModelSelection();
+  selector.reset();
 
-  const langfuseReduceHandler = new CallbackHandler({ tags: ["summarize", "reduce"], userId, sessionId: documentId });
+  const langfuseReduceHandler = new CallbackHandler({
+    tags: ["summarize", "reduce"],
+    userId,
+    sessionId: documentId,
+  });
   const finalSummary = await invokeWithRetry(
     (model) =>
-      REDUCE_PROMPT.pipe(model).pipe(outputParser).invoke({
-        content: mappedSummaries.join("\n\n---\n\n"),
-      }, { callbacks: [langfuseReduceHandler] }),
-    "reduce phase"
+      REDUCE_PROMPT.pipe(model)
+        .pipe(outputParser)
+        .invoke(
+          {
+            content: mappedSummaries.join("\n\n---\n\n"),
+          },
+          { callbacks: [langfuseReduceHandler] }
+        ),
+    "reduce phase",
+    selector
   );
 
   return finalSummary?.trim() ?? mappedSummaries[0] ?? "Summary unavailable.";
@@ -179,11 +229,7 @@ function sampleChunks(
   }
 
   const last = chunks[chunks.length - 1];
-  if (
-    last &&
-    !result.includes(last) &&
-    last.tokenCount <= maxTokensPerChunk
-  ) {
+  if (last && !result.includes(last) && last.tokenCount <= maxTokensPerChunk) {
     result.push(last);
   }
 

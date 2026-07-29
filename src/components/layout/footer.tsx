@@ -3,18 +3,18 @@ import { Brain } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="relative border-t border-white/5 bg-background/50 py-8">
-      <div className="container flex flex-col items-center justify-between gap-4 px-4 text-xs text-muted-foreground sm:flex-row">
+    <footer className="bg-background/50 relative border-t border-white/5 py-8">
+      <div className="text-muted-foreground container flex flex-col items-center justify-between gap-4 px-4 text-xs sm:flex-row">
         <Link href="/" className="group flex items-center gap-2.5">
           <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-blue-600 transition-shadow group-hover:shadow-md group-hover:shadow-violet-500/30">
             <Brain className="h-3 w-3 text-white" />
           </div>
-          <span className="font-semibold text-foreground/70 transition-colors group-hover:text-foreground">
+          <span className="text-foreground/70 group-hover:text-foreground font-semibold transition-colors">
             Research AI
           </span>
         </Link>
 
-        <div className="flex items-center gap-1 text-muted-foreground/60">
+        <div className="text-muted-foreground/60 flex items-center gap-1">
           <span>Built as a portfolio project</span>
           <span className="mx-2">·</span>
           <span className="flex items-center gap-1.5">

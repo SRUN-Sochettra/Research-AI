@@ -13,7 +13,12 @@ interface EmptyStateProps {
   };
 }
 
-export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
+export function EmptyState({
+  icon,
+  title,
+  description,
+  action,
+}: EmptyStateProps) {
   return (
     <div className="flex min-h-[40vh] flex-col items-center justify-center gap-5 p-8 text-center">
       <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/20 to-blue-600/20 ring-1 ring-white/10">
@@ -23,7 +28,7 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
       </div>
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">{title}</h3>
-        <p className="max-w-sm text-sm text-muted-foreground">{description}</p>
+        <p className="text-muted-foreground max-w-sm text-sm">{description}</p>
       </div>
       {action &&
         (action.href ? (
@@ -51,7 +56,10 @@ export function NoDocuments() {
       icon={<Upload className="h-10 w-10 text-violet-400" />}
       title="No documents yet"
       description="Upload a PDF to get started. Our AI will analyze it and let you ask questions."
-      action={{ label: "Upload your first PDF", href: "/documents?upload=true" }}
+      action={{
+        label: "Upload your first PDF",
+        href: "/documents?upload=true",
+      }}
     />
   );
 }

@@ -6,7 +6,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen bg-background">
+    <div className="bg-background relative min-h-screen">
       {/* Ambient background */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-32 -right-32 h-[400px] w-[400px] rounded-full bg-violet-600/6 blur-[100px]" />
@@ -16,9 +16,7 @@ export default function DashboardLayout({
 
       <Header />
 
-      <main className="container relative z-10 px-4 py-8">
-        {children}
-      </main>
+      <main className="relative z-10 container px-4 py-8">{children}</main>
     </div>
   );
 }

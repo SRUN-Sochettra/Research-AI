@@ -2,12 +2,14 @@ import { parsePDF } from "./pdf-parser";
 import { chunkDocument } from "./chunker";
 import { embedChunks } from "./embedder";
 import { summarizeDocument } from "./summarizer";
-import {
-  updateDocumentStatus,
-  saveChunks,
-} from "@/lib/db/queries/documents";
+import { updateDocumentStatus, saveChunks } from "@/lib/db/queries/documents";
 
-export interface PipelineOptions { documentId: string; userId: string; buffer: Buffer; onProgress?: (stage: PipelineStage, message: string) => void; }
+export interface PipelineOptions {
+  documentId: string;
+  userId: string;
+  buffer: Buffer;
+  onProgress?: (stage: PipelineStage, message: string) => void;
+}
 
 export type PipelineStage =
   | "parsing"

@@ -51,24 +51,27 @@ export function DocumentFilters() {
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="relative w-full max-w-sm">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
         <Input
           type="search"
           placeholder="Search documents by title..."
-          className="pl-9 bg-white/[0.02] border-white/7"
+          className="border-white/7 bg-white/[0.02] pl-9"
           value={query}
           onChange={handleQueryChange}
         />
       </div>
-      <div className="flex items-center gap-2 w-full sm:w-auto">
-        <label htmlFor="sort" className="text-sm text-muted-foreground shrink-0">
+      <div className="flex w-full items-center gap-2 sm:w-auto">
+        <label
+          htmlFor="sort"
+          className="text-muted-foreground shrink-0 text-sm"
+        >
           Sort by
         </label>
         <select
           id="sort"
           value={sort}
           onChange={handleSortChange}
-          className="flex h-10 w-full sm:w-[140px] items-center justify-between rounded-md border border-white/7 bg-white/[0.02] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="ring-offset-background placeholder:text-muted-foreground focus:ring-ring flex h-10 w-full items-center justify-between rounded-md border border-white/7 bg-white/[0.02] px-3 py-2 text-sm focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:w-[140px]"
         >
           <option value="newest">Newest first</option>
           <option value="oldest">Oldest first</option>

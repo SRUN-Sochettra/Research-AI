@@ -7,7 +7,9 @@ import {
   FileText,
   LayoutDashboard,
   Settings,
-  ChevronRight, GitCompare, Layers
+  ChevronRight,
+  GitCompare,
+  Layers,
 } from "lucide-react";
 
 const navItems = [
@@ -49,11 +51,10 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-full w-64 flex-col border-r border-white/5 bg-background/50 backdrop-blur-xl">
-
+    <aside className="bg-background/50 flex h-full w-64 flex-col border-r border-white/5 backdrop-blur-xl">
       {/* Nav items */}
       <nav className="flex-1 space-y-0.5 p-3">
-        <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+        <p className="text-muted-foreground mb-2 px-3 text-[10px] font-semibold tracking-[0.15em] uppercase">
           Navigation
         </p>
         {navItems.map((item) => {
@@ -67,7 +68,7 @@ export function Sidebar() {
                 "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-150",
                 isActive
                   ? "bg-violet-500/10 text-violet-300 shadow-sm"
-                  : "text-muted-foreground hover:bg-white/4 hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-white/4"
               )}
             >
               {/* Active indicator */}
@@ -82,15 +83,17 @@ export function Sidebar() {
                 <item.icon
                   className={cn(
                     "h-4 w-4 transition-colors",
-                    isActive ? "text-white" : "text-muted-foreground group-hover:text-foreground"
+                    isActive
+                      ? "text-white"
+                      : "text-muted-foreground group-hover:text-foreground"
                   )}
                 />
               </div>
 
               <div className="min-w-0 flex-1">
-                <div className="font-medium leading-none">{item.label}</div>
+                <div className="leading-none font-medium">{item.label}</div>
                 {item.description && (
-                  <div className="mt-0.5 truncate text-[11px] text-muted-foreground/70">
+                  <div className="text-muted-foreground/70 mt-0.5 truncate text-[11px]">
                     {item.description}
                   </div>
                 )}
@@ -115,8 +118,8 @@ export function Sidebar() {
               className={cn(
                 "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all",
                 isActive
-                  ? "bg-white/6 text-foreground"
-                  : "text-muted-foreground hover:bg-white/4 hover:text-foreground"
+                  ? "text-foreground bg-white/6"
+                  : "text-muted-foreground hover:text-foreground hover:bg-white/4"
               )}
             >
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/4 transition-colors group-hover:bg-white/7">

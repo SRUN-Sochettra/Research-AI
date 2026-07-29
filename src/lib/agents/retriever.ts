@@ -1,5 +1,8 @@
 import { embedQuery } from "./embedder";
-import { searchSimilarChunks, searchMultipleSimilarChunks } from "@/lib/db/queries/documents";
+import {
+  searchSimilarChunks,
+  searchMultipleSimilarChunks,
+} from "@/lib/db/queries/documents";
 import { AI_CONFIG } from "@/lib/utils/constants";
 import { logger } from "@/lib/observability/logger";
 
@@ -33,14 +36,10 @@ export async function retrieveRelevantChunks(
   const queryEmbedding = await embedQuery(query);
 
   // 2. Semantic search against pgvector
-  const rawChunks = await searchSimilarChunks(
-    documentId,
-    queryEmbedding,
-    {
-      threshold: options?.threshold ?? AI_CONFIG.similarityThreshold,
-      count: options?.count ?? AI_CONFIG.maxRetrievedChunks,
-    }
-  );
+  const rawChunks = await searchSimilarChunks(documentId, queryEmbedding, {
+    threshold: options?.threshold ?? AI_CONFIG.similarityThreshold,
+    count: options?.count ?? AI_CONFIG.maxRetrievedChunks,
+  });
 
   logger.info("[Retriever] Retrieved chunks", {
     documentId,
@@ -58,7 +57,6 @@ export async function retrieveRelevantChunks(
 
   return { chunks, query };
 }
-
 
 export async function retrieveMultipleDocumentsChunks(
   query: string,
@@ -101,7 +99,6 @@ export async function retrieveMultipleDocumentsChunks(
   return { chunks, query };
 }
 
-
 // Format chunks into a readable context string for the LLM
 export function formatChunksAsContext(chunks: RetrievedChunk[]): string {
   if (chunks.length === 0) {
@@ -110,9 +107,7 @@ export function formatChunksAsContext(chunks: RetrievedChunk[]): string {
 
   return chunks
     .map((chunk, index) => {
-      const pageRef = chunk.pageNumber
-        ? ` (Page ${chunk.pageNumber})`
-        : "";
+      const pageRef = chunk.pageNumber ? ` (Page ${chunk.pageNumber})` : "";
       return `[Source ${index + 1}${pageRef}]:\n${chunk.content}`;
     })
     .join("\n\n---\n\n");

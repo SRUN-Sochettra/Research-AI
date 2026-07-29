@@ -20,11 +20,7 @@ const SUGGESTED_QUESTIONS = [
   "List the most important facts mentioned",
 ];
 
-export function ChatInput({
-  onSend,
-  isLoading,
-  disabled,
-}: ChatInputProps) {
+export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -73,7 +69,7 @@ export function ChatInput({
                 setValue(q);
                 textareaRef.current?.focus();
               }}
-              className="rounded-full border bg-muted px-3 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              className="bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-full border px-3 py-1 text-xs transition-colors"
             >
               {q}
             </button>
@@ -82,7 +78,7 @@ export function ChatInput({
       )}
 
       {/* Input area */}
-      <div className="relative flex items-end gap-2 rounded-xl border bg-background p-2 shadow-sm focus-within:ring-1 focus-within:ring-ring">
+      <div className="bg-background focus-within:ring-ring relative flex items-end gap-2 rounded-xl border p-2 shadow-sm focus-within:ring-1">
         <Textarea
           ref={textareaRef}
           value={value}
@@ -109,9 +105,7 @@ export function ChatInput({
         <Button
           size="icon"
           onClick={handleSubmit}
-          disabled={
-            !value.trim() || isLoading || disabled
-          }
+          disabled={!value.trim() || isLoading || disabled}
           className="h-9 w-9 shrink-0 rounded-lg"
           aria-label={isLoading ? "Cancel response" : "Send message"}
         >
@@ -132,9 +126,7 @@ export function ChatInput({
         <p
           className={cn(
             "text-right text-xs",
-            charsRemaining < 50
-              ? "text-destructive"
-              : "text-muted-foreground"
+            charsRemaining < 50 ? "text-destructive" : "text-muted-foreground"
           )}
         >
           {charsRemaining} characters remaining
