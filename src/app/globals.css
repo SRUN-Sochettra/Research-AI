@@ -21,8 +21,9 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, monospace;
   --radius: 0.5rem;
 }
 
@@ -79,7 +80,7 @@
     min-height: 100vh;
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
     background-image:
       linear-gradient(hsl(var(--border) / 0.12) 1px, transparent 1px),
       linear-gradient(90deg, hsl(var(--border) / 0.08) 1px, transparent 1px);
@@ -113,14 +114,15 @@
   margin-inline: auto;
 }
 .display-serif {
-  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  font-weight: 720;
-  letter-spacing: -0.055em;
+  font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
 }
 .eyebrow {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-plex-mono), ui-monospace, SFMono-Regular, monospace;
   font-size: 0.68rem;
-  font-weight: 650;
+  font-weight: 600;
   letter-spacing: 0.13em;
   text-transform: uppercase;
   color: hsl(var(--muted-foreground));

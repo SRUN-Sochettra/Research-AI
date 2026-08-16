@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Check, Loader2, MailCheck } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { BrandWordmark } from "@/components/layout/brand-mark";
+import { GoogleMark } from "@/components/layout/google-mark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,11 +50,11 @@ export default function SignupPage() {
     );
   return (
     <main className="neural-field grid min-h-screen lg:grid-cols-[.9fr_1.1fr]">
-      <section className="bg-card flex flex-col justify-between border-r p-6 sm:p-10">
+      <section className="bg-card flex min-h-[15rem] flex-col border-b p-6 sm:p-10 lg:min-h-screen lg:border-r lg:border-b-0">
         <Link href="/" aria-label="SynapseDoc home">
           <BrandWordmark />
         </Link>
-        <div className="hidden lg:block">
+        <div className="mx-auto my-auto hidden w-full max-w-xl py-12 lg:block">
           <p className="eyebrow">The research instrument</p>
           <h2 className="display-serif mt-5 text-5xl">
             Build an argument with the source still attached.
@@ -71,16 +72,19 @@ export default function SignupPage() {
           </ul>
         </div>
       </section>
-      <section className="grid place-items-center px-5 py-12">
-        <div className="w-full max-w-sm">
+      <section className="grid place-items-center px-5 py-10 sm:px-8 lg:py-14">
+        <div className="w-full max-w-[27rem]">
           <p className="eyebrow">New workspace</p>
-          <h1 className="display-serif mt-3 text-5xl">Create account.</h1>
+          <h1 className="display-serif mt-3 text-4xl sm:text-5xl">
+            Create account.
+          </h1>
           <Button
             variant="outline"
             className="mt-8 h-11 w-full"
             onClick={signInWithGoogle}
             disabled={busy}
           >
+            <GoogleMark />
             Continue with Google
           </Button>
           <div className="my-6 flex items-center gap-3">

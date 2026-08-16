@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { BrandWordmark } from "@/components/layout/brand-mark";
+import { GoogleMark } from "@/components/layout/google-mark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,11 +24,11 @@ export default function LoginPage() {
   }
   return (
     <main className="neural-field grid min-h-screen lg:grid-cols-[.9fr_1.1fr]">
-      <section className="flex flex-col justify-between border-r p-6 sm:p-10">
+      <section className="bg-card flex min-h-[15rem] flex-col border-b p-6 sm:p-10 lg:min-h-screen lg:border-r lg:border-b-0">
         <Link href="/" aria-label="SynapseDoc home">
           <BrandWordmark />
         </Link>
-        <div className="hidden lg:block">
+        <div className="mx-auto my-auto hidden w-full max-w-xl py-12 lg:block">
           <p className="eyebrow">A quieter way to research</p>
           <p className="display-serif mt-5 max-w-lg text-5xl leading-[1.02]">
             Return to your sources, not another noisy dashboard.
@@ -37,10 +38,12 @@ export default function LoginPage() {
           Source-grounded PDF research
         </p>
       </section>
-      <section className="grid place-items-center px-5 py-12">
-        <div className="w-full max-w-sm">
+      <section className="grid place-items-center px-5 py-10 sm:px-8 lg:py-14">
+        <div className="w-full max-w-[27rem]">
           <p className="eyebrow">Workspace access</p>
-          <h1 className="display-serif mt-3 text-5xl">Welcome back.</h1>
+          <h1 className="display-serif mt-3 text-4xl sm:text-5xl">
+            Welcome back.
+          </h1>
           <p className="text-muted-foreground mt-3 text-sm">
             Sign in to continue your research.
           </p>
@@ -50,6 +53,7 @@ export default function LoginPage() {
             onClick={signInWithGoogle}
             disabled={busy || isLoading}
           >
+            <GoogleMark />
             Continue with Google
           </Button>
           <div className="my-6 flex items-center gap-3">
