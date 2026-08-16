@@ -106,7 +106,7 @@ function DocumentDetailCard({ doc }: { doc?: Document }) {
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-2 text-xl">
-              <FileText className="h-5 w-5 text-violet-400" />
+              <FileText className="text-primary h-5 w-5" />
               {doc.title}
             </CardTitle>
             <div className="text-muted-foreground flex items-center gap-2 text-xs">
@@ -140,7 +140,7 @@ function DocumentDetailCard({ doc }: { doc?: Document }) {
             </div>
           </div>
           <div className="bg-background/50 flex items-center gap-2 p-4">
-            <Layers className="h-4 w-4 text-violet-400" />
+            <Layers className="text-primary h-4 w-4" />
             <div className="flex flex-col">
               <span className="text-muted-foreground text-xs">Pages</span>
               <span className="text-sm font-medium">

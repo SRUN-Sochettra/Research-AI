@@ -11,6 +11,7 @@ import {
   formatConversationHistory,
 } from "./query-reformulator";
 import { logger } from "@/lib/observability/logger";
+import { AI_CONFIG } from "@/lib/utils/constants";
 import type { RetrievedChunk } from "./retriever";
 import type { Message } from "@/types/database";
 
@@ -58,6 +59,8 @@ export async function runQAAgent(
   documentIds?: string[]
 ): Promise<void> {
   const startTime = Date.now();
+  let currentStage = "initialization";
+  let currentModel: string = AI_CONFIG.chatModel;
 
   try {
     logger.info("[QAAgent] Starting QA pipeline", {
@@ -67,6 +70,8 @@ export async function runQAAgent(
     });
 
     // ─── Step 1: Reformulate Query ─────────────────────
+    currentStage = "query-reformulation";
+    currentModel = AI_CONFIG.chatModel;
     const reformulatedQuery = await reformulateQuery(
       question,
       conversationHistory,
@@ -75,6 +80,8 @@ export async function runQAAgent(
     );
 
     // ─── Step 2: Retrieve Relevant Chunks ──────────────
+    currentStage = "retrieval";
+    currentModel = AI_CONFIG.embeddingModel;
     let chunks: RetrievedChunk[] = [];
     if (documentIds && documentIds.length > 0) {
       const result = await retrieveMultipleDocumentsChunks(
@@ -113,16 +120,12 @@ export async function runQAAgent(
     }
 
     // ─── Step 3: Format Context ─────────────────────────
+    currentStage = "format-context";
     const context = formatChunksAsContext(chunks);
     const chatHistory = formatConversationHistory(conversationHistory);
 
     // ─── Step 4: Stream LLM Response (with model fallback) ─────
-    //
-    // Mirrors the summarizer's resilience: on a 429 we advance the fallback
-    // chain and retry. A model swap is only safe BEFORE any token has been
-    // emitted to the client — once we've started streaming a partial answer we
-    // can't cleanly restart with a different model, so at that point a failure
-    // surfaces as onError (the client keeps whatever it received).
+    currentStage = "llm-generation";
     const langfuseHandler = new CallbackHandler({
       sessionId: conversationId,
       userId: userId,
@@ -133,10 +136,11 @@ export async function runQAAgent(
     let fullAnswer = "";
 
     while (true) {
+      currentModel = selector.current();
       const model = getChatModel({
         temperature: 0.3,
         streaming: true,
-        modelOverride: selector.current(),
+        modelOverride: currentModel,
       });
 
       const chain = QA_PROMPT.pipe(model);
@@ -168,18 +172,23 @@ export async function runQAAgent(
           const nextModel = selector.next();
           if (nextModel) {
             logger.warn("[QAAgent] Chat hit rate limit, switching model", {
+              stage: currentStage,
+              previousModel: currentModel,
               nextModel,
             });
             fullAnswer = "";
             continue;
           }
-          logger.warn("[QAAgent] All chat models exhausted");
+          logger.warn("[QAAgent] All chat models exhausted", {
+            stage: currentStage,
+          });
         }
         throw error;
       }
     }
 
     // ─── Step 5: Build Citations ────────────────────────
+    currentStage = "citation-building";
     const citations = buildCitations(
       chunks,
       (documentId || documentIds?.[0] || "") as string
@@ -203,8 +212,12 @@ export async function runQAAgent(
   } catch (error) {
     logger.error(
       "[QAAgent] Pipeline failed",
-      error instanceof Error ? error : new Error("Unknown error"),
-      { documentId: documentId || documentIds?.[0] }
+      error instanceof Error ? error : new Error("QA pipeline failed"),
+      {
+        stage: currentStage,
+        model: currentModel,
+        documentId: documentId || documentIds?.[0],
+      }
     );
     callbacks.onError(
       error instanceof Error ? error : new Error("QA pipeline failed")

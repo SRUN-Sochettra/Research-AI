@@ -78,7 +78,7 @@ export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
       )}
 
       {/* Input area */}
-      <div className="bg-background focus-within:ring-ring relative flex items-end gap-2 rounded-xl border p-2 shadow-sm focus-within:ring-1">
+      <div className="bg-background focus-within:ring-ring relative flex items-end gap-2 rounded-md border p-2 shadow-sm focus-within:ring-1">
         <Textarea
           ref={textareaRef}
           value={value}

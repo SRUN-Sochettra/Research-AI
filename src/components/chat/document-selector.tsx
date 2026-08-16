@@ -38,7 +38,7 @@ export function DocumentSelector({ documents }: { documents: Document[] }) {
       </div>
 
       {documents.length === 0 ? (
-        <div className="bg-muted/20 rounded-xl border border-dashed p-12 text-center">
+        <div className="bg-muted/20 rounded-md border border-dashed p-12 text-center">
           <p className="text-muted-foreground text-sm">
             No documents found. Please upload some first.
           </p>
@@ -52,9 +52,9 @@ export function DocumentSelector({ documents }: { documents: Document[] }) {
               <div
                 key={doc.id}
                 onClick={() => isReady && toggleSelection(doc.id)}
-                className={`relative cursor-pointer rounded-xl border p-4 transition-all ${
+                className={`relative cursor-pointer rounded-md border p-4 transition-all ${
                   isSelected
-                    ? "border-violet-500 bg-violet-500/10"
+                    ? "border-primary bg-primary/10"
                     : "border-white/10 bg-white/[0.02] hover:border-white/20"
                 } ${!isReady ? "cursor-not-allowed opacity-50" : ""}`}
               >
@@ -68,7 +68,7 @@ export function DocumentSelector({ documents }: { documents: Document[] }) {
                     </p>
                   </div>
                   {isSelected && (
-                    <CheckCircle2 className="h-5 w-5 shrink-0 text-violet-500" />
+                    <CheckCircle2 className="text-primary h-5 w-5 shrink-0" />
                   )}
                 </div>
               </div>

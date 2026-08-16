@@ -107,26 +107,49 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // ─── 5. Get or Create Conversation ──────────────────────
-  const conversation = await getOrCreateConversation(
-    user.id,
-    documentId,
-    conversationId,
-    documentIds
-  );
+  // ─── 5. Get or Create Conversation & Pre-stream Setup ──────
+  let conversation;
+  let history;
+  try {
+    conversation = await getOrCreateConversation(
+      user.id,
+      documentId,
+      conversationId,
+      documentIds
+    );
 
-  // ─── 6. Load Conversation History ───────────────────────
-  const history = await getConversationMessages(
-    conversation.id,
-    20 // Last 20 messages for context
-  );
+    history = await getConversationMessages(
+      conversation.id,
+      20 // Last 20 messages for context
+    );
 
-  // ─── 7. Save User Message ────────────────────────────────
-  await saveMessage({
-    conversationId: conversation.id,
-    role: "user",
-    content: message,
-  });
+    await saveMessage({
+      conversationId: conversation.id,
+      role: "user",
+      content: message,
+    });
+  } catch (error) {
+    const isSyntaxOrProviderError =
+      error instanceof Error &&
+      (error.message.includes("JSON.parse") ||
+        error.name === "SyntaxError" ||
+        error.message.includes("Unexpected token"));
+
+    logger.error(
+      "[ChatAPI] Pre-stream setup failed",
+      error instanceof Error ? error : new Error("Pre-stream error"),
+      { documentId }
+    );
+
+    const errorMessage = isSyntaxOrProviderError
+      ? "The AI provider returned an invalid response. Please retry."
+      : "Failed to process chat request. Please try again.";
+
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
   // ─── 8. Build Streaming Response ────────────────────────
   const encoder = new TextEncoder();
@@ -197,9 +220,24 @@ export async function POST(request: NextRequest) {
             },
 
             onError: (error) => {
-              logger.error("[ChatAPI] QA agent error", error, { documentId });
+              const isSyntaxOrProviderError =
+                error instanceof Error &&
+                (error.message.includes("JSON.parse") ||
+                  error.name === "SyntaxError" ||
+                  error.message.includes("Unexpected token"));
+
+              logger.error(
+                "[ChatAPI] QA agent error",
+                error instanceof Error ? error : new Error("QA agent error"),
+                { documentId }
+              );
+
+              const userMessage = isSyntaxOrProviderError
+                ? "The AI provider returned an invalid response. Please retry."
+                : "Failed to generate response. Please try again.";
+
               send("error", {
-                message: "Failed to generate response. Please try again.",
+                message: userMessage,
               });
               controller.close();
             },
@@ -208,12 +246,23 @@ export async function POST(request: NextRequest) {
           documentIds
         );
       } catch (error) {
+        const isSyntaxOrProviderError =
+          error instanceof Error &&
+          (error.message.includes("JSON.parse") ||
+            error.name === "SyntaxError" ||
+            error.message.includes("Unexpected token"));
+
         logger.error(
           "[ChatAPI] Unexpected error",
           error instanceof Error ? error : new Error("Unknown"),
           { documentId }
         );
-        send("error", { message: "Unexpected error occurred." });
+
+        const userMessage = isSyntaxOrProviderError
+          ? "The AI provider returned an invalid response. Please retry."
+          : "Unexpected error occurred.";
+
+        send("error", { message: userMessage });
         controller.close();
       }
     },

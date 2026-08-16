@@ -86,11 +86,11 @@ export function ChatInterface({
   const isDocumentReady = document.status === "ready";
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-white/7 bg-white/[0.015]">
+    <div className="flex h-full flex-col overflow-hidden rounded-md border border-white/7 bg-white/[0.015]">
       {/* ── Doc header bar ── */}
       <div className="flex items-center gap-3 border-b border-white/6 px-5 py-3.5">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600/20 to-blue-600/10 ring-1 ring-white/8">
-          <Brain className="h-4 w-4 text-violet-400" />
+          <Brain className="text-primary h-4 w-4" />
         </div>
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{document.title}</p>
@@ -169,9 +169,9 @@ export function ChatInterface({
           {isLoading && (
             <div className="mt-5 flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-600/20 to-blue-600/10 ring-1 ring-white/8">
-                <Brain className="h-4 w-4 text-violet-400" />
+                <Brain className="text-primary h-4 w-4" />
               </div>
-              <div className="flex items-center gap-1 rounded-2xl rounded-tl-sm border border-white/7 bg-white/[0.03] px-4 py-3">
+              <div className="flex items-center gap-1 rounded-md rounded-tl-sm border border-white/7 bg-white/[0.03] px-4 py-3">
                 <span className="flex gap-1">
                   {[0, 1, 2].map((i) => (
                     <span

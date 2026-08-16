@@ -21,7 +21,7 @@ export default async function ComparePage() {
 
   if (error) {
     return (
-      <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-center text-sm text-red-400">
+      <div className="rounded-md border border-red-500/20 bg-red-500/10 p-4 text-center text-sm text-red-400">
         Failed to load documents. Please try again.
       </div>
     );

@@ -1,399 +1,123 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { ArrowRight, BookOpen, FileSearch, Quote, Upload } from "lucide-react";
 import { Header } from "@/components/layout/header";
-import {
-  Brain,
-  FileText,
-  MessageSquare,
-  Zap,
-  Shield,
-  BarChart3,
-  ArrowRight,
-  Sparkles,
-  Upload,
-  Search,
-  CheckCircle,
-} from "lucide-react";
-
-const features = [
-  {
-    icon: FileText,
-    title: "PDF Analysis",
-    description:
-      "Upload any PDF and our AI agents automatically extract, chunk, and index every word for instant retrieval.",
-    accent: "violet",
-    iconBg: "from-violet-500/20 to-violet-600/10",
-    iconColor: "text-violet-400",
-    border: "hover:border-violet-500/30",
-    glow: "hover:shadow-violet-500/5",
-  },
-  {
-    icon: MessageSquare,
-    title: "Intelligent Q&A",
-    description:
-      "Ask in natural language. Get precise answers backed by page-level citations you can verify instantly.",
-    accent: "blue",
-    iconBg: "from-blue-500/20 to-blue-600/10",
-    iconColor: "text-blue-400",
-    border: "hover:border-blue-500/30",
-    glow: "hover:shadow-blue-500/5",
-  },
-  {
-    icon: Zap,
-    title: "Auto-Summarization",
-    description:
-      "Get comprehensive multi-section summaries of dense documents in seconds using parallel AI agents.",
-    accent: "amber",
-    iconBg: "from-amber-500/20 to-amber-600/10",
-    iconColor: "text-amber-400",
-    border: "hover:border-amber-500/30",
-    glow: "hover:shadow-amber-500/5",
-  },
-  {
-    icon: Brain,
-    title: "RAG Pipeline",
-    description:
-      "Retrieval-Augmented Generation grounds every answer in your document — no hallucinations.",
-    accent: "emerald",
-    iconBg: "from-emerald-500/20 to-emerald-600/10",
-    iconColor: "text-emerald-400",
-    border: "hover:border-emerald-500/30",
-    glow: "hover:shadow-emerald-500/5",
-  },
-  {
-    icon: Shield,
-    title: "Secure & Private",
-    description:
-      "Row-level security, encrypted storage, and strict user data isolation. Your documents stay yours.",
-    accent: "rose",
-    iconBg: "from-rose-500/20 to-rose-600/10",
-    iconColor: "text-rose-400",
-    border: "hover:border-rose-500/30",
-    glow: "hover:shadow-rose-500/5",
-  },
-  {
-    icon: BarChart3,
-    title: "Observable AI",
-    description:
-      "Full LangFuse tracing of every agent decision. Know exactly why every answer was generated.",
-    accent: "indigo",
-    iconBg: "from-indigo-500/20 to-indigo-600/10",
-    iconColor: "text-indigo-400",
-    border: "hover:border-indigo-500/30",
-    glow: "hover:shadow-indigo-500/5",
-  },
-];
+import { Button } from "@/components/ui/button";
 
 const steps = [
-  {
-    step: "01",
-    icon: Upload,
-    title: "Upload your PDF",
-    description:
-      "Drag & drop or browse. Up to 10MB. Processing starts instantly.",
-  },
-  {
-    step: "02",
-    icon: Brain,
-    title: "AI indexes the content",
-    description:
-      "Multi-agent pipeline chunks, embeds, and stores your document.",
-  },
-  {
-    step: "03",
-    icon: Search,
-    title: "Ask anything",
-    description:
-      "Natural language questions. Cited answers in under 3 seconds.",
-  },
-];
-
-const techStack = [
-  { name: "Next.js 15", color: "text-white/70" },
-  { name: "LangChain.js", color: "text-emerald-400/70" },
-  { name: "Google Gemini", color: "text-blue-400/70" },
-  { name: "Supabase", color: "text-emerald-400/70" },
-  { name: "pgvector", color: "text-cyan-400/70" },
-  { name: "TypeScript", color: "text-blue-400/70" },
-  { name: "Tailwind CSS", color: "text-cyan-400/70" },
-  { name: "LangFuse", color: "text-violet-400/70" },
-];
-
-const stats = [
-  { value: "<3s", label: "Response time", sub: "avg" },
-  { value: "10MB", label: "Max PDF size", sub: "per doc" },
-  { value: "99%", label: "Citation accuracy", sub: "grounded" },
-  { value: "∞", label: "Questions", sub: "per doc" },
+  [
+    "01",
+    "Bring the source",
+    "Upload a PDF. Mogger preserves page references while it parses and indexes the text.",
+  ],
+  [
+    "02",
+    "Interrogate the evidence",
+    "Ask direct questions, compare claims, or request a structured summary.",
+  ],
+  [
+    "03",
+    "Trace every answer",
+    "Open page-level citations and move from synthesis back to the original source.",
+  ],
 ];
 
 export default function HomePage() {
   return (
-    <div className="bg-background relative min-h-screen overflow-x-hidden">
-      {/* ── Global ambient background ── */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        {/* Top-right orb */}
-        <div className="absolute -top-48 -right-48 h-[600px] w-[600px] rounded-full bg-violet-600/10 blur-[130px]" />
-        {/* Bottom-left orb */}
-        <div className="absolute -bottom-48 -left-48 h-[500px] w-[500px] rounded-full bg-blue-600/10 blur-[130px]" />
-        {/* Center subtle orb */}
-        <div className="absolute top-1/2 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-600/5 blur-[150px]" />
-        {/* Grid */}
-        <div className="grid-pattern absolute inset-0 opacity-100" />
-        {/* Vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,hsl(222,47%,4%)_100%)]" />
-      </div>
-
+    <div className="min-h-screen overflow-hidden">
       <Header />
-
-      {/* ━━━━━━━━━━━━━━ HERO ━━━━━━━━━━━━━━ */}
-      <section className="relative container flex flex-col items-center justify-center gap-8 px-4 py-24 text-center md:py-36">
-        {/* Badge */}
-        <div className="animate-fade-in inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/8 px-4 py-1.5 text-xs font-medium text-violet-300 backdrop-blur-sm">
-          <Sparkles className="h-3 w-3 text-violet-400" />
-          <span>Autonomous multi-agent AI pipeline</span>
-          <span className="ml-1 rounded-full bg-violet-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-violet-300">
-            BETA
-          </span>
-        </div>
-
-        {/* Headline */}
-        <div className="animate-slide-up stagger-1 space-y-3">
-          <h1 className="max-w-4xl text-5xl leading-[1.08] font-extrabold tracking-[-0.03em] text-balance sm:text-6xl md:text-7xl">
-            Research smarter
-            <br />
-            <span className="gradient-text glow-text">with AI agents</span>
-          </h1>
-          <p className="text-muted-foreground mx-auto max-w-lg text-base leading-relaxed text-pretty sm:text-lg">
-            Upload PDFs, ask questions in plain English, and get accurate
-            answers with citations — powered by an autonomous RAG pipeline.
-          </p>
-        </div>
-
-        {/* CTAs */}
-        <div className="animate-slide-up stagger-2 flex flex-col items-center gap-3 sm:flex-row">
-          <Button
-            size="lg"
-            asChild
-            className="group animate-gradient relative h-12 overflow-hidden bg-gradient-to-r from-violet-600 to-blue-600 px-7 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all hover:scale-[1.02] hover:shadow-violet-500/40"
-          >
-            <Link href="/signup">
-              Start for free
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-            </Link>
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            asChild
-            className="h-12 border-white/8 bg-white/3 px-7 text-sm font-medium backdrop-blur-sm hover:border-white/15 hover:bg-white/7"
-          >
-            <Link href="/login">Sign in</Link>
-          </Button>
-        </div>
-
-        {/* Social proof micro-copy */}
-        <p className="animate-fade-in stagger-3 text-muted-foreground flex items-center gap-2 text-xs">
-          <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />
-          No credit card · Free to get started · Built with production-grade AI
-        </p>
-
-        {/* ── Stats strip ── */}
-        <div className="animate-slide-up stagger-3 mt-2 grid w-full max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="glass card-interactive group rounded-2xl border border-white/6 p-4 text-center"
-            >
-              <div className="gradient-text text-2xl font-extrabold tracking-tight">
-                {stat.value}
-              </div>
-              <div className="text-foreground/70 mt-0.5 text-[11px] font-medium">
-                {stat.label}
-              </div>
-              <div className="text-muted-foreground text-[10px]">
-                {stat.sub}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ━━━━━━━━━━━━━━ HOW IT WORKS ━━━━━━━━━━━━━━ */}
-      <section className="relative container px-4 py-20">
-        {/* Section label */}
-        <div className="mb-14 text-center">
-          <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-[0.2em] uppercase">
-            How it works
-          </p>
-          <h2 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
-            From PDF to insights{" "}
-            <span className="gradient-text">in seconds</span>
-          </h2>
-        </div>
-
-        {/* Steps */}
-        <div className="relative grid gap-6 sm:grid-cols-3">
-          {/* Connector line — desktop only */}
-          <div className="pointer-events-none absolute top-[52px] right-[calc(16.67%+1rem)] left-[calc(16.67%+1rem)] hidden h-px sm:block">
-            <div className="h-full w-full bg-gradient-to-r from-violet-500/30 via-blue-500/30 to-cyan-500/30" />
-          </div>
-
-          {steps.map((step, i) => (
-            <div
-              key={step.step}
-              className={`glass card-interactive group animate-slide-up relative flex flex-col items-center rounded-2xl border border-white/7 p-7 text-center stagger-${i + 1}`}
-            >
-              {/* Step number */}
-              <div className="mb-5 flex flex-col items-center gap-3">
-                <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-violet-600/20 to-blue-600/10">
-                  <step.icon className="h-6 w-6 text-violet-400" />
-                  {/* Step badge */}
-                  <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-blue-600 text-[10px] font-bold text-white">
-                    {i + 1}
-                  </span>
-                </div>
-              </div>
-              <h3 className="mb-2 text-base font-semibold">{step.title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                {step.description}
+      <main>
+        <section className="container px-5 pt-16 pb-16 sm:px-8 sm:pt-24 lg:pb-24">
+          <div className="grid gap-12 lg:grid-cols-[1.15fr_.85fr] lg:items-end">
+            <div>
+              <p className="eyebrow mb-6">
+                Research workspace / PDF intelligence
               </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ━━━━━━━━━━━━━━ FEATURES ━━━━━━━━━━━━━━ */}
-      <section className="relative container px-4 py-20">
-        <div className="mb-14 text-center">
-          <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-[0.2em] uppercase">
-            Features
-          </p>
-          <h2 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
-            Everything you need to{" "}
-            <span className="gradient-text">research smarter</span>
-          </h2>
-          <p className="text-muted-foreground mt-3 text-sm">
-            Production-grade AI infrastructure, not a toy demo.
-          </p>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature, i) => (
-            <div
-              key={feature.title}
-              className={`card-interactive group relative overflow-hidden rounded-2xl border border-white/7 bg-white/[0.018] p-6 transition-all duration-300 ${feature.border} hover:shadow-lg ${feature.glow} animate-slide-up stagger-${Math.min(i + 1, 6)}`}
-            >
-              {/* Top shimmer bar on hover */}
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-              {/* Icon */}
-              <div
-                className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${feature.iconBg} ring-1 ring-white/8`}
-              >
-                <feature.icon className={`h-5 w-5 ${feature.iconColor}`} />
-              </div>
-
-              <h3 className="mb-2 text-base leading-snug font-semibold">
-                {feature.title}
-              </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                {feature.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ━━━━━━━━━━━━━━ TECH STACK ━━━━━━━━━━━━━━ */}
-      <section className="relative border-y border-white/5 py-14">
-        <div className="container px-4 text-center">
-          <p className="text-muted-foreground mb-6 text-[11px] font-semibold tracking-[0.25em] uppercase">
-            Built with
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {techStack.map((tech) => (
-              <span
-                key={tech.name}
-                className={`rounded-full border border-white/8 bg-white/3 px-4 py-1.5 text-xs font-medium ${tech.color} hover:text-foreground transition-all duration-200 hover:border-violet-500/25 hover:bg-violet-500/5`}
-              >
-                {tech.name}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ━━━━━━━━━━━━━━ CTA ━━━━━━━━━━━━━━ */}
-      <section className="relative container px-4 py-24">
-        <div className="border-gradient relative overflow-hidden rounded-3xl p-px">
-          <div className="via-background relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-950/60 to-blue-950/60 px-8 py-16 text-center sm:px-16">
-            {/* Inner glows */}
-            <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-violet-500/15 blur-[80px]" />
-            <div className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-blue-500/15 blur-[80px]" />
-            <div className="dot-pattern absolute inset-0 opacity-30" />
-
-            <div className="relative">
-              {/* Icon */}
-              <div className="glow-md mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-blue-600 shadow-lg shadow-violet-500/30">
-                <Brain className="h-8 w-8 text-white" />
-              </div>
-
-              <h2 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
-                Ready to transform
+              <h1 className="display-serif max-w-4xl text-[clamp(3.4rem,8vw,7.5rem)] leading-[.86]">
+                Read less.
                 <br />
-                <span className="gradient-text">your research workflow?</span>
-              </h2>
-              <p className="text-muted-foreground mt-3 text-sm">
-                Free to start. No credit card. Cancel anytime.
+                <em className="text-primary not-italic">Know where</em>
+                <br />
+                it came from.
+              </h1>
+              <p className="text-muted-foreground mt-8 max-w-xl text-base leading-7 sm:text-lg">
+                Mogger Research turns dense PDFs into a source-grounded
+                conversation—summaries, precise answers, and page citations in
+                one restrained workspace.
               </p>
-
-              <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                <Button
-                  size="lg"
-                  asChild
-                  className="group animate-gradient h-12 bg-gradient-to-r from-violet-600 to-blue-600 px-8 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all hover:scale-[1.02] hover:shadow-violet-500/40"
-                >
+              <div className="mt-9 flex flex-wrap gap-3">
+                <Button asChild size="lg" className="h-11 px-5">
                   <Link href="/signup">
-                    Start analyzing for free
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    Start a research file <ArrowRight />
                   </Link>
                 </Button>
                 <Button
-                  size="lg"
-                  variant="ghost"
                   asChild
-                  className="text-muted-foreground hover:text-foreground h-12 px-6"
+                  size="lg"
+                  variant="outline"
+                  className="h-11 px-5"
                 >
-                  <Link href="/login">Already have an account →</Link>
+                  <Link href="/login">Open workspace</Link>
                 </Button>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ━━━━━━━━━━━━━━ FOOTER ━━━━━━━━━━━━━━ */}
-      <footer className="relative border-t border-white/5 py-8">
-        <div className="text-muted-foreground container flex flex-col items-center justify-between gap-4 px-4 text-xs sm:flex-row">
-          <Link href="/" className="group flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-blue-600 shadow-sm shadow-violet-500/20 transition-shadow group-hover:shadow-violet-500/40">
-              <Brain className="h-3.5 w-3.5 text-white" />
+            <div className="folio-panel relative overflow-hidden p-5 sm:p-7">
+              <div className="mb-8 flex items-center justify-between border-b pb-4">
+                <span className="eyebrow">Evidence brief</span>
+                <span className="text-muted-foreground font-mono text-xs">
+                  PDF / 24 pp.
+                </span>
+              </div>
+              <Quote className="text-primary mb-5 size-8" />
+              <p className="display-serif text-3xl leading-tight">
+                “The answer is only useful when the path back to the source is
+                obvious.”
+              </p>
+              <div className="bg-border mt-8 grid grid-cols-2 gap-px border">
+                <div className="bg-card p-4">
+                  <FileSearch className="text-primary mb-4 size-5" />
+                  <p className="text-sm font-medium">Source-bound answers</p>
+                </div>
+                <div className="bg-card p-4">
+                  <BookOpen className="text-primary mb-4 size-5" />
+                  <p className="text-sm font-medium">Page-level citations</p>
+                </div>
+              </div>
             </div>
-            <span className="text-foreground/80 font-semibold">
-              Research AI
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-6">
-            <span>Built as a portfolio project</span>
-            <span className="hidden text-white/20 sm:block">·</span>
-            <span className="hidden items-center gap-1.5 sm:flex">
-              <span className="status-dot status-online" />
-              All systems operational
-            </span>
           </div>
-        </div>
-      </footer>
+        </section>
+        <section className="bg-card/40 border-y">
+          <div className="container grid lg:grid-cols-3">
+            {steps.map(([n, t, d]) => (
+              <article
+                key={n}
+                className="border-b p-7 sm:p-9 lg:border-r lg:border-b-0 lg:last:border-r-0"
+              >
+                <span className="text-primary font-mono text-xs">{n}</span>
+                <h2 className="display-serif mt-10 text-3xl">{t}</h2>
+                <p className="text-muted-foreground mt-4 text-sm leading-6">
+                  {d}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+        <section className="container px-5 py-20 sm:px-8 lg:py-28">
+          <div className="grid-paper border p-7 sm:p-12 lg:flex lg:items-center lg:justify-between">
+            <div>
+              <p className="eyebrow">Your next reading list</p>
+              <h2 className="display-serif mt-4 max-w-2xl text-4xl sm:text-5xl">
+                Turn the PDF pile into a line of inquiry.
+              </h2>
+            </div>
+            <Button asChild size="lg" className="mt-8 h-12 lg:mt-0">
+              <Link href="/signup">
+                <Upload />
+                Upload the first document
+              </Link>
+            </Button>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

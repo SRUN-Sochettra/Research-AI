@@ -55,7 +55,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         {/* Bubble */}
         <div
           className={cn(
-            "rounded-2xl px-4 py-3 text-sm leading-relaxed",
+            "rounded-md px-4 py-3 text-sm leading-relaxed",
             isUser
               ? "bg-primary text-primary-foreground rounded-tr-sm"
               : "bg-muted text-foreground rounded-tl-sm"

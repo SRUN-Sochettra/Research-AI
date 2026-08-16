@@ -47,14 +47,14 @@ export default async function SettingsPage() {
       <Card className="border-white/10 bg-white/[0.02]">
         <CardHeader className="border-b border-white/5 pb-4">
           <CardTitle className="flex items-center gap-2 text-xl">
-            <Settings className="h-5 w-5 text-violet-400" />
+            <Settings className="text-primary h-5 w-5" />
             Profile Details
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 p-6">
           <div className="flex items-center gap-6">
             <Avatar className="h-20 w-20 ring-1 ring-violet-500/30">
-              <AvatarFallback className="bg-gradient-to-br from-violet-600 to-blue-600 text-2xl font-bold text-white">
+              <AvatarFallback className="bg-primary text-2xl font-bold text-white">
                 {initials}
               </AvatarFallback>
             </Avatar>

@@ -1,7 +1,7 @@
 export const APP_CONFIG = {
-  name: "Research AI",
+  name: "Mogger Research",
   description:
-    "AI-powered research assistant that reads PDFs, summarizes, and answers questions",
+    "Source-grounded PDF research with summaries, answers, and page-level citations",
   url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
 } as const;
 

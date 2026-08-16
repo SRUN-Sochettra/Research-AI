@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   description: APP_CONFIG.description,
   keywords: ["AI", "research", "PDF", "RAG", "summarize", "question answering"],
-  authors: [{ name: "Your Name" }],
+  authors: [{ name: "Sochettra Srun" }],
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -41,7 +41,7 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased`}>
         <SkipNav />
         <Providers>
-          <main id="main-content">{children}</main>
+          <div id="main-content">{children}</div>
         </Providers>
       </body>
     </html>

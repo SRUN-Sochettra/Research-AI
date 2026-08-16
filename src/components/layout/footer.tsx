@@ -6,11 +6,11 @@ export function Footer() {
     <footer className="bg-background/50 relative border-t border-white/5 py-8">
       <div className="text-muted-foreground container flex flex-col items-center justify-between gap-4 px-4 text-xs sm:flex-row">
         <Link href="/" className="group flex items-center gap-2.5">
-          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-blue-600 transition-shadow group-hover:shadow-md group-hover:shadow-violet-500/30">
+          <div className="bg-primary flex h-6 w-6 items-center justify-center rounded-lg transition-shadow group-hover:shadow-md group-hover:shadow-violet-500/30">
             <Brain className="h-3 w-3 text-white" />
           </div>
           <span className="text-foreground/70 group-hover:text-foreground font-semibold transition-colors">
-            Research AI
+            Mogger Research
           </span>
         </Link>
 

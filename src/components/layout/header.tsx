@@ -1,168 +1,96 @@
 "use client";
-
 import Link from "next/link";
-import { useTheme } from "next-themes";
+import { usePathname } from "next/navigation";
+import { BookOpenText, LogOut, Menu, UserRound } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Brain,
-  Sun,
-  Moon,
-  LogOut,
-  FileText,
-  Settings,
-  ChevronDown,
-} from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
+const nav = [
+  ["/dashboard", "Overview"],
+  ["/documents", "Library"],
+  ["/compare", "Compare"],
+] as const;
 export function Header() {
-  const { user, profile, signOut } = useAuth();
-  const { theme, setTheme } = useTheme();
-
-  const initials = profile?.full_name
-    ? profile.full_name
-        .split(" ")
-        .map((n: string) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : user?.email?.[0]?.toUpperCase() || "?";
-
-  return (
-    <header className="sticky top-0 z-50 w-full">
-      {/* Backdrop */}
-      <div className="bg-background/70 absolute inset-0 border-b border-white/5 backdrop-blur-xl" />
-
-      <div className="relative container flex h-16 items-center justify-between px-4">
-        {/* ── Logo ── */}
+  const { user, loading, signOut } = useAuth();
+  const pathname = usePathname();
+  const links = (
+    <>
+      {nav.map(([href, label]) => (
         <Link
-          href="/"
-          className="group flex items-center gap-2.5 transition-opacity hover:opacity-90"
+          key={href}
+          href={href}
+          aria-current={pathname.startsWith(href) ? "page" : undefined}
+          className="text-muted-foreground hover:text-foreground aria-[current=page]:border-primary aria-[current=page]:text-foreground border-b-2 border-transparent px-1 py-5 text-sm transition-colors"
         >
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-blue-600 shadow-md shadow-violet-500/20 transition-all duration-200 group-hover:scale-105 group-hover:shadow-violet-500/40">
-            <Brain className="h-4 w-4 text-white" />
-          </div>
-          <span className="text-sm font-bold tracking-tight">
-            Research <span className="gradient-text">AI</span>
+          {label}
+        </Link>
+      ))}
+    </>
+  );
+  return (
+    <header className="bg-background/95 sticky top-0 z-50 border-b">
+      <div className="container flex h-16 items-center px-5 sm:px-8">
+        <Link href="/" className="flex items-center gap-2.5 font-semibold">
+          <span className="bg-primary text-primary-foreground grid size-8 place-items-center">
+            <BookOpenText className="size-4" />
+          </span>
+          <span>
+            Mogger{" "}
+            <span className="text-muted-foreground font-normal">Research</span>
           </span>
         </Link>
-
-        {/* ── Right controls ── */}
-        <div className="flex items-center gap-1.5">
-          {/* Theme toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            aria-label="Toggle theme"
-            className="text-muted-foreground hover:text-foreground h-8 w-8 rounded-lg transition-colors hover:bg-white/6"
+        {user && (
+          <nav
+            className="ml-10 hidden items-center gap-7 md:flex"
+            aria-label="Primary"
           >
-            <Sun className="h-[15px] w-[15px] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-            <Moon className="absolute h-[15px] w-[15px] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-          </Button>
-
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+            {links}
+          </nav>
+        )}
+        <div className="ml-auto flex items-center gap-2">
+          {!loading &&
+            (user ? (
+              <>
                 <Button
                   variant="ghost"
-                  className="group text-muted-foreground hover:text-foreground flex h-8 items-center gap-2 rounded-xl px-2 transition-all hover:bg-white/6 data-[state=open]:bg-white/6"
+                  size="sm"
+                  asChild
+                  className="hidden sm:inline-flex"
                 >
-                  <Avatar className="h-6 w-6 ring-1 ring-violet-500/30 transition-all group-hover:ring-violet-500/50">
-                    <AvatarFallback className="bg-gradient-to-br from-violet-600 to-blue-600 text-[10px] font-bold text-white">
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="hidden text-xs font-medium sm:block">
-                    {profile?.full_name?.split(" ")[0] ||
-                      user.email?.split("@")[0]}
-                  </span>
-                  <ChevronDown className="h-3 w-3 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                  <Link href="/settings">
+                    <UserRound />
+                    Account
+                  </Link>
                 </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent
-                align="end"
-                sideOffset={8}
-                className="glass-heavy w-56 rounded-xl border-white/8 p-1 shadow-xl shadow-black/30"
-              >
-                {/* User info */}
-                <div className="flex items-center gap-3 rounded-lg px-3 py-2.5">
-                  <Avatar className="h-8 w-8 ring-1 ring-violet-500/20">
-                    <AvatarFallback className="bg-gradient-to-br from-violet-600 to-blue-600 text-xs font-bold text-white">
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0 flex-1">
-                    {profile?.full_name && (
-                      <p className="truncate text-sm font-medium">
-                        {profile.full_name}
-                      </p>
-                    )}
-                    <p className="text-muted-foreground truncate text-xs">
-                      {user.email}
-                    </p>
-                  </div>
-                </div>
-
-                <DropdownMenuSeparator className="my-1 bg-white/5" />
-
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="/documents"
-                    className="flex cursor-pointer items-center rounded-lg px-3 py-2 text-sm transition-colors hover:bg-white/5"
-                  >
-                    <FileText className="mr-2.5 h-4 w-4 text-violet-400" />
-                    My Documents
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="/settings"
-                    className="flex cursor-pointer items-center rounded-lg px-3 py-2 text-sm transition-colors hover:bg-white/5"
-                  >
-                    <Settings className="mr-2.5 h-4 w-4 text-blue-400" />
-                    Settings
-                  </Link>
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator className="my-1 bg-white/5" />
-
-                <DropdownMenuItem
-                  onClick={signOut}
-                  className="flex cursor-pointer items-center rounded-lg px-3 py-2 text-sm text-red-400 transition-colors hover:bg-red-500/8 hover:text-red-300 focus:text-red-300"
-                >
-                  <LogOut className="mr-2.5 h-4 w-4" />
+                <Button variant="outline" size="sm" onClick={signOut}>
+                  <LogOut />
                   Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <div className="ml-1 flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="text-muted-foreground hover:text-foreground h-8 px-3 text-xs hover:bg-white/6"
-              >
-                <Link href="/login">Log in</Link>
-              </Button>
-              <Button
-                size="sm"
-                asChild
-                className="animate-gradient h-8 bg-gradient-to-r from-violet-600 to-blue-600 px-4 text-xs font-semibold text-white shadow-md shadow-violet-500/20 transition-all hover:scale-[1.02] hover:shadow-violet-500/35"
-              >
-                <Link href="/signup">Sign up</Link>
-              </Button>
-            </div>
-          )}
+                </Button>
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="md:hidden">
+                      <Menu />
+                      <span className="sr-only">Open menu</span>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent>
+                    <nav className="mt-12 flex flex-col gap-1 px-4">
+                      {links}
+                    </nav>
+                  </SheetContent>
+                </Sheet>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/login">Sign in</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link href="/signup">Create account</Link>
+                </Button>
+              </>
+            ))}
         </div>
       </div>
     </header>

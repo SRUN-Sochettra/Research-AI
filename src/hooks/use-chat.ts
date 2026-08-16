@@ -166,11 +166,31 @@ export function useChat({
           signal: abortControllerRef.current.signal,
         });
 
+        const contentType = response.headers.get("content-type") || "";
+
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(
-            errorData.error || `Request failed: ${response.status}`
-          );
+          let errorMessage = `Request failed: ${response.status}`;
+          if (contentType.includes("application/json")) {
+            const errorData = await response.json().catch(() => ({}));
+            if (errorData.error) {
+              errorMessage = errorData.error;
+            }
+          } else {
+            const text = await response.text().catch(() => "");
+            if (text.includes("JSON.parse")) {
+              errorMessage =
+                "The AI provider returned an invalid response. Please retry.";
+            }
+          }
+          throw new Error(errorMessage);
+        }
+
+        if (contentType.includes("application/json")) {
+          const data = await response.json().catch(() => ({}));
+          if (data.error) {
+            throw new Error(data.error);
+          }
+          throw new Error("Invalid response format from server");
         }
 
         if (!response.body) {

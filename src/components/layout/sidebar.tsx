@@ -65,9 +65,9 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-150",
+                "group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-all duration-150",
                 isActive
-                  ? "bg-violet-500/10 text-violet-300 shadow-sm"
+                  ? "bg-primary/10 text-violet-300 shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-white/4"
               )}
             >
@@ -76,7 +76,7 @@ export function Sidebar() {
                 className={cn(
                   "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all duration-150",
                   isActive
-                    ? "bg-gradient-to-br from-violet-600 to-blue-600 shadow-md shadow-violet-500/20"
+                    ? "bg-primary shadow-md shadow-violet-500/20"
                     : "bg-white/4 group-hover:bg-white/7"
                 )}
               >
@@ -100,7 +100,7 @@ export function Sidebar() {
               </div>
 
               {isActive && (
-                <ChevronRight className="h-3 w-3 text-violet-400 opacity-60" />
+                <ChevronRight className="text-primary h-3 w-3 opacity-60" />
               )}
             </Link>
           );
@@ -116,7 +116,7 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all",
+                "group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-all",
                 isActive
                   ? "text-foreground bg-white/6"
                   : "text-muted-foreground hover:text-foreground hover:bg-white/4"

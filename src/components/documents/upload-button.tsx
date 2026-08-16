@@ -120,7 +120,7 @@ export function UploadButton() {
       }}
     >
       <DialogTrigger asChild>
-        <Button className="group bg-gradient-to-r from-violet-600 to-blue-600 text-white shadow-lg shadow-violet-500/20 hover:from-violet-700 hover:to-blue-700 hover:shadow-violet-500/30">
+        <Button className="group bg-primary text-white shadow-lg shadow-violet-500/20 hover:from-violet-700 hover:to-blue-700 hover:shadow-violet-500/30">
           <Upload className="mr-2 h-4 w-4 transition-transform group-hover:-translate-y-0.5" />
           Upload PDF
         </Button>
@@ -129,7 +129,7 @@ export function UploadButton() {
       <DialogContent className="glass border-white/10 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-violet-400" />
+            <Sparkles className="text-primary h-4 w-4" />
             Upload Document
           </DialogTitle>
           <DialogDescription>
@@ -141,12 +141,12 @@ export function UploadButton() {
         <div className="space-y-4">
           {/* Drop zone */}
           <div
-            className={`relative flex min-h-50 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-all duration-200 ${
+            className={`relative flex min-h-50 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed p-6 transition-all duration-200 ${
               state === "idle"
-                ? "border-white/10 hover:border-violet-500/40 hover:bg-violet-500/5"
+                ? "hover:border-primary/40 border-white/10 hover:bg-violet-500/5"
                 : state === "done"
                   ? "border-emerald-500/40 bg-emerald-500/5"
-                  : "border-violet-500/40 bg-violet-500/5"
+                  : "border-primary/40 bg-violet-500/5"
             }`}
             onClick={() => state === "idle" && fileInputRef.current?.click()}
           >
@@ -161,8 +161,8 @@ export function UploadButton() {
 
             {state === "idle" && (
               <div className="text-center">
-                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-violet-500/10 ring-1 ring-violet-500/20">
-                  <FileUp className="h-7 w-7 text-violet-400" />
+                <div className="bg-primary/10 mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-md ring-1 ring-violet-500/20">
+                  <FileUp className="text-primary h-7 w-7" />
                 </div>
                 <p className="text-sm font-medium">Click to select a PDF</p>
                 <p className="text-muted-foreground mt-1 text-xs">
@@ -173,8 +173,8 @@ export function UploadButton() {
 
             {state === "selected" && file && (
               <div className="text-center">
-                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-violet-500/10 ring-1 ring-violet-500/30">
-                  <FileUp className="h-7 w-7 text-violet-400" />
+                <div className="bg-primary/10 mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-md ring-1 ring-violet-500/30">
+                  <FileUp className="text-primary h-7 w-7" />
                 </div>
                 <p className="text-sm font-semibold">{file.name}</p>
                 <p className="text-muted-foreground mt-1 text-xs">
@@ -196,7 +196,7 @@ export function UploadButton() {
 
             {(state === "uploading" || state === "processing") && (
               <div className="text-center">
-                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-blue-500/10 ring-1 ring-blue-500/30">
+                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-md bg-blue-500/10 ring-1 ring-blue-500/30">
                   <Loader2 className="h-7 w-7 animate-spin text-blue-400" />
                 </div>
                 <p className="text-sm font-medium">
@@ -212,7 +212,7 @@ export function UploadButton() {
 
             {state === "done" && (
               <div className="text-center">
-                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-500/30">
+                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-md bg-emerald-500/10 ring-1 ring-emerald-500/30">
                   <CheckCircle2 className="h-7 w-7 text-emerald-400" />
                 </div>
                 <p className="text-sm font-semibold text-emerald-400">
@@ -238,7 +238,7 @@ export function UploadButton() {
           {state === "selected" && (
             <Button
               onClick={handleUpload}
-              className="w-full bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:from-violet-700 hover:to-blue-700"
+              className="bg-primary w-full text-white hover:from-violet-700 hover:to-blue-700"
             >
               <Upload className="mr-2 h-4 w-4" />
               Upload & Analyze

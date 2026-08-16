@@ -21,10 +21,10 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className="flex min-h-[40vh] flex-col items-center justify-center gap-5 p-8 text-center">
-      <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600/20 to-blue-600/20 ring-1 ring-white/10">
-        {icon || <FileText className="h-10 w-10 text-violet-400" />}
+      <div className="relative flex h-20 w-20 items-center justify-center rounded-md bg-gradient-to-br from-violet-600/20 to-blue-600/20 ring-1 ring-white/10">
+        {icon || <FileText className="text-primary h-10 w-10" />}
         {/* Glow */}
-        <div className="absolute inset-0 rounded-2xl bg-violet-500/10 blur-xl" />
+        <div className="bg-primary/10 absolute inset-0 rounded-md blur-xl" />
       </div>
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">{title}</h3>
@@ -34,14 +34,14 @@ export function EmptyState({
         (action.href ? (
           <Button
             asChild
-            className="bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:from-violet-700 hover:to-blue-700"
+            className="bg-primary text-white hover:from-violet-700 hover:to-blue-700"
           >
             <Link href={action.href}>{action.label}</Link>
           </Button>
         ) : (
           <Button
             onClick={action.onClick}
-            className="bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:from-violet-700 hover:to-blue-700"
+            className="bg-primary text-white hover:from-violet-700 hover:to-blue-700"
           >
             {action.label}
           </Button>
@@ -53,7 +53,7 @@ export function EmptyState({
 export function NoDocuments() {
   return (
     <EmptyState
-      icon={<Upload className="h-10 w-10 text-violet-400" />}
+      icon={<Upload className="text-primary h-10 w-10" />}
       title="No documents yet"
       description="Upload a PDF to get started. Our AI will analyze it and let you ask questions."
       action={{

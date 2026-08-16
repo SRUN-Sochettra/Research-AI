@@ -48,7 +48,7 @@ async function DocumentList({ query, sort }: DocumentListProps) {
 
   if (error) {
     return (
-      <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-center text-sm text-red-400">
+      <div className="rounded-md border border-red-500/20 bg-red-500/10 p-4 text-center text-sm text-red-400">
         Failed to load documents. Please try again.
       </div>
     );
@@ -57,7 +57,7 @@ async function DocumentList({ query, sort }: DocumentListProps) {
   if (!documents || documents.length === 0) {
     if (query) {
       return (
-        <div className="bg-muted/20 flex flex-col items-center justify-center rounded-xl border border-dashed p-12 text-center">
+        <div className="bg-muted/20 flex flex-col items-center justify-center rounded-md border border-dashed p-12 text-center">
           <h3 className="mt-4 text-lg font-semibold">No results found</h3>
           <p className="text-muted-foreground mt-2 text-sm">
             No documents matched your search query &quot;{query}&quot;.
