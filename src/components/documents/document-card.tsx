@@ -46,7 +46,7 @@ const statusConfig: Record<string, StatusConfig> = {
     label: "Processing",
     icon: Loader2,
     dotClass: "status-online",
-    badgeClass: "border-blue-500/20 bg-blue-500/8 text-blue-400",
+    badgeClass: "border-primary/20 bg-primary/8 text-primary",
     animate: true,
   },
   ready: {
@@ -89,9 +89,9 @@ export function DocumentCard({ document }: { document: Document }) {
   const isProcessing = document.status === "processing";
 
   return (
-    <div className="card-interactive group relative flex flex-col overflow-hidden rounded-md border border-white/7 bg-white/[0.02] transition-all duration-300 hover:border-white/12 hover:bg-white/[0.03]">
+    <div className="card-interactive group border-border bg-card relative flex flex-col overflow-hidden rounded-md border transition-all duration-300 hover:border-white/12 hover:bg-white/[0.03]">
       {/* Top gradient accent — visible on hover */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="bg-primary/50 absolute inset-x-0 top-0 h-px opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
       {/* Processing shimmer */}
       {isProcessing && (
@@ -103,11 +103,11 @@ export function DocumentCard({ document }: { document: Document }) {
         <div className="mb-4 flex items-start justify-between gap-3">
           <div className="flex w-full items-start gap-3 pr-8">
             {/* File icon */}
-            <div className="relative mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-violet-600/15 to-blue-600/10 ring-1 ring-white/8">
+            <div className="bg-primary/10 ring-border relative mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md ring-1">
               <FileText className="text-primary h-4.5 w-4.5" />
               {isProcessing && (
-                <div className="border-background absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 bg-blue-400">
-                  <div className="absolute inset-0 animate-ping rounded-full bg-blue-400 opacity-60" />
+                <div className="border-background bg-primary absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2">
+                  <div className="bg-primary absolute inset-0 animate-ping rounded-full opacity-60" />
                 </div>
               )}
             </div>
@@ -200,7 +200,7 @@ export function DocumentCard({ document }: { document: Document }) {
           <Button
             asChild
             size="sm"
-            className="group/btn bg-primary w-full text-xs font-semibold text-white shadow-md shadow-violet-500/15 transition-all hover:scale-[1.01] hover:shadow-violet-500/30"
+            className="group/btn bg-primary w-full text-xs font-semibold text-white shadow-md shadow-black/10 transition-all hover:scale-[1.01] hover:shadow-black/15"
           >
             <Link href={`/chat/${document.id}`}>
               <MessageSquare className="mr-1.5 h-3.5 w-3.5" />
@@ -212,7 +212,7 @@ export function DocumentCard({ document }: { document: Document }) {
           <Button
             disabled
             size="sm"
-            className="w-full cursor-not-allowed border border-blue-500/20 bg-blue-500/8 text-xs text-blue-400 opacity-100"
+            className="text-primary border-primary/20 bg-primary/8 w-full cursor-not-allowed border text-xs opacity-100"
           >
             <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
             Indexing document…

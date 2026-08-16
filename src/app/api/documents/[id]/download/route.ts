@@ -24,7 +24,14 @@ export async function GET(
         { error: "Too many requests. Please wait a minute." },
         {
           status: 429,
-          headers: { "X-RateLimit-Reset": String(rateLimit.reset) },
+          headers: {
+            "X-RateLimit-Limit": String(rateLimit.limit),
+            "X-RateLimit-Remaining": String(rateLimit.remaining),
+            "X-RateLimit-Reset": String(rateLimit.reset),
+            "Retry-After": String(
+              Math.max(1, Math.ceil((rateLimit.reset - Date.now()) / 1000))
+            ),
+          },
         }
       );
     }

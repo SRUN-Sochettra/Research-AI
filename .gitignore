@@ -61,3 +61,6 @@ graft/
 
 # repomix
 repomix-output.*
+
+# artifacts
+artifacts/

@@ -38,10 +38,10 @@ class Logger {
     // In development: pretty print
     if (this.isDevelopment) {
       const prefix = {
-        debug: "🔍",
+        debug: "Inspect",
         info: "ℹ️ ",
-        warn: "⚠️ ",
-        error: "❌",
+        warn: "Warning ",
+        error: "Error",
       }[level];
 
       console[level === "debug" ? "log" : level](

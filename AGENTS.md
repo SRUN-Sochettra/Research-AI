@@ -7,14 +7,14 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ---
 
-# Research AI — Agent Operating Guide
+# SynapseDoc — Agent Operating Guide
 
 > Context for AI agents (and humans) working on this repo. Read this **first**, before touching code.
 > When in doubt, trust the **running code and `src/lib/utils/constants.ts`** over prose in `README.md` / `docs/` — some docs are stale (see [Known Traps](#known-traps--do-not-trust-blindly)).
 
 ## 1. What this project is
 
-**Research AI** — upload a PDF → an agent pipeline parses / chunks / embeds / summarizes it → user asks questions → RAG answers stream back with page-level citations.
+**SynapseDoc** — upload a PDF → an agent pipeline parses / chunks / embeds / summarizes it → user asks questions → RAG answers stream back with page-level citations.
 
 Two pipelines, both in `src/lib/agents/`:
 

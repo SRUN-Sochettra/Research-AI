@@ -11,8 +11,8 @@ export function DiffViewer({ oldText, newText }: DiffViewerProps) {
   const differences = diffWords(oldText, newText);
 
   return (
-    <Card className="flex flex-col border-white/10 bg-white/[0.02]">
-      <CardHeader className="border-b border-white/5 pb-4">
+    <Card className="border-border bg-card flex flex-col">
+      <CardHeader className="border-border border-b pb-4">
         <CardTitle className="text-xl">Summary Comparison Diff</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col overflow-hidden p-4">

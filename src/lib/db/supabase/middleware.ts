@@ -14,8 +14,8 @@ export async function updateSession(request: NextRequest) {
   if (!supabaseUrl || !supabaseAnonKey) {
     console.error(
       "[Supabase Middleware] Missing environment variables:\n" +
-        `  NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? "✓" : "✗ MISSING"}\n` +
-        `  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${supabaseAnonKey ? "✓" : "✗ MISSING"}`
+        `  NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? "OK" : "Error MISSING"}\n` +
+        `  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${supabaseAnonKey ? "OK" : "Error MISSING"}`
     );
     return supabaseResponse;
   }

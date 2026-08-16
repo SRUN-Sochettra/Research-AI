@@ -1,4 +1,4 @@
-# Agy CLI task — finish the Research AI shippability pass
+# Agy CLI task — finish the SynapseDoc shippability pass
 
 You're running in my local repo (Next.js 16 + Supabase RAG app). A patch set was
 already applied that adds fixes to code files. Your job is the stuff that needs a

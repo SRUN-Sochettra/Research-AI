@@ -1,4 +1,4 @@
-# Deploying Research AI to Vercel — repo-tailored checklist
+# Deploying SynapseDoc to Vercel — repo-tailored checklist
 
 Your code is already built for Vercel (`waitUntil` pipeline, `maxDuration: 60`,
 `src/proxy.ts` middleware, `vercel.json`). This is the exact order that avoids
@@ -83,7 +83,7 @@ LANGFUSE_HOST                   = https://cloud.langfuse.com
 
 ## Phase 3 — Grab your real URL
 
-After the build finishes you get a URL like `https://research-ai-xxxx.vercel.app`.
+After the build finishes you get a URL like `https://synapsedoc-xxxx.vercel.app`.
 Copy it. (Or add a custom domain now under Project → Settings → Domains, and use
 that instead — cleaner, and you skip re-deploys later if you set it first.)
 
@@ -95,7 +95,7 @@ This is the step people miss. Auth and CORS both need the real URL.
 
 **4a. Update `NEXT_PUBLIC_APP_URL` in Vercel**
 Project → Settings → Environment Variables → edit `NEXT_PUBLIC_APP_URL` to your
-real URL (no trailing slash), e.g. `https://research-ai-xxxx.vercel.app`.
+real URL (no trailing slash), e.g. `https://synapsedoc-xxxx.vercel.app`.
 Why it matters: `vercel.json` sets the CORS `Access-Control-Allow-Origin` header
 to `$NEXT_PUBLIC_APP_URL`, and `constants.ts` uses it as `APP_CONFIG.url`.
 
@@ -103,11 +103,11 @@ to `$NEXT_PUBLIC_APP_URL`, and `constants.ts` uses it as `APP_CONFIG.url`.
 Supabase Dashboard → project `jfaevdbmgqvpuewdggql` → **Authentication → URL
 Configuration**:
 
-- **Site URL**: `https://research-ai-xxxx.vercel.app`
+- **Site URL**: `https://synapsedoc-xxxx.vercel.app`
 - **Redirect URLs** — add:
   ```
-  https://research-ai-xxxx.vercel.app/**
-  https://research-ai-xxxx.vercel.app/auth/callback
+  https://synapsedoc-xxxx.vercel.app/**
+  https://synapsedoc-xxxx.vercel.app/auth/callback
   ```
 
 Your `src/app/auth/callback/route.ts` handles the OAuth/email-confirm exchange;

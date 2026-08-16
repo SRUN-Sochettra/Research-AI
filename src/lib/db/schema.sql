@@ -1,5 +1,5 @@
 -- ============================================================================
--- Research AI — Canonical Database Schema
+-- SynapseDoc — Canonical Database Schema
 -- ============================================================================
 -- Run this in the Supabase SQL Editor on a fresh project.
 --
@@ -7,14 +7,14 @@
 -- "Database Setup" SQL, and supabase/migrations/. This file supersedes the
 -- previously EMPTY src/lib/db/schema.sql.
 --
--- ⚠️ SECURITY NOTE: The original README SQL created the tables but never
+-- Warning: SECURITY NOTE: The original README SQL created the tables but never
 -- enabled Row Level Security or added policies on the application tables —
 -- despite the docs claiming "RLS on ALL tables". Section 6 below adds the
 -- RLS enablement + policies that the documented security model REQUIRES.
 -- Without them, the RLS-scoped server client does NOT actually isolate users.
 -- Review Section 6 before running against an existing database.
 --
--- ✅ VERIFIED 2026-07-28 against the live project (ref jfaevdbmgqvpuewdggql):
+-- Verified: VERIFIED 2026-07-28 against the live project (ref jfaevdbmgqvpuewdggql):
 -- RLS is ENABLED on all five tables, the policies below are DEPLOYED, and an
 -- unauthenticated anon-key SELECT on public.documents returns 0 rows (proof
 -- that isolation works). Section 6 was rewritten to match what is actually
@@ -199,7 +199,7 @@ create trigger on_auth_user_created
 
 
 -- ============================================================================
--- 6. ROW LEVEL SECURITY  (✅ VERIFIED DEPLOYED — matches live project)
+-- 6. ROW LEVEL SECURITY  (Verified: VERIFIED DEPLOYED — matches live project)
 -- ============================================================================
 -- The app's per-user isolation depends on these. The service-role admin client
 -- (src/lib/db/supabase/admin.ts) bypasses RLS by design for pipeline writes
@@ -266,7 +266,7 @@ create policy "Users view own chunks" on public.document_chunks
 -- ─── 7. Storage bucket policies ─────────────────────────────────────────────
 -- First create a PRIVATE bucket named 'documents' in Supabase → Storage,
 -- then run these. Files are namespaced per user: <user_id>/<file>.
--- ✅ VERIFIED DEPLOYED: the three policies below exist in the `storage` schema.
+-- Verified: VERIFIED DEPLOYED: the three policies below exist in the `storage` schema.
 
 create policy "Users can upload their own documents"
 on storage.objects for insert to authenticated

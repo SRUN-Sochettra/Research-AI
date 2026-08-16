@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpenText, LogOut, Menu, UserRound } from "lucide-react";
+import { LogOut, Menu, UserRound } from "lucide-react";
+import { BrandWordmark } from "@/components/layout/brand-mark";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -32,13 +33,7 @@ export function Header() {
     <header className="bg-background/95 sticky top-0 z-50 border-b">
       <div className="container flex h-16 items-center px-5 sm:px-8">
         <Link href="/" className="flex items-center gap-2.5 font-semibold">
-          <span className="bg-primary text-primary-foreground grid size-8 place-items-center">
-            <BookOpenText className="size-4" />
-          </span>
-          <span>
-            Mogger{" "}
-            <span className="text-muted-foreground font-normal">Research</span>
-          </span>
+          <BrandWordmark />
         </Link>
         {user && (
           <nav

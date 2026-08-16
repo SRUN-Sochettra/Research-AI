@@ -1,6 +1,6 @@
-# Handoff Prompt — Mogger Research (paste with the fresh repomix)
+# Handoff Prompt — SynapseDoc (paste with the fresh repomix)
 
-I'm continuing work on **Mogger Research**, a RAG app I built and deployed
+I'm continuing work on **SynapseDoc**, a RAG app I built and deployed
 yesterday. I'm attaching a **repomix of the current repo** — treat that repo
 dump as the single source of truth for all code. Anything in this prompt about
 code structure is context from the last session and may be stale; **verify
@@ -24,7 +24,7 @@ npm run build` all green.
 - **Stack:** Next.js 16.2.12 (App Router, Turbopack), React 19, TypeScript strict,
   Supabase (Postgres + pgvector + Auth + Storage), Google Gemini via LangChain.js
   v1, Upstash rate limiting, Tailwind v4 + shadcn/ui. Deploy: Vercel.
-- **Live at:** `mogger-research.vercel.app`
+- **Live at:** `synapsedoc.vercel.app`
 - **Supabase project ref:** `jfaevdbmgqvpuewdggql`
 - **Verified working:** deploy is up; RLS is on and isolates users (proved via
   anon-key SELECT returning 0 rows); CI gate green; email/password login works
@@ -49,17 +49,17 @@ confirmation screen ONLY when `data.session === null`; otherwise push to
 `/dashboard` + refresh. Check the repomix for how it currently handles the
 signUp response.
 
-**2. Rename "Research AI" → "Mogger Research"** everywhere user-facing. Grep the
+**2. Rename "SynapseDoc" → "SynapseDoc"** everywhere user-facing. Grep the
 repo. Hit at least: `constants.ts` `APP_CONFIG.name` (source of truth),
 `app/layout.tsx` metadata (title/description/OG), the header wordmark, and the
-auth pages. `grep -rn "Research AI" src` should come back clean when done.
+auth pages. `grep -rn "SynapseDoc" src` should come back clean when done.
 
 **3. Google OAuth doesn't work.** The "Continue with Google" button exists but
 the provider isn't configured. Walk me through: (a) Google Cloud OAuth client
 with redirect URI `https://jfaevdbmgqvpuewdggql.supabase.co/auth/v1/callback`,
 (b) enabling Google in Supabase Auth providers, (c) verifying the app-side
 `signInWithOAuth` call + `auth/callback` route handle the code exchange with
-`redirectTo` = `https://mogger-research.vercel.app/auth/callback`. Note the
+`redirectTo` = `https://synapsedoc.vercel.app/auth/callback`. Note the
 consent-screen "Testing mode" gotcha.
 
 **4. Actually enable Upstash Redis rate limiting.** Right now
@@ -92,7 +92,7 @@ Before writing code, propose 2–3 concrete design directions and let me pick on
 Delete stale `.prettiercc` if the real `.prettierrc` exists; `npm remove
 @google-cloud/vision` (unused after OCR simplification — confirm no imports
 first); dedupe `chunker.spec.ts` vs `chunker.test.ts`; confirm Vercel
-`NEXT_PUBLIC_APP_URL` = `https://mogger-research.vercel.app` (not the old `xxxx`
+`NEXT_PUBLIC_APP_URL` = `https://synapsedoc.vercel.app` (not the old `xxxx`
 placeholder).
 
 **Start by reading `AGENTS.md` and the relevant files from the attached repomix,

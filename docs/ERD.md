@@ -1,6 +1,6 @@
 # Entity-Relationship Diagram
 
-This diagram represents the main tables in the Research AI database schema.
+This diagram represents the main tables in the SynapseDoc database schema.
 
 > Source of truth: kept in sync with `src/types/database.ts` and
 > `supabase/migrations/`. If code and this doc disagree, the code wins.

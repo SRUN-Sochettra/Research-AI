@@ -1,4 +1,4 @@
-# Research AI — Shippability Fix Patch Set
+# SynapseDoc — Shippability Fix Patch Set
 
 Drop-in replacements. Every path here mirrors the repo layout — unzip **at the
 repo root** and let it overwrite. Then run the agy prompt (`AGY_PROMPT.md`) for

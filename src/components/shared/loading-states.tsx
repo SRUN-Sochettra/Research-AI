@@ -5,9 +5,8 @@ export function PageLoader() {
   return (
     <div className="flex h-[50vh] items-center justify-center">
       <div className="flex flex-col items-center gap-3">
-        <div className="relative h-10 w-10">
-          <div className="absolute inset-0 rounded-full bg-violet-500/20 blur-lg" />
-          <Loader2 className="text-primary relative h-10 w-10 animate-spin" />
+        <div className="relative flex h-10 w-10 items-center justify-center">
+          <Loader2 className="text-primary h-10 w-10 animate-spin" />
         </div>
         <p className="text-muted-foreground text-sm">Loading...</p>
       </div>
@@ -17,16 +16,16 @@ export function PageLoader() {
 
 export function CardSkeleton() {
   return (
-    <div className="glass animate-pulse rounded-md border border-white/10 p-5">
+    <div className="bg-card border-border animate-pulse rounded-md border p-5">
       <div className="mb-4 flex items-center gap-3">
-        <Skeleton className="h-10 w-10 rounded-md bg-white/5" />
-        <Skeleton className="h-4 w-2/3 bg-white/5" />
+        <Skeleton className="bg-muted h-10 w-10 rounded-md" />
+        <Skeleton className="bg-muted h-4 w-2/3" />
       </div>
       <div className="mb-4 space-y-2">
-        <Skeleton className="h-3 w-1/2 bg-white/5" />
-        <Skeleton className="h-3 w-1/3 bg-white/5" />
+        <Skeleton className="bg-muted h-3 w-1/2" />
+        <Skeleton className="bg-muted h-3 w-1/3" />
       </div>
-      <Skeleton className="h-8 w-full rounded-lg bg-white/5" />
+      <Skeleton className="bg-muted h-8 w-full rounded-lg" />
     </div>
   );
 }
@@ -45,10 +44,10 @@ export function ChatSkeleton() {
   return (
     <div className="space-y-4 p-4">
       <div className="flex justify-end">
-        <Skeleton className="h-10 w-48 rounded-md bg-white/5" />
+        <Skeleton className="bg-muted h-10 w-48 rounded-md" />
       </div>
       <div className="flex justify-start">
-        <Skeleton className="h-20 w-72 rounded-md bg-white/5" />
+        <Skeleton className="bg-muted h-20 w-72 rounded-md" />
       </div>
     </div>
   );

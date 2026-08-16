@@ -1,14 +1,9 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import {
-  ArrowRight,
-  BookOpenText,
-  Check,
-  Loader2,
-  MailCheck,
-} from "lucide-react";
+import { ArrowRight, Check, Loader2, MailCheck } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { BrandWordmark } from "@/components/layout/brand-mark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,7 +31,7 @@ export default function SignupPage() {
   }
   if (done)
     return (
-      <main className="grid min-h-screen place-items-center px-5">
+      <main className="neural-field grid min-h-screen place-items-center px-5">
         <div className="max-w-md border p-8 text-center">
           <MailCheck className="text-primary mx-auto size-9" />
           <p className="eyebrow mt-6">Account created</p>
@@ -53,13 +48,10 @@ export default function SignupPage() {
       </main>
     );
   return (
-    <main className="grid min-h-screen lg:grid-cols-[.9fr_1.1fr]">
+    <main className="neural-field grid min-h-screen lg:grid-cols-[.9fr_1.1fr]">
       <section className="bg-card flex flex-col justify-between border-r p-6 sm:p-10">
-        <Link href="/" className="flex items-center gap-2 font-semibold">
-          <span className="bg-primary text-primary-foreground grid size-8 place-items-center">
-            <BookOpenText className="size-4" />
-          </span>
-          Mogger Research
+        <Link href="/" aria-label="SynapseDoc home">
+          <BrandWordmark />
         </Link>
         <div className="hidden lg:block">
           <p className="eyebrow">The research instrument</p>

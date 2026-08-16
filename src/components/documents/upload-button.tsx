@@ -18,7 +18,7 @@ import {
   Loader2,
   CheckCircle2,
   X,
-  Sparkles,
+  ScanSearch,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatFileSize } from "@/lib/utils/helpers";
@@ -120,16 +120,16 @@ export function UploadButton() {
       }}
     >
       <DialogTrigger asChild>
-        <Button className="group bg-primary text-white shadow-lg shadow-violet-500/20 hover:from-violet-700 hover:to-blue-700 hover:shadow-violet-500/30">
+        <Button className="group bg-primary hover:bg-primary/90 text-white shadow-lg shadow-black/15 hover:shadow-black/15">
           <Upload className="mr-2 h-4 w-4 transition-transform group-hover:-translate-y-0.5" />
           Upload PDF
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="glass border-white/10 sm:max-w-md">
+      <DialogContent className="bg-card border-border sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="text-primary h-4 w-4" />
+            <ScanSearch className="text-primary h-4 w-4" />
             Upload Document
           </DialogTitle>
           <DialogDescription>
@@ -143,10 +143,10 @@ export function UploadButton() {
           <div
             className={`relative flex min-h-50 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed p-6 transition-all duration-200 ${
               state === "idle"
-                ? "hover:border-primary/40 border-white/10 hover:bg-violet-500/5"
+                ? "hover:border-primary/40 border-border hover:bg-primary/5"
                 : state === "done"
                   ? "border-emerald-500/40 bg-emerald-500/5"
-                  : "border-primary/40 bg-violet-500/5"
+                  : "border-primary/40 bg-primary/5"
             }`}
             onClick={() => state === "idle" && fileInputRef.current?.click()}
           >
@@ -161,7 +161,7 @@ export function UploadButton() {
 
             {state === "idle" && (
               <div className="text-center">
-                <div className="bg-primary/10 mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-md ring-1 ring-violet-500/20">
+                <div className="bg-primary/10 ring-primary/20 mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-md ring-1">
                   <FileUp className="text-primary h-7 w-7" />
                 </div>
                 <p className="text-sm font-medium">Click to select a PDF</p>
@@ -173,7 +173,7 @@ export function UploadButton() {
 
             {state === "selected" && file && (
               <div className="text-center">
-                <div className="bg-primary/10 mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-md ring-1 ring-violet-500/30">
+                <div className="bg-primary/10 ring-primary/30 mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-md ring-1">
                   <FileUp className="text-primary h-7 w-7" />
                 </div>
                 <p className="text-sm font-semibold">{file.name}</p>
@@ -196,8 +196,8 @@ export function UploadButton() {
 
             {(state === "uploading" || state === "processing") && (
               <div className="text-center">
-                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-md bg-blue-500/10 ring-1 ring-blue-500/30">
-                  <Loader2 className="h-7 w-7 animate-spin text-blue-400" />
+                <div className="bg-primary/10 ring-primary/30 mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-md ring-1">
+                  <Loader2 className="text-primary h-7 w-7 animate-spin" />
                 </div>
                 <p className="text-sm font-medium">
                   {state === "uploading"
@@ -238,7 +238,7 @@ export function UploadButton() {
           {state === "selected" && (
             <Button
               onClick={handleUpload}
-              className="bg-primary w-full text-white hover:from-violet-700 hover:to-blue-700"
+              className="bg-primary hover:bg-primary/90 w-full text-white"
             >
               <Upload className="mr-2 h-4 w-4" />
               Upload & Analyze

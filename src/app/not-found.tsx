@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Brain, Home, ArrowLeft } from "lucide-react";
+import { Home, ArrowLeft } from "lucide-react";
+import { BrandMark } from "@/components/layout/brand-mark";
 
 export default function NotFound() {
   return (
@@ -11,8 +12,8 @@ export default function NotFound() {
           404
         </p>
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="bg-primary flex h-16 w-16 items-center justify-center rounded-full shadow-lg">
-            <Brain className="text-primary-foreground h-8 w-8" />
+          <div className="bg-card flex h-16 w-16 items-center justify-center rounded-xl border shadow-lg">
+            <BrandMark className="border-0 bg-transparent" />
           </div>
         </div>
       </div>

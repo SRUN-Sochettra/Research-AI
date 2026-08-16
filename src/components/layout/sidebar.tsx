@@ -51,7 +51,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="bg-background/50 flex h-full w-64 flex-col border-r border-white/5 backdrop-blur-xl">
+    <aside className="bg-background/50 border-border flex h-full w-64 flex-col border-r">
       {/* Nav items */}
       <nav className="flex-1 space-y-0.5 p-3">
         <p className="text-muted-foreground mb-2 px-3 text-[10px] font-semibold tracking-[0.15em] uppercase">
@@ -67,8 +67,8 @@ export function Sidebar() {
               className={cn(
                 "group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-all duration-150",
                 isActive
-                  ? "bg-primary/10 text-violet-300 shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/4"
+                  ? "bg-primary/10 text-primary shadow-sm"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
               )}
             >
               {/* Active indicator */}
@@ -76,8 +76,8 @@ export function Sidebar() {
                 className={cn(
                   "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all duration-150",
                   isActive
-                    ? "bg-primary shadow-md shadow-violet-500/20"
-                    : "bg-white/4 group-hover:bg-white/7"
+                    ? "bg-primary shadow-md shadow-black/15"
+                    : "bg-muted/40 group-hover:bg-muted/70"
                 )}
               >
                 <item.icon
@@ -108,7 +108,7 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom section */}
-      <div className="border-t border-white/5 p-3">
+      <div className="border-border border-t p-3">
         {bottomItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -118,11 +118,11 @@ export function Sidebar() {
               className={cn(
                 "group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-all",
                 isActive
-                  ? "text-foreground bg-white/6"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/4"
+                  ? "text-foreground bg-muted/60"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
               )}
             >
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/4 transition-colors group-hover:bg-white/7">
+              <div className="bg-muted/40 group-hover:bg-muted/70 flex h-7 w-7 items-center justify-center rounded-lg transition-colors">
                 <item.icon className="h-4 w-4" />
               </div>
               <span className="text-sm">{item.label}</span>

@@ -1,5 +1,5 @@
 export const APP_CONFIG = {
-  name: "Mogger Research",
+  name: "SynapseDoc",
   description:
     "Source-grounded PDF research with summaries, answers, and page-level citations",
   url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",

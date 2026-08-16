@@ -1,39 +1,25 @@
-# Mogger Research — full visual redesign patch
+# SynapseDoc — visual system
 
-## Design direction
+## Direction
 
-Academic index terminal: deep ultramarine surfaces, safety-yellow signal color, dense sans display typography, squared research-file panels, and citation-led product language. The old purple/blue glass-gradient template language has been removed.
+A focused document-intelligence workspace built around the idea of connected evidence. The interface uses warm paper surfaces, deep green-black structure, and a precise teal signal color. A custom node-and-link mark gives the product an identity without relying on generic brain icons, gradients, glass panels, or decorative AI imagery.
 
 ## Scope
 
-- New public landing page and product narrative
-- Rebuilt login and signup presentation
-- Rebuilt authenticated header and responsive mobile navigation
-- Rebuilt dashboard overview
-- New global token system, typography, focus treatment, reduced-motion rules, and product-wide visual cleanup
-- Restyled documents, upload, compare, settings, chat, citations, empty/loading states, and shared surfaces
-- Renamed user-facing product source of truth to “Mogger Research”
-- Preserved the existing RAG, API, database, upload, chat, and authentication logic
+- Renamed product-facing references to SynapseDoc
+- Added a reusable SynapseDoc mark and wordmark
+- Reworked global color, typography, background, focus, and motion tokens
+- Updated landing, authentication, navigation, dashboard, document, compare, settings, chat, loading, empty, and error surfaces through shared design tokens
+- Preserved RAG, API, authentication, database, upload, and chat behavior
 
-## Apply
+## Visual principles
 
-Extract this ZIP at the repository root and allow it to overwrite matching paths.
+- Content and citations stay visually dominant
+- One teal accent; no purple-blue AI gradients
+- Borders and spacing establish hierarchy before shadows
+- Motion is brief, optional, and removed under reduced-motion preferences
+- No emoji in product copy or interface states
 
-## Verification performed
+## Verification required locally
 
-- Parsed 152 files from the supplied Repomix snapshot.
-- Isolated TypeScript/TSX transpilation passed for every changed source file.
-- Full npm install/build could not be run because the supplied snapshot contains no package-lock.json or node_modules and dependency installation timed out in the isolated environment.
-
-## Required local gate
-
-Run:
-
-```bash
-npm install
-npm run test:all
-npm run format:check
-npm run build
-```
-
-Then visually test at 360px, 768px, 1280px, and 1536px, especially login, signup, dashboard, documents, upload dialog, document detail, and chat.
+Run `npm install`, `npm run test:all`, `npm run format:check`, and `npm run build`, then inspect the required state matrix in `AGY_SYNAPSEDOC_PROMPT.md`.

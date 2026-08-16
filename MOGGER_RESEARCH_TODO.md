@@ -1,6 +1,6 @@
-# Mogger Research — Next Session TODO
+# SynapseDoc — Next Session TODO
 
-> Status as of 2026-07-28: **Deployed & working** at `mogger-research.vercel.app`.
+> Status as of 2026-07-28: **Deployed & working** at `synapsedoc.vercel.app`.
 > Auth login works (created account with email-confirm OFF). Core RAG pipeline
 > untested in prod yet. Five things to fix — ordered by effort/impact below.
 >
@@ -52,7 +52,7 @@ Supabase actually returns.
 
 ---
 
-## 2. 🏷️ Rename "Research AI" → "Mogger Research"
+## 2. 🏷️ Rename "SynapseDoc" → "SynapseDoc"
 
 Grep-and-replace, but hit ALL of these (don't miss the metadata/SEO ones):
 
@@ -60,15 +60,15 @@ Grep-and-replace, but hit ALL of these (don't miss the metadata/SEO ones):
   else should ideally import from here rather than hardcode).
 - `src/app/layout.tsx` → `metadata.title` / `metadata.description` (browser tab +
   SEO + OpenGraph).
-- `src/components/layout/header.tsx` → the "Research AI" logo/wordmark text.
-- Anywhere else: `grep -rn "Research AI" src` and fix each.
-- `package.json` `"name"` is `research-ai` — cosmetic, optional (affects nothing
+- `src/components/layout/header.tsx` → the "SynapseDoc" logo/wordmark text.
+- Anywhere else: `grep -rn "SynapseDoc" src` and fix each.
+- `package.json` `"name"` is `synapsedoc` — cosmetic, optional (affects nothing
   user-facing; changing it is fine but not required).
-- Check `src/app/(auth)/*` pages for hardcoded "Research AI" in headings.
+- Check `src/app/(auth)/*` pages for hardcoded "SynapseDoc" in headings.
 - The brain 🧠 logo icon in the header — keep or swap, your call.
 
-**Acceptance:** `grep -rn "Research AI" src` returns nothing user-facing; tab
-title + header + auth pages all say "Mogger Research".
+**Acceptance:** `grep -rn "SynapseDoc" src` returns nothing user-facing; tab
+title + header + auth pages all say "SynapseDoc".
 
 ---
 
@@ -95,12 +95,12 @@ paste Client ID + Secret → Save.
 
 - Confirm the "Continue with Google" button calls
   `supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: ... }})`
-  with `redirectTo` = `https://mogger-research.vercel.app/auth/callback`.
+  with `redirectTo` = `https://synapsedoc.vercel.app/auth/callback`.
 - Confirm `src/app/auth/callback/route.ts` exchanges the code for a session
   (it already exists — just verify it handles the OAuth code flow, not only
   email confirm).
 - Supabase → URL Configuration → Redirect URLs must include
-  `https://mogger-research.vercel.app/**` (already added).
+  `https://synapsedoc.vercel.app/**` (already added).
 
 **Gotcha:** Google OAuth consent screen may be in "Testing" mode → only
 allow-listed test users can log in. Either add your Gmail as a test user, or
@@ -146,7 +146,7 @@ AI-generated boilerplate. Needs a deliberate visual language.
 
 **Approach (do NOT just throw more effects at it):**
 
-- **Pick a design direction first**, then commit. Given the name "Mogger
+- **Pick a design direction first**, then commit. Given the name "SynapseDoc
   Research" there's room for either (a) serious/editorial research tool, or
   (b) a bit of personality/edge. Decide the vibe before touching CSS.
 - **Typography before decoration:** set a real type scale, readable body
@@ -199,5 +199,5 @@ just the presentation layer. Verify `npm run build` + visual QA on mobile
 - `npm remove @google-cloud/vision` (unused after OCR simplification).
 - Dedupe `tests/unit/agents/chunker.spec.ts` vs `chunker.test.ts`.
 - Rotate the demo password (`Chettra12$$` was exposed in chat).
-- `NEXT_PUBLIC_APP_URL` in Vercel must = `https://mogger-research.vercel.app`
+- `NEXT_PUBLIC_APP_URL` in Vercel must = `https://synapsedoc.vercel.app`
   (confirm it's not still the `xxxx` placeholder).

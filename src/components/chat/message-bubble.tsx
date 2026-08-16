@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils/helpers";
 import { CitationCard } from "./citation-card";
 import { Button } from "@/components/ui/button";
 import {
-  Brain,
+  Network,
   User,
   ChevronDown,
   ChevronUp,
@@ -42,7 +42,11 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             : "bg-muted text-muted-foreground"
         )}
       >
-        {isUser ? <User className="h-4 w-4" /> : <Brain className="h-4 w-4" />}
+        {isUser ? (
+          <User className="h-4 w-4" />
+        ) : (
+          <Network className="h-4 w-4" />
+        )}
       </div>
 
       {/* Message content */}

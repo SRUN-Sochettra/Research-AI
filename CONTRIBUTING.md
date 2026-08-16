@@ -1,6 +1,6 @@
-# Contributing to Research AI
+# Contributing to SynapseDoc
 
-Thanks for contributing to Research AI!
+Thanks for contributing to SynapseDoc!
 
 > **AI agents:** read [`AGENTS.md`](AGENTS.md) first — it's the primary context
 > file (project overview, conventions, config source of truth, and known traps).

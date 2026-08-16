@@ -14,7 +14,15 @@ const supabase = createClient(
   { auth: { persistSession: false } }
 );
 
-const { error } = await supabase.from("profiles").select("id").limit(1);
-clearTimeout(timeout);
-console.log(error ? `❌ ${error.message}` : "✅ Connection OK");
-process.exit(error ? 1 : 0); // ← the line the inline version was missing
+async function main() {
+  const { error } = await supabase.from("profiles").select("id").limit(1);
+  clearTimeout(timeout);
+  console.log(error ? `❌ ${error.message}` : "✅ Connection OK");
+  process.exit(error ? 1 : 0);
+}
+
+main().catch((err) => {
+  clearTimeout(timeout);
+  console.error("❌", err);
+  process.exit(1);
+});

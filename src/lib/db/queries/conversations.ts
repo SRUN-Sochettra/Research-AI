@@ -1,6 +1,7 @@
 import { getSupabaseAdminClient } from "@/lib/db/supabase/admin";
 import { getSupabaseServerClient } from "@/lib/db/supabase/server";
 import type {
+  Database,
   Conversation,
   Message,
   Citation,
@@ -29,14 +30,23 @@ export async function getOrCreateConversation(
   }
 
   // Create new conversation
+  const insertPayload: Database["public"]["Tables"]["conversations"]["Insert"] =
+    {
+      user_id: userId,
+      title: "New Conversation",
+    };
+
+  if (documentId) {
+    insertPayload.document_id = documentId;
+  }
+
+  if (documentIds && documentIds.length > 0) {
+    insertPayload.document_ids = documentIds;
+  }
+
   const { data, error } = await supabase
     .from("conversations")
-    .insert({
-      user_id: userId,
-      document_id: documentId ?? null,
-      document_ids: documentIds ?? null,
-      title: "New Conversation",
-    })
+    .insert(insertPayload)
     .select()
     .single();
 

@@ -1,8 +1,9 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, BookOpenText, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { BrandWordmark } from "@/components/layout/brand-mark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,13 +22,10 @@ export default function LoginPage() {
     setBusy(false);
   }
   return (
-    <main className="grid min-h-screen lg:grid-cols-[.9fr_1.1fr]">
+    <main className="neural-field grid min-h-screen lg:grid-cols-[.9fr_1.1fr]">
       <section className="flex flex-col justify-between border-r p-6 sm:p-10">
-        <Link href="/" className="flex items-center gap-2 font-semibold">
-          <span className="bg-primary text-primary-foreground grid size-8 place-items-center">
-            <BookOpenText className="size-4" />
-          </span>
-          Mogger Research
+        <Link href="/" aria-label="SynapseDoc home">
+          <BrandWordmark />
         </Link>
         <div className="hidden lg:block">
           <p className="eyebrow">A quieter way to research</p>

@@ -36,7 +36,7 @@ export default async function SettingsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Account <span className="gradient-text">Settings</span>
+            Account Settings
           </h1>
           <p className="text-muted-foreground mt-1">
             Manage your profile and preferences
@@ -44,8 +44,8 @@ export default async function SettingsPage() {
         </div>
       </div>
 
-      <Card className="border-white/10 bg-white/[0.02]">
-        <CardHeader className="border-b border-white/5 pb-4">
+      <Card className="border-border bg-card">
+        <CardHeader className="border-border border-b pb-4">
           <CardTitle className="flex items-center gap-2 text-xl">
             <Settings className="text-primary h-5 w-5" />
             Profile Details
@@ -53,7 +53,7 @@ export default async function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-6 p-6">
           <div className="flex items-center gap-6">
-            <Avatar className="h-20 w-20 ring-1 ring-violet-500/30">
+            <Avatar className="ring-primary/30 h-20 w-20 ring-1">
               <AvatarFallback className="bg-primary text-2xl font-bold text-white">
                 {initials}
               </AvatarFallback>
@@ -67,7 +67,7 @@ export default async function SettingsPage() {
             </div>
           </div>
 
-          <div className="grid gap-6 border-t border-white/5 pt-4 md:grid-cols-2">
+          <div className="border-border grid gap-6 border-t pt-4 md:grid-cols-2">
             <div className="space-y-2">
               <label className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
                 <User className="h-4 w-4" />

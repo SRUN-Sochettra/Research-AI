@@ -10,4 +10,4 @@ Please use the latest version of the application.
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability within Research AI, please do not open a public issue. Instead, send an email directly to the repository maintainer. We take security very seriously and will work to address the issue as quickly as possible. Please include as much detail as possible to help us reproduce the issue.
+If you discover a security vulnerability within SynapseDoc, please do not open a public issue. Instead, send an email directly to the repository maintainer. We take security very seriously and will work to address the issue as quickly as possible. Please include as much detail as possible to help us reproduce the issue.

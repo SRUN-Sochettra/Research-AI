@@ -93,9 +93,7 @@ export default async function DocumentsPage(props: DocumentsPageProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            My <span className="gradient-text">Documents</span>
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">My Documents</h1>
           <p className="text-muted-foreground mt-1">
             Upload PDFs and start asking questions
           </p>

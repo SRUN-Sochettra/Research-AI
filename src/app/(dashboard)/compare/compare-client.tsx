@@ -101,8 +101,8 @@ function DocumentDetailCard({ doc }: { doc?: Document }) {
     );
   const isReady = doc.status === "ready";
   return (
-    <Card className="flex h-[600px] flex-col border-white/10 bg-white/[0.02]">
-      <CardHeader className="border-b border-white/5 pb-4">
+    <Card className="border-border bg-card flex h-[600px] flex-col">
+      <CardHeader className="border-border border-b pb-4">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-2 text-xl">
@@ -129,9 +129,9 @@ function DocumentDetailCard({ doc }: { doc?: Document }) {
         </div>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col overflow-hidden p-0">
-        <div className="grid grid-cols-2 gap-px bg-white/5">
+        <div className="bg-muted grid grid-cols-2 gap-px">
           <div className="bg-background/50 flex items-center gap-2 p-4">
-            <FileIcon className="h-4 w-4 text-blue-400" />
+            <FileIcon className="text-primary h-4 w-4" />
             <div className="flex flex-col">
               <span className="text-muted-foreground text-xs">Size</span>
               <span className="text-sm font-medium">
@@ -158,7 +158,7 @@ function DocumentDetailCard({ doc }: { doc?: Document }) {
             </div>
           </div>
         </div>
-        <div className="flex flex-1 flex-col overflow-hidden border-t border-white/5 p-4">
+        <div className="border-border flex flex-1 flex-col overflow-hidden border-t p-4">
           <h4 className="text-muted-foreground mb-2 text-sm font-medium">
             AI Summary
           </h4>

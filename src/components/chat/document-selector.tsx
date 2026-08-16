@@ -55,7 +55,7 @@ export function DocumentSelector({ documents }: { documents: Document[] }) {
                 className={`relative cursor-pointer rounded-md border p-4 transition-all ${
                   isSelected
                     ? "border-primary bg-primary/10"
-                    : "border-white/10 bg-white/[0.02] hover:border-white/20"
+                    : "border-border bg-card hover:border-white/20"
                 } ${!isReady ? "cursor-not-allowed opacity-50" : ""}`}
               >
                 <div className="flex items-start gap-3">
@@ -77,11 +77,11 @@ export function DocumentSelector({ documents }: { documents: Document[] }) {
         </div>
       )}
 
-      <div className="flex justify-end border-t border-white/10 pt-4">
+      <div className="border-border flex justify-end border-t pt-4">
         <Button
           onClick={handleStartChat}
           disabled={selected.size === 0}
-          className="bg-violet-600 text-white hover:bg-violet-700"
+          className="bg-primary hover:bg-primary/90 text-white"
         >
           Start Chat ({selected.size})
         </Button>

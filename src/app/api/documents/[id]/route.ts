@@ -1,66 +1,53 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/db/supabase/server";
-import { checkRateLimit } from "@/lib/services/rate-limiter";
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const { id } = await params;
+  const { id } = await params;
 
-    const supabase = await getSupabaseServerClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  const supabase = await getSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    const rateLimit = await checkRateLimit(`documents:download:${user.id}`);
-    if (!rateLimit.success) {
-      return NextResponse.json(
-        { error: "Too many requests. Please wait a minute." },
-        {
-          status: 429,
-          headers: { "X-RateLimit-Reset": String(rateLimit.reset) },
-        }
-      );
-    }
+  const { data: document, error } = await supabase
+    .from("documents")
+    .select("id, status, summary, page_count, updated_at")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .single();
 
-    const { data: doc, error: docError } = await supabase
-      .from("documents")
-      .select("file_path, file_name, title")
-      .eq("id", id)
-      .eq("user_id", user.id)
-      .single();
+  if (error || !document) {
+    return NextResponse.json({ error: "Document not found" }, { status: 404 });
+  }
 
-    if (docError || !doc) {
-      return NextResponse.json(
-        { error: "Document not found" },
-        { status: 404 }
-      );
-    }
+  const response = NextResponse.json({
+    id: document.id,
+    status: document.status,
+    summary: document.summary,
+    pageCount: document.page_count,
+    updatedAt: document.updated_at,
+  });
 
-    const { data, error: storageError } = await supabase.storage
-      .from("documents")
-      .createSignedUrl(doc.file_path, 60, {
-        download: doc.file_name || doc.title,
-      });
-
-    if (storageError || !data?.signedUrl) {
-      return NextResponse.json(
-        { error: "Failed to generate download URL" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.redirect(data.signedUrl);
-  } catch (_error) {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+  // Cache ready documents longer — they won't change
+  // Cache processing documents briefly for polling
+  if (document.status === "ready") {
+    response.headers.set(
+      "Cache-Control",
+      "private, max-age=300" // 5 min for ready docs
+    );
+  } else {
+    response.headers.set(
+      "Cache-Control",
+      "private, max-age=5, must-revalidate" // 5s for processing
     );
   }
+
+  return response;
 }

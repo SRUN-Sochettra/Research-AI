@@ -41,7 +41,7 @@ export function CitationCard({ citation, index }: CitationCardProps) {
 
       {/* Snippet */}
       <p className="text-muted-foreground line-clamp-3 leading-relaxed">
-        &ldquo;{citation.snippet}&rdquo;
+        “{citation.snippet}”
       </p>
     </div>
   );

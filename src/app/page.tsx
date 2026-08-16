@@ -7,7 +7,7 @@ const steps = [
   [
     "01",
     "Bring the source",
-    "Upload a PDF. Mogger preserves page references while it parses and indexes the text.",
+    "Upload a PDF. SynapseDoc preserves page references while it parses and indexes the text.",
   ],
   [
     "02",
@@ -25,29 +25,27 @@ export default function HomePage() {
   return (
     <div className="min-h-screen overflow-hidden">
       <Header />
-      <main>
+      <main className="neural-field">
         <section className="container px-5 pt-16 pb-16 sm:px-8 sm:pt-24 lg:pb-24">
           <div className="grid gap-12 lg:grid-cols-[1.15fr_.85fr] lg:items-end">
             <div>
               <p className="eyebrow mb-6">
-                Research workspace / PDF intelligence
+                Document intelligence / source-grounded
               </p>
               <h1 className="display-serif max-w-4xl text-[clamp(3.4rem,8vw,7.5rem)] leading-[.86]">
-                Read less.
+                Connect the document.
                 <br />
-                <em className="text-primary not-italic">Know where</em>
-                <br />
-                it came from.
+                <em className="text-primary not-italic">Trace the answer.</em>
               </h1>
               <p className="text-muted-foreground mt-8 max-w-xl text-base leading-7 sm:text-lg">
-                Mogger Research turns dense PDFs into a source-grounded
+                SynapseDoc turns dense PDFs into a source-grounded
                 conversation—summaries, precise answers, and page citations in
                 one restrained workspace.
               </p>
               <div className="mt-9 flex flex-wrap gap-3">
                 <Button asChild size="lg" className="h-11 px-5">
                   <Link href="/signup">
-                    Start a research file <ArrowRight />
+                    Open a workspace <ArrowRight />
                   </Link>
                 </Button>
                 <Button

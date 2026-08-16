@@ -21,10 +21,8 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className="flex min-h-[40vh] flex-col items-center justify-center gap-5 p-8 text-center">
-      <div className="relative flex h-20 w-20 items-center justify-center rounded-md bg-gradient-to-br from-violet-600/20 to-blue-600/20 ring-1 ring-white/10">
+      <div className="bg-primary/10 ring-border relative flex h-20 w-20 items-center justify-center rounded-md ring-1">
         {icon || <FileText className="text-primary h-10 w-10" />}
-        {/* Glow */}
-        <div className="bg-primary/10 absolute inset-0 rounded-md blur-xl" />
       </div>
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">{title}</h3>
@@ -32,16 +30,13 @@ export function EmptyState({
       </div>
       {action &&
         (action.href ? (
-          <Button
-            asChild
-            className="bg-primary text-white hover:from-violet-700 hover:to-blue-700"
-          >
+          <Button asChild className="bg-primary hover:bg-primary/90 text-white">
             <Link href={action.href}>{action.label}</Link>
           </Button>
         ) : (
           <Button
             onClick={action.onClick}
-            className="bg-primary text-white hover:from-violet-700 hover:to-blue-700"
+            className="bg-primary hover:bg-primary/90 text-white"
           >
             {action.label}
           </Button>
@@ -67,7 +62,7 @@ export function NoDocuments() {
 export function NoMessages() {
   return (
     <EmptyState
-      icon={<MessageSquare className="h-10 w-10 text-blue-400" />}
+      icon={<MessageSquare className="text-primary h-10 w-10" />}
       title="Start a conversation"
       description="Ask a question about this document and our AI will find the answers with citations."
     />
