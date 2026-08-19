@@ -5,6 +5,11 @@ import {
 } from "@/lib/db/queries/documents";
 import { AI_CONFIG } from "@/lib/utils/constants";
 import { logger } from "@/lib/observability/logger";
+import {
+  MAX_RERANK_CANDIDATES,
+  rerankChunks,
+  rerankingEnabled,
+} from "@/lib/ai/reranker";
 
 export interface RetrievedChunk {
   id: string;
@@ -38,7 +43,12 @@ export async function retrieveRelevantChunks(
   // 2. Semantic search against pgvector
   const rawChunks = await searchSimilarChunks(documentId, queryEmbedding, {
     threshold: options?.threshold ?? AI_CONFIG.similarityThreshold,
-    count: options?.count ?? AI_CONFIG.maxRetrievedChunks,
+    count: rerankingEnabled()
+      ? Math.max(
+          options?.count ?? AI_CONFIG.maxRetrievedChunks,
+          MAX_RERANK_CANDIDATES
+        )
+      : (options?.count ?? AI_CONFIG.maxRetrievedChunks),
   });
 
   logger.info("[Retriever] Retrieved chunks", {
@@ -55,7 +65,14 @@ export async function retrieveRelevantChunks(
     similarity: chunk.similarity,
   }));
 
-  return { chunks, query };
+  return {
+    chunks: await rerankChunks(
+      query,
+      chunks,
+      options?.count ?? AI_CONFIG.maxRetrievedChunks
+    ),
+    query,
+  };
 }
 
 export async function retrieveMultipleDocumentsChunks(
@@ -78,7 +95,12 @@ export async function retrieveMultipleDocumentsChunks(
     queryEmbedding,
     {
       threshold: options?.threshold ?? AI_CONFIG.similarityThreshold,
-      count: options?.count ?? AI_CONFIG.maxRetrievedChunks,
+      count: rerankingEnabled()
+        ? Math.max(
+            options?.count ?? AI_CONFIG.maxRetrievedChunks,
+            MAX_RERANK_CANDIDATES
+          )
+        : (options?.count ?? AI_CONFIG.maxRetrievedChunks),
     }
   );
 
@@ -96,7 +118,14 @@ export async function retrieveMultipleDocumentsChunks(
     similarity: chunk.similarity,
   }));
 
-  return { chunks, query };
+  return {
+    chunks: await rerankChunks(
+      query,
+      chunks,
+      options?.count ?? AI_CONFIG.maxRetrievedChunks
+    ),
+    query,
+  };
 }
 
 // Format chunks into a readable context string for the LLM

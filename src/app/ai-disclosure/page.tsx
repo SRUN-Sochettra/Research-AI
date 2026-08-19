@@ -73,6 +73,41 @@ export default function AiDisclosurePage() {
           provider data is never retained or used for improvement.
         </p>
       </LegalSection>
+      <LegalSection title="Provider selection and data processing">
+        <p>
+          Text-generation requests may be routed between Google Gemini and an
+          enabled fallback provider such as Groq for reliability. Data can
+          include a question, bounded conversation history, and retrieved
+          passages. OCR can require transmitting PDF content to Gemini.
+          SynapseDoc does not guarantee a specific provider. Account-specific
+          retention, training, location, and legal terms must be verified before
+          launch.
+        </p>
+      </LegalSection>
+      <LegalSection title="AI processors, gateways, and reranking">
+        <p>
+          Depending on server configuration and provider health, ordinary text
+          generation may use Google Gemini, Groq, Cerebras Cloud, SambaNova
+          Cloud, Mistral AI, OpenRouter, Hugging Face Inference Providers, or
+          Cloudflare Workers AI. OpenRouter and Hugging Face are gateways and
+          may also transmit the request to an upstream inference provider. Not
+          every provider receives every request, and SynapseDoc does not
+          guarantee a specific provider.
+        </p>
+        <p>
+          Ordinary chat may send the question, bounded conversation history, and
+          bounded retrieved passages rather than the entire document. If Cohere
+          reranking is enabled, Cohere may receive the query and a bounded
+          candidate set of retrieved passages. PDF OCR may send PDF content to
+          Google Gemini, which remains the only active AI OCR provider.
+        </p>
+        <p>
+          Retention, training, security, region, data-residency, and compliance
+          terms depend on each operator account and must be verified before
+          launch. Evaluation or free-tier credentials are not assumed to be
+          production-suitable.
+        </p>
+      </LegalSection>
     </LegalPage>
   );
 }

@@ -1,5 +1,4 @@
-import { CallbackHandler } from "@/lib/observability/langfuse-callback";
-import { getChatModel, createChatModelSelector } from "@/lib/ai/gemini";
+import { aiRouter } from "@/lib/ai/router";
 import { QA_PROMPT } from "@/lib/ai/prompts";
 import {
   retrieveRelevantChunks,
@@ -38,15 +37,6 @@ export interface QAStreamCallbacks {
   onToken: (token: string) => void;
   onComplete: (result: QAResult) => void;
   onError: (error: Error) => void;
-}
-
-function isRateLimitError(error: unknown): boolean {
-  return (
-    error instanceof Error &&
-    (error.message.includes("429") ||
-      error.message.includes("Too Many Requests") ||
-      error.message.includes("quota"))
-  );
 }
 
 export async function runQAAgent(
@@ -124,68 +114,19 @@ export async function runQAAgent(
     const context = formatChunksAsContext(chunks);
     const chatHistory = formatConversationHistory(conversationHistory);
 
-    // ─── Step 4: Stream LLM Response (with model fallback) ─────
+    // ─── Step 4: Stream LLM Response ──────────────────
     currentStage = "llm-generation";
-    const langfuseHandler = new CallbackHandler({
-      sessionId: conversationId,
-      userId: userId,
-      tags: ["qa"],
+    const messages = await QA_PROMPT.formatMessages({
+      context,
+      chat_history: chatHistory,
+      question,
     });
-
-    const selector = createChatModelSelector();
-    let fullAnswer = "";
-
-    while (true) {
-      currentModel = selector.current();
-      const model = getChatModel({
-        temperature: 0.3,
-        streaming: true,
-        modelOverride: currentModel,
-      });
-
-      const chain = QA_PROMPT.pipe(model);
-      let tokensEmitted = false;
-
-      try {
-        const stream = await chain.stream(
-          {
-            context,
-            chat_history: chatHistory,
-            question,
-          },
-          { callbacks: [langfuseHandler] }
-        );
-
-        for await (const chunk of stream) {
-          const token = chunk.content as string;
-          if (token) {
-            tokensEmitted = true;
-            fullAnswer += token;
-            callbacks.onToken(token);
-          }
-        }
-
-        break; // stream completed successfully
-      } catch (error) {
-        // Only safe to fail over if nothing has been sent to the client yet.
-        if (isRateLimitError(error) && !tokensEmitted) {
-          const nextModel = selector.next();
-          if (nextModel) {
-            logger.warn("[QAAgent] Chat hit rate limit, switching model", {
-              stage: currentStage,
-              previousModel: currentModel,
-              nextModel,
-            });
-            fullAnswer = "";
-            continue;
-          }
-          logger.warn("[QAAgent] All chat models exhausted", {
-            stage: currentStage,
-          });
-        }
-        throw error;
-      }
-    }
+    const routed = await aiRouter.streamChat(
+      { workload: "chat", messages, temperature: 0.3, streaming: true },
+      callbacks.onToken
+    );
+    const fullAnswer = routed.text;
+    currentModel = `${routed.provider}:${routed.model}`;
 
     // ─── Step 5: Build Citations ────────────────────────
     currentStage = "citation-building";

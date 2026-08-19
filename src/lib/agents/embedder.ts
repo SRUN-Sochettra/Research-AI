@@ -1,4 +1,5 @@
 import { getEmbeddingModel } from "@/lib/ai/gemini";
+import { GEMINI_EMBEDDING_PROFILE } from "@/lib/ai/contracts";
 import { sleep } from "@/lib/utils/helpers";
 import type { TextChunk } from "./chunker";
 
@@ -74,7 +75,13 @@ export async function embedChunks(
 }
 
 // Embed a single query (used during Q&A)
-export async function embedQuery(query: string): Promise<number[]> {
+export async function embedQuery(
+  query: string,
+  profileId = GEMINI_EMBEDDING_PROFILE.id
+): Promise<number[]> {
+  if (profileId !== GEMINI_EMBEDDING_PROFILE.id) {
+    throw new Error(`Incompatible embedding profile: ${profileId}`);
+  }
   const embedder = getEmbeddingModel();
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {

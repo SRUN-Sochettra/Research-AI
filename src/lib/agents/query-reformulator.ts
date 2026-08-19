@@ -1,7 +1,6 @@
-import { CallbackHandler } from "@/lib/observability/langfuse-callback";
-import { getChatModel } from "@/lib/ai/gemini";
+import { HumanMessage } from "@langchain/core/messages";
+import { aiRouter } from "@/lib/ai/router";
 import { QUERY_REFORMULATION_PROMPT } from "@/lib/ai/prompts";
-import { StringOutputParser } from "@langchain/core/output_parsers";
 import { logger } from "@/lib/observability/logger";
 import type { Message } from "@/types/database";
 
@@ -11,6 +10,8 @@ export async function reformulateQuery(
   userId: string,
   conversationId: string
 ): Promise<string> {
+  void userId;
+  void conversationId;
   // If no history, no need to reformulate
   if (conversationHistory.length === 0) {
     return question;
@@ -22,11 +23,6 @@ export async function reformulateQuery(
   }
 
   try {
-    const model = getChatModel({ temperature: 0 });
-    const outputParser = new StringOutputParser();
-
-    const chain = QUERY_REFORMULATION_PROMPT.pipe(model).pipe(outputParser);
-
     // Format recent history for context
     const recentHistory = conversationHistory
       .slice(-6) // Last 3 exchanges
@@ -36,18 +32,15 @@ export async function reformulateQuery(
       )
       .join("\n");
 
-    const langfuseHandler = new CallbackHandler({
-      tags: ["query-reformulation"],
-      userId,
-      sessionId: conversationId,
+    const promptText = await QUERY_REFORMULATION_PROMPT.format({
+      chat_history: recentHistory,
+      question,
     });
-    const reformulated = await chain.invoke(
-      {
-        chat_history: recentHistory,
-        question,
-      },
-      { callbacks: [langfuseHandler] }
-    );
+    const { text: reformulated } = await aiRouter.invokeText({
+      workload: "query-reformulation",
+      messages: [new HumanMessage(promptText)],
+      temperature: 0,
+    });
 
     logger.debug("[QueryReformulator] Reformulated query", {
       original: question,

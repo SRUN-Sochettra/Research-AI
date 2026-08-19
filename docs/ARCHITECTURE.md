@@ -175,3 +175,7 @@ document_chunks    conversations
   (`supabase/migrations/20260611_multi_document_chat.sql`).
 - After any schema change, run `npm run db:types` to regenerate
   `src/types/database.ts`.
+
+## Multi-provider AI routing
+
+See `docs/ADAPTIVE_AI_ROUTING.md`. The registry separates direct providers from gateways, filters configuration/capability/health, permits at most two sequential providers, preserves pre-token-only fallback, reuses shared Upstash circuits, and maintains Gemini embedding/OCR affinity. Cohere reranking is optional, bounded, reorder-only, and fail-open.

@@ -82,3 +82,7 @@ Plus the app env vars (as secrets) for the CI build/E2E jobs:
 `SUPABASE_SERVICE_ROLE_KEY`, `GOOGLE_API_KEY`, `UPSTASH_REDIS_REST_URL`,
 `UPSTASH_REDIS_REST_TOKEN`, `NEXT_PUBLIC_APP_URL`, and `CODECOV_TOKEN`
 (optional, for coverage upload).
+
+## Multi-provider routing deployment
+
+Configure only server-side variables in `docs/ADAPTIVE_AI_ROUTING.md`. Start Gemini-only, verify each account model independently, then add one provider at a time. Never use `NEXT_PUBLIC_*` credentials. Enable Cohere only after privacy and citation checks. Roll back with Gemini-only order, fallback off, max providers one, and reranking off.

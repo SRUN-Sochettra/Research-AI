@@ -1,4 +1,8 @@
 #!/usr/bin/env tsx
+import { loadEnvConfig } from "@next/env";
+loadEnvConfig(process.cwd());
+import { parseRoutingConfig } from "../src/lib/ai/provider-config";
+import { createProviderRegistry } from "../src/lib/ai/provider-registry";
 /**
  * Pre-deployment checklist
  * Run: npx tsx scripts/pre-deploy-check.ts
@@ -66,6 +70,36 @@ function checkEnvVars(): CheckResult[] {
   return results;
 }
 
+function checkAiRouting(): CheckResult[] {
+  try {
+    const routing = parseRoutingConfig(process.env);
+    const providers = createProviderRegistry(process.env);
+    const first = providers.find(
+      (provider) => provider.id === routing.order[0]
+    );
+    const firstValid = Boolean(first?.configured());
+    return [
+      {
+        name: "AI provider routing configuration",
+        passed: firstValid,
+        message: firstValid
+          ? `✓ Valid order; maximum ${routing.maxProvidersPerRequest} provider(s) per request`
+          : `✗ First ordered provider is not fully configured: ${first?.configurationError?.() ?? "not registered"}`,
+        critical: true,
+      },
+    ];
+  } catch (error) {
+    return [
+      {
+        name: "AI provider routing configuration",
+        passed: false,
+        message: `✗ ${error instanceof Error ? error.message : "Invalid AI routing configuration"}`,
+        critical: true,
+      },
+    ];
+  }
+}
+
 function checkUrlFormat(): CheckResult[] {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
@@ -100,7 +134,11 @@ async function runChecks() {
   console.log("\n🔍 Pre-Deployment Checklist\n");
   console.log("=".repeat(50));
 
-  const allChecks = [...checkEnvVars(), ...checkUrlFormat()];
+  const allChecks = [
+    ...checkEnvVars(),
+    ...checkAiRouting(),
+    ...checkUrlFormat(),
+  ];
 
   let criticalFailures = 0;
   let warnings = 0;

@@ -12,3 +12,5 @@ This patch supplies a repo-tailored operational draft, not legal advice. Before 
 8. Decide and document retention periods for operational logs, deleted data, backups, and failed uploads.
 9. Obtain qualified legal review for the jurisdictions where the service is offered.
 10. Re-run review whenever providers, analytics, cookies, pricing, age requirements, upload types, limits, or data flows change.
+11. Verify account-specific terms for Gemini, Groq, Cerebras, SambaNova, Mistral, OpenRouter/upstreams, Hugging Face/inference partners, Cloudflare Workers AI, and Cohere when enabled.
+12. Confirm deployed disclosures match provider order, gateway routing, model availability, regions, retention, training, security, and production-key terms.

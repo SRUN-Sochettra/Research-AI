@@ -77,7 +77,7 @@ export default function PrivacyPage() {
           answers. Do not upload material you are not authorized to send to an
           external AI provider. Read the{" "}
           <Link className="text-primary underline" href="/ai-disclosure">
-            AI &amp; Data Processing Notice
+            AI & Data Processing Notice
           </Link>{" "}
           for details.
         </p>
@@ -184,6 +184,42 @@ export default function PrivacyPage() {
       <LegalSection title="12. Contact">
         <p>
           Privacy requests: <LegalContact />.
+        </p>
+      </LegalSection>
+      <LegalSection title="Adaptive AI provider routing">
+        <p>
+          SynapseDoc may send user questions, bounded conversation context, and
+          retrieved document passages to Google Gemini or an enabled fallback
+          text provider such as Groq for availability and reliability. Ordinary
+          chat fallback is designed to send only the context needed for the
+          response, not the entire document. PDF OCR may send document content
+          to Gemini. A specific provider is not guaranteed for every request.
+          Provider retention, training, regional processing, and
+          account-specific terms require launch review.
+        </p>
+      </LegalSection>
+      <LegalSection title="AI processors, gateways, and reranking">
+        <p>
+          Depending on server configuration and provider health, ordinary text
+          generation may use Google Gemini, Groq, Cerebras Cloud, SambaNova
+          Cloud, Mistral AI, OpenRouter, Hugging Face Inference Providers, or
+          Cloudflare Workers AI. OpenRouter and Hugging Face are gateways and
+          may also transmit the request to an upstream inference provider. Not
+          every provider receives every request, and SynapseDoc does not
+          guarantee a specific provider.
+        </p>
+        <p>
+          Ordinary chat may send the question, bounded conversation history, and
+          bounded retrieved passages rather than the entire document. If Cohere
+          reranking is enabled, Cohere may receive the query and a bounded
+          candidate set of retrieved passages. PDF OCR may send PDF content to
+          Google Gemini, which remains the only active AI OCR provider.
+        </p>
+        <p>
+          Retention, training, security, region, data-residency, and compliance
+          terms depend on each operator account and must be verified before
+          launch. Evaluation or free-tier credentials are not assumed to be
+          production-suitable.
         </p>
       </LegalSection>
     </LegalPage>
