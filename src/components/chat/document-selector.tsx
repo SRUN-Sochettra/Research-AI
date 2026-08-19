@@ -81,7 +81,7 @@ export function DocumentSelector({ documents }: { documents: Document[] }) {
         <Button
           onClick={handleStartChat}
           disabled={selected.size === 0}
-          className="bg-primary hover:bg-primary/90 text-white"
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
         >
           Start Chat ({selected.size})
         </Button>

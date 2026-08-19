@@ -30,13 +30,16 @@ export function EmptyState({
       </div>
       {action &&
         (action.href ? (
-          <Button asChild className="bg-primary hover:bg-primary/90 text-white">
+          <Button
+            asChild
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
             <Link href={action.href}>{action.label}</Link>
           </Button>
         ) : (
           <Button
             onClick={action.onClick}
-            className="bg-primary hover:bg-primary/90 text-white"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {action.label}
           </Button>

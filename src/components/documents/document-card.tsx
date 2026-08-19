@@ -200,7 +200,7 @@ export function DocumentCard({ document }: { document: Document }) {
           <Button
             asChild
             size="sm"
-            className="group/btn bg-primary w-full text-xs font-semibold text-white shadow-md shadow-black/10 transition-all hover:scale-[1.01] hover:shadow-black/15"
+            className="group/btn bg-primary text-primary-foreground hover:bg-primary/90 w-full text-xs font-semibold shadow-md shadow-black/10 transition-all hover:scale-[1.01] hover:shadow-black/15"
           >
             <Link href={`/chat/${document.id}`}>
               <MessageSquare className="mr-1.5 h-3.5 w-3.5" />

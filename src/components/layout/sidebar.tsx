@@ -84,7 +84,7 @@ export function Sidebar() {
                   className={cn(
                     "h-4 w-4 transition-colors",
                     isActive
-                      ? "text-white"
+                      ? "text-primary-foreground"
                       : "text-muted-foreground group-hover:text-foreground"
                   )}
                 />

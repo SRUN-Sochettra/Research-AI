@@ -121,7 +121,7 @@ export function UploadButton() {
       }}
     >
       <DialogTrigger asChild>
-        <Button className="group bg-primary hover:bg-primary/90 text-white shadow-lg shadow-black/15 hover:shadow-black/15">
+        <Button className="group bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-black/15 hover:shadow-black/15">
           <Upload className="mr-2 h-4 w-4 transition-transform group-hover:-translate-y-0.5" />
           Upload PDF
         </Button>
@@ -245,7 +245,7 @@ export function UploadButton() {
           {state === "selected" && (
             <Button
               onClick={handleUpload}
-              className="bg-primary hover:bg-primary/90 w-full text-white"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 w-full"
             >
               <Upload className="mr-2 h-4 w-4" />
               Upload & Analyze

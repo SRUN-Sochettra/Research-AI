@@ -55,7 +55,7 @@ export default async function SettingsPage() {
         <CardContent className="space-y-6 p-6">
           <div className="flex items-center gap-6">
             <Avatar className="ring-primary/30 h-20 w-20 ring-1">
-              <AvatarFallback className="bg-primary text-2xl font-bold text-white">
+              <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
                 {initials}
               </AvatarFallback>
             </Avatar>
