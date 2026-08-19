@@ -3,6 +3,92 @@ import { AppError } from "@/lib/utils/errors";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { AI_CONFIG } from "@/lib/utils/constants";
 
+// Polyfills for serverless Node environments where @napi-rs/canvas is unavailable
+if (typeof (globalThis as Record<string, unknown>).DOMMatrix === "undefined") {
+  (globalThis as Record<string, unknown>).DOMMatrix = class DOMMatrix {
+    a = 1;
+    b = 0;
+    c = 0;
+    d = 1;
+    e = 0;
+    f = 0;
+    m11 = 1;
+    m12 = 0;
+    m13 = 0;
+    m14 = 0;
+    m21 = 0;
+    m22 = 1;
+    m23 = 0;
+    m24 = 0;
+    m31 = 0;
+    m32 = 0;
+    m33 = 1;
+    m34 = 0;
+    m41 = 0;
+    m42 = 0;
+    m43 = 0;
+    m44 = 1;
+    is2D = true;
+    isIdentity = true;
+    constructor(init?: unknown) {
+      if (Array.isArray(init) && init.length === 6) {
+        this.a = this.m11 = init[0];
+        this.b = this.m12 = init[1];
+        this.c = this.m21 = init[2];
+        this.d = this.m22 = init[3];
+        this.e = this.m41 = init[4];
+        this.f = this.m42 = init[5];
+      }
+    }
+    multiply() {
+      return this;
+    }
+    translate() {
+      return this;
+    }
+    scale() {
+      return this;
+    }
+    rotate() {
+      return this;
+    }
+    inverse() {
+      return this;
+    }
+    transformPoint(point: unknown) {
+      return point;
+    }
+  };
+}
+
+if (typeof (globalThis as Record<string, unknown>).ImageData === "undefined") {
+  (globalThis as Record<string, unknown>).ImageData = class ImageData {
+    data: Uint8ClampedArray;
+    width: number;
+    height: number;
+    constructor(width: number, height: number) {
+      this.width = width;
+      this.height = height;
+      this.data = new Uint8ClampedArray(width * height * 4);
+    }
+  };
+}
+
+if (typeof (globalThis as Record<string, unknown>).Path2D === "undefined") {
+  (globalThis as Record<string, unknown>).Path2D = class Path2D {
+    addPath() {}
+    closePath() {}
+    moveTo() {}
+    lineTo() {}
+    bezierCurveTo() {}
+    quadraticCurveTo() {}
+    arc() {}
+    arcTo() {}
+    ellipse() {}
+    rect() {}
+  };
+}
+
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { PDFParse } = require("pdf-parse");
 
