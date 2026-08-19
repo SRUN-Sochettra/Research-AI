@@ -106,6 +106,10 @@ export interface ParsedPDF {
 }
 
 export async function parsePDF(buffer: Buffer): Promise<ParsedPDF> {
+  let fullText = "";
+  let pageCount = 1;
+  let pages: string[] = [];
+
   try {
     // Pass buffer in constructor (required)
     const parser = new PDFParse({
@@ -114,51 +118,62 @@ export async function parsePDF(buffer: Buffer): Promise<ParsedPDF> {
     });
 
     const result = await parser.getText({});
-
-    const pageCount = result.total;
-
-    const pages = result.pages.map((p: { text: string }) =>
-      cleanPDFText(p.text)
-    );
-
-    const fullText = cleanPDFText(result.text);
-
-    // No usable text layer → try the OCR fallback (image-only / scanned PDF).
-    if (!fullText || fullText.length < 50) {
-      try {
-        const ocrText = await extractTextWithGemini(buffer);
-        const cleanOcrText = cleanPDFText(ocrText);
-        if (!cleanOcrText || cleanOcrText.length < 50) {
-          throw new AppError("Invalid PDF", "INVALID_PDF_CONTENT", 400);
-        }
-        return {
-          text: cleanOcrText,
-          pageCount: pageCount > 0 ? pageCount : 1,
-          pages: [cleanOcrText],
-          metadata: {},
-        };
-      } catch (ocrError) {
-        if (ocrError instanceof AppError) throw ocrError;
-        throw new AppError("PDF empty", "INVALID_PDF_CONTENT", 400);
+    pageCount = result.total || 1;
+    pages = result.pages
+      ? result.pages.map((p: { text: string }) => cleanPDFText(p.text))
+      : [];
+    fullText = cleanPDFText(result.text);
+  } catch (parseError) {
+    // If local parser fails (e.g. worker unavailable or unreadable format), attempt OCR fallback
+    try {
+      const ocrText = await extractTextWithGemini(buffer);
+      const cleanOcrText = cleanPDFText(ocrText);
+      if (!cleanOcrText || cleanOcrText.length < 20) {
+        throw new AppError("Invalid PDF", "INVALID_PDF_CONTENT", 400);
       }
+      return {
+        text: cleanOcrText,
+        pageCount: 1,
+        pages: [cleanOcrText],
+        metadata: {},
+      };
+    } catch (ocrError) {
+      if (ocrError instanceof AppError) throw ocrError;
+      throw new AppError(
+        "Failed to parse PDF. The file may be corrupted or password-protected.",
+        "PDF_PARSE_ERROR",
+        400,
+        parseError
+      );
     }
-
-    return {
-      text: fullText,
-      pageCount,
-      pages,
-      metadata: {}, // this version does not expose metadata via getText()
-    };
-  } catch (error) {
-    if (error instanceof AppError) throw error;
-
-    throw new AppError(
-      "Failed to parse PDF. The file may be corrupted or password-protected.",
-      "PDF_PARSE_ERROR",
-      400,
-      error
-    );
   }
+
+  // No usable text layer → try the OCR fallback (image-only / scanned PDF).
+  if (!fullText || fullText.length < 50) {
+    try {
+      const ocrText = await extractTextWithGemini(buffer);
+      const cleanOcrText = cleanPDFText(ocrText);
+      if (!cleanOcrText || cleanOcrText.length < 20) {
+        throw new AppError("Invalid PDF", "INVALID_PDF_CONTENT", 400);
+      }
+      return {
+        text: cleanOcrText,
+        pageCount: pageCount > 0 ? pageCount : 1,
+        pages: [cleanOcrText],
+        metadata: {},
+      };
+    } catch (ocrError) {
+      if (ocrError instanceof AppError) throw ocrError;
+      throw new AppError("PDF empty", "INVALID_PDF_CONTENT", 400);
+    }
+  }
+
+  return {
+    text: fullText,
+    pageCount,
+    pages,
+    metadata: {}, // this version does not expose metadata via getText()
+  };
 }
 
 // OCR fallback for PDFs with no extractable text layer.

@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   // Moved out of experimental in Next.js 15+
   serverExternalPackages: ["pdf-parse"],
 
+  outputFileTracingIncludes: {
+    "/api/**/*": ["./node_modules/pdf-parse/**/*"],
+  },
+
   // Security headers
   async headers() {
     return [
