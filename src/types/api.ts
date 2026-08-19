@@ -86,10 +86,15 @@ export const embedSchema = z.union([
   }),
 ]);
 
+export const deleteAccountSchema = z.object({
+  confirmation: z.literal("DELETE"),
+});
+
 export type UploadInput = z.infer<typeof uploadSchema>;
 export type ChatInput = z.infer<typeof chatSchema>;
 export type SummarizeInput = z.infer<typeof summarizeSchema>;
 export type EmbedInput = z.infer<typeof embedSchema>;
+export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>;
 
 // ============================================
 // Response types
@@ -115,4 +120,10 @@ export interface EmbedResponse {
   model: string; // e.g. "gemini-embedding-001"
   dimension: number; // 3072
   embeddings: number[][]; // one vector per input text
+}
+
+export interface DeleteAccountResponse {
+  message: string;
+  deletedDocumentsCount: number;
+  deletedFilesCount: number;
 }

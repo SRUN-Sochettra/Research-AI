@@ -10,13 +10,7 @@ const REQUIRED_ENV_VARS = [
   "SUPABASE_SERVICE_ROLE_KEY",
   "GOOGLE_API_KEY",
   "NEXT_PUBLIC_APP_URL",
-] as const;
-
-const OPTIONAL_ENV_VARS = [
-  "UPSTASH_REDIS_REST_URL",
-  "UPSTASH_REDIS_REST_TOKEN",
-  "LANGFUSE_PUBLIC_KEY",
-  "LANGFUSE_SECRET_KEY",
+  "NEXT_PUBLIC_LEGAL_EMAIL",
 ] as const;
 
 interface CheckResult {
@@ -41,7 +35,25 @@ function checkEnvVars(): CheckResult[] {
     });
   }
 
-  for (const varName of OPTIONAL_ENV_VARS) {
+  const redisUrl =
+    process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+  const redisToken =
+    process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+
+  results.push({
+    name: "ENV: Upstash / Vercel KV Redis",
+    passed: !!redisUrl && !!redisToken,
+    message:
+      redisUrl && redisToken
+        ? `✓ Set (${redisUrl.slice(0, 16)}...)`
+        : "⚠ Not set (optional in non-prod, required in prod)",
+    critical: false,
+  });
+
+  for (const varName of [
+    "LANGFUSE_PUBLIC_KEY",
+    "LANGFUSE_SECRET_KEY",
+  ] as const) {
     const value = process.env[varName];
     results.push({
       name: `ENV: ${varName}`,

@@ -2,6 +2,7 @@ import { getSupabaseServerClient } from "@/lib/db/supabase/server";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { DeleteAccountCard } from "@/components/settings/delete-account-card";
 import { Settings, Mail, User } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -95,6 +96,8 @@ export default async function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <DeleteAccountCard />
     </div>
   );
 }

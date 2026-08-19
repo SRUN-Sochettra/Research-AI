@@ -1,102 +1,57 @@
-# Agy CLI task — finish the SynapseDoc shippability pass
+# Prompt for Agy — apply and verify the SynapseDoc legal patch
 
-You're running in my local repo (Next.js 16 + Supabase RAG app). A patch set was
-already applied that adds fixes to code files. Your job is the stuff that needs a
-real shell, a package manager, and my Supabase project — things a static reviewer
-couldn't do. **Read `AGENTS.md` first**, then work top-to-bottom. Don't fabricate
-results: run the command, paste the real output, and if something fails, stop and
-report rather than papering over it.
+You are operating in the real SynapseDoc repository and deployment environment. Do not redesign the product or rewrite the legal text unless required to fix a verified mismatch. Treat this ZIP as a drop-in patch.
 
-## Ground rules
+## Objective
 
-- Read `AGENTS.md` and `src/lib/utils/constants.ts` before touching anything.
-- Smallest safe change. Show me a diff for anything beyond the explicit deletes.
-- After each step, report: **Command run / Real output / Pass|Fail / Next**.
+Apply the included files, configure the missing legal contact, verify the code and live behavior, and report evidence without claiming more than was tested.
 
-## 1. Deletes (I could only create/overwrite, not remove)
+## Steps
 
-- Delete the misnamed `./.prettiercc`. The correct `./.prettierrc` now exists —
-  confirm Prettier picks it up (`npx prettier --check` should now load the
-  tailwind plugin without a "no config found" fallback).
-- There are duplicate chunker tests: `tests/unit/agents/chunker.spec.ts` and
-  `tests/unit/agents/chunker.test.ts`. Open both. If one is a stale leftover,
-  delete it; if they cover different cases, merge into `chunker.test.ts` and
-  delete the `.spec.ts`. Report which and why.
+1. Back up or commit current work. Extract this ZIP at the repository root and allow matching paths to overwrite.
+2. Set `NEXT_PUBLIC_LEGAL_EMAIL` in `.env.local`, Vercel Production, and Preview if needed. Use a real monitored address belonging to the operator. Never place secrets in `NEXT_PUBLIC_*` values.
+3. Inspect the diff. Confirm no unrelated files changed.
+4. Run:
+   ```bash
+   npm ci
+   npm run format
+   npm run test:all
+   npm run build
+   ```
+5. If TypeScript or JSX fails, make the smallest safe correction. Do not remove the legal routes, links, age statement, upload disclosures, or provider disclosures merely to pass tests.
+6. Start the app and manually test at desktop and 360px mobile widths:
+   - `/terms`
+   - `/privacy`
+   - `/acceptable-use`
+   - `/ai-disclosure`
+   - `/limits`
+   - landing-page footer links
+   - `/signup`: email signup and Google sign-in must not proceed until the checkbox is selected; keyboard focus and label interaction must work; error must be announced.
+   - upload dialog: PDF-only and 10 MB limit text must be visible before file selection; the limits link must work.
+7. Verify real API enforcement with authenticated requests:
+   - reject empty files;
+   - reject non-PDF files;
+   - reject files over 10 MiB;
+   - enforce 10-document quota;
+   - enforce 5,000-character chat-message limit;
+   - confirm actual production rate-limit behavior with Upstash configured.
+8. Inspect and test the real Supabase project:
+   - RLS enabled and ownership policies active for profiles, documents, chunks, conversations, and messages;
+   - private `documents` bucket and per-user storage policies;
+   - deleting a document removes storage object, chunks, intended conversations/messages, and stale IDs from multi-document conversation arrays;
+   - determine backup retention and whether deleted data can remain in backups.
+9. Verify production provider/data flow from runtime configuration and official current terms: Vercel, Supabase, Google Gemini API, Upstash, and any Langfuse behavior. The current repo has a no-op LangChain callback but also initializes the Langfuse SDK; determine whether any data is actually emitted. Update the privacy page only where evidence proves a correction is needed.
+10. Implement a secure account-deletion endpoint and settings UI if the site is intended for public users. Requirements: recent authentication where supported, explicit confirmation naming the consequence, server-side user ownership checks, delete storage objects and application data before deleting the auth user, idempotent retries, safe partial-failure logging without PII, and a manual recovery path. Add tests. If not implemented, leave the policy's manual-request wording intact.
+11. Add E2E coverage for legal routes, footer links, signup agreement gating, and upload-limit disclosure.
+12. Deploy only after local checks pass. Then manually exercise the deployed production URL, including one real signup, one PDF upload, one AI question with citation, document deletion, and account-deletion/manual-request path. Capture provider/runtime logs. A green build is not proof of production behavior.
 
-## 2. Dependency hygiene
+## Required report
 
-- After the OCR change, `@google-cloud/vision` should be unused. Grep the repo:
-  `grep -rn "@google-cloud/vision" src`. If zero hits, `npm remove @google-cloud/vision`.
-- Verify these are actually imported anywhere; if not, propose removal (don't
-  remove without showing me the grep): `ai`, `html2pdf.js`, `langfuse`
-  (note: `langfuse` tracing is currently a no-op shim in
-  `src/lib/observability/langfuse-callback.ts` — confirm nothing else imports the
-  real `langfuse` package before removing).
-- `npm install` / `npm ci` and make sure the lockfile is clean.
+Return:
 
-## 3. Formatting + the real CI gate
+- **Changed** — exact files and any additional corrections.
+- **Verified** — each command and manual/live test with raw result.
+- **Risks** — legal placeholders, provider-term uncertainty, retention/deletion gaps, live DB gaps.
+- **Next step** — the smallest remaining action before public launch.
 
-Run, in order, and paste real output for each:
-
-```
-npx prettier --write .
-npm run type-check
-npm run lint
-npm run test
-npm run build
-```
-
-`npm run test:all` is the definition of done per AGENTS.md. The Prettier step
-was the suspected CI blocker (config was ignored + mixed 2/4-space indentation),
-so I especially want to see `prettier --check .` and `tsc --noEmit` go green.
-If `tsc` complains about the removed `getCurrentChatModelName` /
-`switchToNextModel` / `resetModelSelection` exports from `gemini.ts`, that means
-some other caller still references the old globals — find it and migrate it to
-`createChatModelSelector()` (see how `summarizer.ts` / `qa-agent.ts` now do it).
-
-## 4. Verify live-DB RLS is ACTUALLY on (highest-risk item)
-
-`src/lib/db/schema.sql` §6 enables RLS + policies, but the app only isolates
-users if that was actually run against the live project. If the DB was created
-from the _old_ README SQL, RLS is OFF and every user can read every document.
-Check it (psql or Supabase SQL editor):
-
-```sql
-select relname, relrowsecurity
-from pg_class
-where relname in ('profiles','documents','document_chunks','conversations','messages');
-```
-
-Every row must show `relrowsecurity = true`. Also confirm policies exist:
-
-```sql
-select tablename, policyname from pg_policies where schemaname = 'public';
-```
-
-If RLS is off / policies missing, run the enablement + policy blocks from
-`src/lib/db/schema.sql` §6 and §7 (storage). Report the before/after.
-
-## 5. Optional hardening — multi-doc search RLS (needs a migration)
-
-`searchMultipleSimilarChunks` (and the single-doc variant) call RPCs via the
-service-role admin client, which bypasses RLS. It's safe _today_ because the
-chat route pre-checks ownership of every `documentId`, but it's fragile. If you
-want defense-in-depth, add a migration under `supabase/migrations/` that scopes
-`match_multiple_document_chunks` to a `match_user_id uuid` param (join
-`document_chunks → documents` and filter `documents.user_id = match_user_id`),
-`npm run db:types`, then thread `userId` through the retriever + query. **Do the
-migration + deploy FIRST, then the code** — never merge code that calls an RPC
-signature that isn't live yet. Show me the migration before applying.
-
-## 6. Cleanup docs
-
-- `docs/ARCHITECTURE.md` is flagged stale in AGENTS.md (says `text-embedding-004`
-  / `vector[768]`; reality is `gemini-embedding-001` / 3072). Fix it to match
-  `constants.ts` + `schema.sql`.
-- Sanity-check `AI_CONFIG.ocrModel` (`gemini-2.5-flash`) is a currently valid
-  multimodal model name against the live API before relying on the OCR fallback.
-
-## Report back as
-
-Changed / Verified (commands you actually ran + output) / Risks / Next step.
-Do not imply "done" without the green `test:all` + build output pasted.
+Do not claim legal compliance, complete deletion, privacy, security, or production readiness without direct evidence and qualified review.

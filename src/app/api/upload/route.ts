@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { waitUntil } from "@vercel/functions";
 import { getSupabaseServerClient } from "@/lib/db/supabase/server";
+import { getSupabaseAdminClient } from "@/lib/db/supabase/admin";
 import { checkRateLimit } from "@/lib/services/rate-limiter";
 import {
   createDocument,
@@ -58,6 +59,9 @@ export async function POST(
             "X-RateLimit-Limit": String(rateLimit.limit),
             "X-RateLimit-Remaining": String(rateLimit.remaining),
             "X-RateLimit-Reset": String(rateLimit.reset),
+            "Retry-After": String(
+              Math.max(1, Math.ceil((rateLimit.reset - Date.now()) / 1000))
+            ),
           },
         }
       );
@@ -141,7 +145,8 @@ export async function POST(
     const fileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
     const filePath = `${user.id}/${Date.now()}_${fileName}`;
 
-    const { error: storageError } = await supabase.storage
+    const adminClient = getSupabaseAdminClient();
+    const { error: storageError } = await adminClient.storage
       .from("documents")
       .upload(filePath, fileBuffer, {
         contentType: "application/pdf",

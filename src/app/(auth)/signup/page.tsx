@@ -21,9 +21,16 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (!agreed) {
+      setError(
+        "Confirm that you are 18 or older and agree to the Terms and Privacy Policy."
+      );
+      return;
+    }
     setBusy(true);
     const r = await signUpWithEmail(email, password, name);
     if (r.error) setError(r.error);
@@ -81,7 +88,15 @@ export default function SignupPage() {
           <Button
             variant="outline"
             className="mt-8 h-11 w-full"
-            onClick={signInWithGoogle}
+            onClick={() => {
+              if (!agreed) {
+                setError(
+                  "Confirm that you are 18 or older and agree to the Terms and Privacy Policy."
+                );
+                return;
+              }
+              void signInWithGoogle();
+            }}
             disabled={busy}
           >
             <GoogleMark />
@@ -93,6 +108,32 @@ export default function SignupPage() {
             <span className="bg-border h-px flex-1" />
           </div>
           <form onSubmit={submit} className="space-y-4">
+            <label className="text-muted-foreground flex items-start gap-3 text-xs leading-5">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(event) => setAgreed(event.target.checked)}
+                className="accent-primary mt-0.5 size-4 shrink-0"
+              />
+              <span>
+                I am at least 18 years old and agree to the{" "}
+                <Link
+                  className="text-foreground underline underline-offset-4"
+                  href="/terms"
+                >
+                  Terms
+                </Link>{" "}
+                and{" "}
+                <Link
+                  className="text-foreground underline underline-offset-4"
+                  href="/privacy"
+                >
+                  Privacy Policy
+                </Link>
+                .
+              </span>
+            </label>
+
             {error && (
               <p
                 role="alert"

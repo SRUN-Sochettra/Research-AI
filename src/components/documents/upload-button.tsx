@@ -12,6 +12,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
+import Link from "next/link";
+import { LIMITS } from "@/lib/utils/constants";
 import {
   Upload,
   FileUp,
@@ -22,7 +24,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatFileSize } from "@/lib/utils/helpers";
-import { LIMITS } from "@/lib/utils/constants";
 
 type UploadState = "idle" | "selected" | "uploading" | "processing" | "done";
 
@@ -86,14 +87,14 @@ export function UploadButton() {
 
       setProgress(60);
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error?.message || "Upload failed");
+        throw new Error(data.error?.message || "Upload failed");
       }
 
       setState("processing");
       setProgress(80);
-      await response.json();
       setProgress(100);
       setState("done");
 
@@ -136,6 +137,12 @@ export function UploadButton() {
             Upload a PDF to analyze with AI. Max{" "}
             {formatFileSize(LIMITS.maxFileSize)}.
           </DialogDescription>
+          <Link
+            href="/limits"
+            className="text-primary text-xs underline underline-offset-4"
+          >
+            PDF only · view all upload and service limits
+          </Link>
         </DialogHeader>
 
         <div className="space-y-4">

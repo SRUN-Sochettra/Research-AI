@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen, FileSearch, Quote, Upload } from "lucide-react";
 import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 
 const steps = [
@@ -116,6 +117,7 @@ export default function HomePage() {
           </div>
         </section>
       </main>
+      <Footer />
     </div>
   );
 }

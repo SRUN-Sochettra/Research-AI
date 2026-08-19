@@ -11,16 +11,37 @@ export function _resetRateLimiterInstance(): void {
   hasWarnedUnconfigured = false;
 }
 
+export interface RedisCredentials {
+  url: string;
+  token: string;
+}
+
+/**
+ * Resolves Redis REST credentials supporting both standard UPSTASH_* names
+ * and Vercel's KV_REST_API_* integration fallback.
+ * Excludes read-only tokens because rate limiting requires write operations.
+ */
+export function getRedisCredentials(): RedisCredentials | null {
+  const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+
+  if (!url || !token) {
+    return null;
+  }
+
+  return { url, token };
+}
+
 function getActionPrefix(identifier: string): string {
   const parts = identifier.split(":");
   return parts[0] || "unknown";
 }
 
 function getRatelimiter(): Ratelimit | null {
-  if (
-    !process.env.UPSTASH_REDIS_REST_URL ||
-    !process.env.UPSTASH_REDIS_REST_TOKEN
-  ) {
+  const creds = getRedisCredentials();
+
+  if (!creds) {
     if (!hasWarnedUnconfigured) {
       if (process.env.NODE_ENV === "production") {
         logger.error(
@@ -38,8 +59,8 @@ function getRatelimiter(): Ratelimit | null {
 
   if (!ratelimit) {
     const redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      url: creds.url,
+      token: creds.token,
     });
 
     ratelimit = new Ratelimit({

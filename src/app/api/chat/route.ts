@@ -64,7 +64,12 @@ export async function POST(request: NextRequest) {
         status: 429,
         headers: {
           "Content-Type": "application/json",
+          "X-RateLimit-Limit": String(rateLimit.limit),
+          "X-RateLimit-Remaining": String(rateLimit.remaining),
           "X-RateLimit-Reset": String(rateLimit.reset),
+          "Retry-After": String(
+            Math.max(1, Math.ceil((rateLimit.reset - Date.now()) / 1000))
+          ),
         },
       }
     );

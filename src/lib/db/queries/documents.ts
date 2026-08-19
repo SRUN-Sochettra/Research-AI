@@ -106,7 +106,30 @@ export async function deleteDocument(
     await supabase.storage.from("documents").remove([doc.file_path]);
   }
 
-  // Delete document (cascades to chunks, conversations, messages)
+  // Clean up multi-document conversations that reference this document
+  const { data: multiConvs } = await supabase
+    .from("conversations")
+    .select("id, document_ids")
+    .eq("user_id", userId)
+    .contains("document_ids", [documentId]);
+
+  if (multiConvs && multiConvs.length > 0) {
+    for (const conv of multiConvs) {
+      const remaining = (conv.document_ids || []).filter(
+        (id: string) => id !== documentId
+      );
+      if (remaining.length === 0) {
+        await supabase.from("conversations").delete().eq("id", conv.id);
+      } else {
+        await supabase
+          .from("conversations")
+          .update({ document_ids: remaining })
+          .eq("id", conv.id);
+      }
+    }
+  }
+
+  // Delete document (cascades to chunks, single-doc conversations, messages)
   const { error } = await supabase
     .from("documents")
     .delete()

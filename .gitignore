@@ -64,3 +64,5 @@ repomix-output.*
 
 # artifacts
 artifacts/
+.vercel
+.env*
