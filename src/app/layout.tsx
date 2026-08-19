@@ -12,6 +12,13 @@ export const metadata: Metadata = {
   description: APP_CONFIG.description,
   keywords: ["AI", "research", "PDF", "RAG", "summarize", "question answering"],
   authors: [{ name: "Sochettra Srun" }],
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
