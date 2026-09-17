@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ChatInterface } from "./chat-interface";
 import { ConversationSidebar } from "./conversation-sidebar";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,13 @@ import { toast } from "sonner";
 import { ArrowLeft, FileText, BookOpen, Download } from "lucide-react";
 import Link from "next/link";
 import { truncateText } from "@/lib/utils/helpers";
-import type { Document, Conversation, Message } from "@/types/database";
+import type {
+  Document,
+  Conversation,
+  Message,
+  Citation,
+} from "@/types/database";
+import type { ChatMessage } from "@/hooks/use-chat";
 
 interface ChatPageClientProps {
   document: Document;
@@ -17,6 +23,17 @@ interface ChatPageClientProps {
   conversations: Conversation[];
   initialMessages: Message[];
   initialConversationId: string | null;
+}
+
+function toChatMessages(messages: Message[]): ChatMessage[] {
+  return messages.map((message) => ({
+    id: message.id,
+    role: message.role as "user" | "assistant",
+    content: message.content,
+    citations: (message.citations as unknown as Citation[]) ?? [],
+    latencyMs: message.latency_ms ?? undefined,
+    createdAt: new Date(message.created_at),
+  }));
 }
 
 export function ChatPageClient({
@@ -30,8 +47,19 @@ export function ChatPageClient({
     initialConversationId
   );
   const [conversations, setConversations] = useState(initialConversations);
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState<ChatMessage[]>(() =>
+    toChatMessages(initialMessages)
+  );
+  const [conversationSession, setConversationSession] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
+
+  const handleMessagesChange = useCallback((nextMessages: ChatMessage[]) => {
+    setMessages(nextMessages);
+  }, []);
+
+  const handleConversationIdChange = useCallback((id: string) => {
+    setCurrentConversationId(id);
+  }, []);
 
   const handleDownloadPdf = async () => {
     if (messages.length === 0) return;
@@ -150,6 +178,7 @@ export function ChatPageClient({
     // useChat will create a new one on first message
     setCurrentConversationId(null);
     setMessages([]);
+    setConversationSession((value) => value + 1);
   };
 
   const handleSelectConversation = async (id: string) => {
@@ -159,7 +188,10 @@ export function ChatPageClient({
     const response = await fetch(`/api/conversations/${id}/messages`);
     if (response.ok) {
       const data = await response.json();
-      setMessages(data.messages ?? []);
+      setMessages(toChatMessages(data.messages ?? []));
+      setConversationSession((value) => value + 1);
+    } else {
+      toast.error("Failed to load conversation");
     }
   };
 
@@ -283,10 +315,13 @@ export function ChatPageClient({
         {/* Chat area */}
         <div className="bg-card flex flex-1 flex-col overflow-hidden rounded-lg border">
           <ChatInterface
+            key={conversationSession}
             document={document}
             documentIds={documentIds}
             initialMessages={messages}
             initialConversationId={currentConversationId ?? undefined}
+            onMessagesChange={handleMessagesChange}
+            onConversationIdChange={handleConversationIdChange}
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
@@ -15,37 +15,34 @@ export function DocumentFilters() {
   const [query, setQuery] = useState(initialQuery);
   const [sort, setSort] = useState(initialSort);
 
-  const updateFilters = useCallback(
-    (newQuery: string, newSort: string) => {
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
+      const trimmedQuery = query.trim();
 
-      if (newQuery) {
-        params.set("query", newQuery);
-      } else {
-        params.delete("query");
-      }
+      if (trimmedQuery) params.set("query", trimmedQuery);
+      else params.delete("query");
 
-      if (newSort !== "newest") {
-        params.set("sort", newSort);
-      } else {
-        params.delete("sort");
-      }
+      if (sort !== "newest") params.set("sort", sort);
+      else params.delete("sort");
 
-      router.push(`?${params.toString()}`);
-    },
-    [router, searchParams]
-  );
+      const next = params.toString();
+      const current = searchParams.toString();
+      if (next !== current)
+        router.replace(next ? `?${next}` : "?", { scroll: false });
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [query, sort, router, searchParams]);
 
   const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuery = e.target.value;
     setQuery(newQuery);
-    updateFilters(newQuery, sort);
   };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newSort = e.target.value;
     setSort(newSort);
-    updateFilters(query, newSort);
   };
 
   return (

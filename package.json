@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -19,7 +19,8 @@
     "test:all": "npm run type-check && npm run lint && npm run test",
     "db:types": "supabase gen types typescript --local > src/types/database.ts",
     "analyze": "ANALYZE=true npm run build",
-    "prepare": "node -e \"try { require('husky').install() } catch (e) {}\""
+    "prepare": "node -e \"try { require('husky').install() } catch (e) {}\"",
+    "dev:turbo": "next dev --turbopack"
   },
   "dependencies": {
     "@google/generative-ai": "^0.11.0",
@@ -72,6 +73,10 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite": "^8.1.0",
-    "vitest": "^4.1.6"
+    "vitest": "4.1.9"
+  },
+  "allowScripts": {
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.12.2": true
   }
 }

@@ -238,6 +238,18 @@
   scrollbar-color: hsl(var(--border)) transparent;
 }
 
+@keyframes progress-indeterminate {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+.progress-indeterminate {
+  animation: progress-indeterminate 1.2s ease-in-out infinite;
+}
+
 @keyframes rise {
   from {
     opacity: 0;

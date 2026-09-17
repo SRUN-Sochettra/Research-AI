@@ -1,3 +1,6 @@
+import { loadEnvConfig } from "@next/env";
+loadEnvConfig(process.cwd());
+
 import { chromium } from "playwright";
 import { createClient } from "@supabase/supabase-js";
 import * as fs from "fs";

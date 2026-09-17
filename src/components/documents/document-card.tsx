@@ -68,7 +68,12 @@ export function DocumentCard({ document }: { document: Document }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this document?")) return;
+    if (
+      !confirm(
+        `Delete “${document.title}” permanently? This also removes its conversations.`
+      )
+    )
+      return;
     setIsDeleting(true);
     try {
       const response = await fetch(`/api/documents/${document.id}`, {
@@ -144,7 +149,7 @@ export function DocumentCard({ document }: { document: Document }) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+                  className="h-8 w-8 opacity-100 transition-opacity sm:opacity-70 sm:group-hover:opacity-100"
                 >
                   {isDeleting ? (
                     <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />

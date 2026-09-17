@@ -29,7 +29,7 @@ import {
 import { formatDate, formatFileSize } from "@/lib/utils/helpers";
 import { toast } from "sonner";
 import type { Document, DocumentStatus } from "@/types/database";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const processingMessages = [
   "Extracting text from PDF...",
@@ -56,12 +56,16 @@ export function DocumentDetail({ document }: { document: Document }) {
   const isProcessing =
     currentStatus === "processing" || currentStatus === "uploaded";
 
-  // Cycle through processing messages for UI feedback
-  if (isProcessing) {
-    setTimeout(() => {
-      setProcessingStep((p) => (p + 1) % processingMessages.length);
+  // Cycle through processing messages without scheduling timers during render.
+  useEffect(() => {
+    if (!isProcessing) return;
+
+    const interval = window.setInterval(() => {
+      setProcessingStep((step) => (step + 1) % processingMessages.length);
     }, 3000);
-  }
+
+    return () => window.clearInterval(interval);
+  }, [isProcessing]);
 
   const handleSaveTitle = async () => {
     if (!title.trim() || title === document.title) {

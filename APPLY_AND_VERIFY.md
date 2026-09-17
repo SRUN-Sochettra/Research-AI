@@ -1,33 +1,55 @@
 # Apply and verify
 
-Work from the supplied snapshot or manually resolve conflicts. Read `AGENTS.md`, use Graft first, commit/back up, and run `git status --short`. Stop if unrelated work would be overwritten. Copy each ZIP path to the same destination and delete only obsolete `src/lib/ai/providers/groq-provider.ts`. Preserve `.env.local`. No dependency or database migration is added.
+## Files included
 
-Configure the server-only variables documented in `docs/ADAPTIVE_AI_ROUTING.md`; never use `NEXT_PUBLIC_*` for credentials. Gemini-only and immediate rollback:
+- `src/hooks/use-chat.ts`
+- `tests/unit/hooks/use-chat.test.tsx`
+- `APPLY_AND_VERIFY.md`
 
-```dotenv
-AI_TEXT_PROVIDER_ORDER=gemini
-AI_FALLBACK_ENABLED=false
-AI_MAX_PROVIDERS_PER_REQUEST=1
-AI_RERANK_ENABLED=false
-```
+## Exact change
 
-Two-provider example: `AI_TEXT_PROVIDER_ORDER=gemini,groq`, fallback true, max providers 2. Hugging Face and Cloudflare are activated only by explicitly placing them in the order. To enable reranking, set `COHERE_API_KEY`, `COHERE_RERANK_MODEL`, `AI_RERANK_PROVIDER=cohere`, and `AI_RERANK_ENABLED=true`.
+`useChat` now omits `conversationId` from the JSON request body while its state is `null`. When an existing conversation ID is present, it is serialized unchanged. The server schema remains strict and unchanged: omission creates a conversation, while a supplied value must be a UUID.
 
-Run:
+Focused hook tests now prove:
+
+1. A first-message request has no own `conversationId` property.
+2. An existing UUID is retained unchanged.
+3. The existing `meta` → `token` → `citations` → `done` regression still verifies state updates.
+
+No chat route, schema, SSE, citation, persistence, cancellation, export, dependency, lockfile, database, provider, environment, or production configuration file is changed.
+
+## Verification achieved here
+
+- Parsed the complete Repomix snapshot and reconstructed all 423 packed text files.
+- Inspected the requested hook, API schema, chat route, hook tests, stream lifecycle tests, conversation queries/routes, chat UI/export state flow, `package.json`, `vitest.config.ts`, and `tsconfig.json`.
+- Confirmed the defect from repository evidence: `useChat` initialized the state to `null` and serialized that value; `chatSchema` accepts an omitted UUID but rejects `null`; the route returns HTTP 400 before conversation creation and streaming when parsing fails.
+- Re-read the changed files and ran static overlay assertions confirming the conditional omission and all three required regression cases are present.
+- Project dependencies were not available. An isolated `npm install --ignore-scripts --no-package-lock` attempt timed out and produced no usable dependency tree, so no TypeScript, Prettier, Vitest, ESLint, or Next.js build result is claimed.
+
+## Remaining local verification
+
+Run the exact repository scripts below, then exercise one disposable authenticated first-message chat flow. Runtime confirmation must include HTTP 200, ordered `meta`, `token`, `citations`, and `done` events, one conversation, one user message, one assistant message, valid citations, and complete cleanup.
+
+## Rollback
+
+If the overlay is not committed:
 
 ```bash
-npm install
-npm run format
-npm run format:check
-npm run type-check
-npm run lint
-npm run test
-npm run test:all
-npx vitest run tests/unit/ai
-npm run build
-npx tsx scripts/pre-deploy-check.ts
+git restore -- src/hooks/use-chat.ts tests/unit/hooks/use-chat.test.tsx
+rm APPLY_AND_VERIFY.md
 ```
 
-Verify each provider independently with fallback disabled after inspecting the account's actual model list. Then test two-provider pre-token fallback, permanent errors, post-token interruption, cancellation, at most two providers, one terminal SSE event, one assistant persistence, no duplicated tokens/citations, and rate-limit independence. Run `npx tsx scripts/verify-ai-health-upstash.ts`, verify open/skip/cooldown/half-open/probe/close and cleanup keys. Test Cohere disabled/success/fail-open/citation preservation/bounds. Verify `google:gemini-embedding-001:3072:v1`, existing-document search, and foreign-profile rejection. Test normal, scanned, corrupted, and empty-OCR PDFs; native extraction first and Gemini-only OCR. Inspect privacy pages, safe logs, and absence of secrets. Clean up users, documents, storage, Redis keys, and provider artifacts with direct evidence.
+If committed, revert that commit instead. There is no dependency, lockfile, configuration, environment, or database rollback.
 
-Full code rollback reverts supplied files and restores the previous Groq file. No database rollback applies.
+## Local-agent prompt
+
+```text
+You are the operational verifier for a narrowly scoped SynapseDoc chat request serialization fix. Work in the real local repository. Read AGENTS.md and follow repository instructions, using Graft first where available. Do not redesign or broaden the change. Preserve .env.local, secrets, provider configuration, database state, and every unrelated edit.
+
+1. Run `git status --short` before changing anything. Inspect the supplied overlay files `src/hooks/use-chat.ts`, `tests/unit/hooks/use-chat.test.tsx`, and `APPLY_AND_VERIFY.md`. Compare them with the current worktree and stop with the exact conflicting paths if applying or retaining the overlay would overwrite unrelated uncommitted edits. Otherwise apply or retain only these supplied changes.
+2. Verify the intended delta is only this: when `useChat` state has no conversation ID, the POST `/api/chat` JSON body has no own `conversationId` property; when a valid existing UUID is present, it is serialized unchanged. Keep the server schema strict. Do not alter other chat state, SSE parsing, citations, persistence, cancellation, errors, routes, exports, UI, dependencies, lockfiles, environment files, provider configuration, database schema, or production configuration.
+3. Run, in order, preserving raw command output and exit codes: `npm run format:check`, `npm run type-check`, `npm run lint`, `npx vitest run tests/unit/hooks/use-chat.test.tsx`, `npm run test`, and `npm run build`. Do not weaken or remove tests. If a command is missing, report that exact fact rather than substituting an invented success. If formatting is the only failure, format only the two changed TypeScript files using the repository formatter, then rerun all gates.
+4. Start the local app with the repository's normal development command and run one bounded authenticated disposable-PDF first-message flow with no initial conversation. Capture the outgoing request body and prove it has no own `conversationId` property. Verify POST `/api/chat` returns HTTP 200 and SSE ordering is `meta`, one or more `token` events, `citations`, then `done`, with no `error` event. Confirm the meta conversation UUID becomes client state, citations remain attached, exactly one conversation, one user message, and one assistant message are persisted, and no duplicate assistant content is produced.
+5. Delete the disposable document, conversation/messages, storage object, test account if one was created, and any test-only external artifacts. Verify cleanup directly. Do not touch production unless separately authorized.
+6. Report exactly: Changed; Git status and conflict check; Commands run with raw exit evidence; Focused regression result; Full gate results; Runtime first-message evidence; SSE and citation evidence; Persistence evidence; Cleanup; Not verified; Risks; Rollback. Do not claim production readiness.
+```

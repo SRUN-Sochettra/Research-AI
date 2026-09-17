@@ -179,7 +179,7 @@ function SidebarContent({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6 shrink-0 opacity-0 group-hover:opacity-100"
+                          className="h-8 w-8 shrink-0 opacity-100 sm:opacity-70 sm:group-hover:opacity-100"
                         >
                           <MoreVertical className="h-4 w-4" />
                           <span className="sr-only">More options</span>

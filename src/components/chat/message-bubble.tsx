@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils/helpers";
 import { CitationCard } from "./citation-card";
 import { Button } from "@/components/ui/button";
@@ -24,11 +24,30 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const hasCitations = message.citations.length > 0;
   const [hasCopied, setHasCopied] = useState(false);
+  const copyResetTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyResetTimer.current !== null) {
+        window.clearTimeout(copyResetTimer.current);
+      }
+    };
+  }, []);
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(message.content);
-    setHasCopied(true);
-    setTimeout(() => setHasCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(message.content);
+      setHasCopied(true);
+      if (copyResetTimer.current !== null) {
+        window.clearTimeout(copyResetTimer.current);
+      }
+      copyResetTimer.current = window.setTimeout(
+        () => setHasCopied(false),
+        2000
+      );
+    } catch {
+      setHasCopied(false);
+    }
   };
 
   return (
@@ -137,9 +156,24 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   );
 }
 
-// Renders message with basic markdown-like formatting
+// Renders a constrained, safe subset of Markdown without injecting HTML.
+function BoldText({ text }: { text: string }) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+
+  return (
+    <>
+      {parts.map((part, index) =>
+        part.startsWith("**") && part.endsWith("**") ? (
+          <strong key={index}>{part.slice(2, -2)}</strong>
+        ) : (
+          <Fragment key={index}>{part}</Fragment>
+        )
+      )}
+    </>
+  );
+}
+
 function MessageContent({ content }: { content: string }) {
-  // Split on code blocks and format
   const lines = content.split("\n");
 
   return (
@@ -147,39 +181,36 @@ function MessageContent({ content }: { content: string }) {
       {lines.map((line, i) => {
         if (line === "") return <br key={i} />;
 
-        // Bold text
-        const formatted = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-
-        // Bullet points
         if (line.startsWith("- ") || line.startsWith("• ")) {
           return (
             <div key={i} className="flex gap-2">
-              <span className="mt-0.5 shrink-0">•</span>
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: formatted.slice(2),
-                }}
-              />
+              <span className="mt-0.5 shrink-0" aria-hidden="true">
+                •
+              </span>
+              <span>
+                <BoldText text={line.slice(2)} />
+              </span>
             </div>
           );
         }
 
-        // Numbered lists
-        if (/^\d+\.\s/.test(line)) {
-          const [num, ...rest] = line.split(". ");
+        const numbered = line.match(/^(\d+)\.\s(.*)$/);
+        if (numbered) {
           return (
             <div key={i} className="flex gap-2">
-              <span className="shrink-0 font-medium">{num}.</span>
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: rest.join(". "),
-                }}
-              />
+              <span className="shrink-0 font-medium">{numbered[1]}.</span>
+              <span>
+                <BoldText text={numbered[2] ?? ""} />
+              </span>
             </div>
           );
         }
 
-        return <p key={i} dangerouslySetInnerHTML={{ __html: formatted }} />;
+        return (
+          <p key={i}>
+            <BoldText text={line} />
+          </p>
+        );
       })}
     </div>
   );

@@ -161,7 +161,7 @@ export function useChat({
             message: content.trim(),
             documentId,
             documentIds,
-            conversationId,
+            ...(conversationId ? { conversationId } : {}),
           }),
           signal: abortControllerRef.current.signal,
         });

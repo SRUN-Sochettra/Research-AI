@@ -9,25 +9,16 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { NoMessages } from "@/components/shared/empty-states";
 import { AlertTriangle, X, Network, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Document, Message, Citation } from "@/types/database";
+import type { Document } from "@/types/database";
 import type { ChatMessage } from "@/hooks/use-chat";
 
 interface ChatInterfaceProps {
   document: Document;
   documentIds?: string[];
-  initialMessages?: Message[];
+  initialMessages?: ChatMessage[];
   initialConversationId?: string;
-}
-
-function toDisplayMessages(messages: Message[]): ChatMessage[] {
-  return messages.map((msg) => ({
-    id: msg.id,
-    role: msg.role as "user" | "assistant",
-    content: msg.content,
-    citations: (msg.citations as unknown as Citation[]) ?? [],
-    latencyMs: msg.latency_ms ?? undefined,
-    createdAt: msg.created_at ? new Date(msg.created_at) : new Date(),
-  }));
+  onMessagesChange?: (messages: ChatMessage[]) => void;
+  onConversationIdChange?: (conversationId: string) => void;
 }
 
 export function ChatInterface({
@@ -35,15 +26,24 @@ export function ChatInterface({
   documentIds,
   initialMessages = [],
   initialConversationId,
+  onMessagesChange,
+  onConversationIdChange,
 }: ChatInterfaceProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const { messages, isLoading, error, sendMessage, clearError } = useChat({
+  const {
+    messages,
+    isLoading,
+    error,
+    conversationId,
+    sendMessage,
+    clearError,
+  } = useChat({
     documentId: documentIds && documentIds.length > 0 ? undefined : document.id,
     documentIds:
       documentIds && documentIds.length > 0 ? documentIds : undefined,
-    initialMessages: toDisplayMessages(initialMessages),
+    initialMessages,
     initialConversationId,
   });
 
@@ -81,7 +81,12 @@ export function ChatInterface({
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    onMessagesChange?.(messages);
+  }, [messages, onMessagesChange]);
+
+  useEffect(() => {
+    if (conversationId) onConversationIdChange?.(conversationId);
+  }, [conversationId, onConversationIdChange]);
 
   const isDocumentReady = document.status === "ready";
 
@@ -162,32 +167,6 @@ export function ChatInterface({
                   <MessageBubble message={message} />
                 </div>
               ))}
-            </div>
-          )}
-
-          {/* Loading indicator */}
-          {isLoading && (
-            <div className="mt-5 flex items-center gap-3">
-              <div className="bg-primary/10 ring-border flex h-8 w-8 items-center justify-center rounded-full ring-1">
-                <Network className="text-primary h-4 w-4" />
-              </div>
-              <div className="border-border flex items-center gap-1 rounded-md rounded-tl-sm border bg-white/[0.03] px-4 py-3">
-                <span className="flex gap-1">
-                  {[0, 1, 2].map((i) => (
-                    <span
-                      key={i}
-                      className="bg-primary h-1.5 w-1.5 rounded-full opacity-70"
-                      style={{
-                        animation: "bounce 1.2s ease-in-out infinite",
-                        animationDelay: `${i * 0.2}s`,
-                      }}
-                    />
-                  ))}
-                </span>
-                <span className="text-muted-foreground ml-2 text-xs">
-                  Thinking…
-                </span>
-              </div>
             </div>
           )}
 
