@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { LogOut, Menu, UserRound } from "lucide-react";
 import { BrandWordmark } from "@/components/layout/brand-mark";
 import { useAuth } from "@/hooks/use-auth";
@@ -15,6 +16,7 @@ const nav = [
 export function Header() {
   const { user, loading, signOut } = useAuth();
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
   const links = (
     <>
       {nav.map(([href, label]) => (
@@ -62,7 +64,7 @@ export function Header() {
                   <LogOut />
                   Sign out
                 </Button>
-                <Sheet>
+                <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
                   <SheetTrigger asChild>
                     <Button variant="ghost" size="icon" className="md:hidden">
                       <Menu />
@@ -70,7 +72,10 @@ export function Header() {
                     </Button>
                   </SheetTrigger>
                   <SheetContent>
-                    <nav className="mt-12 flex flex-col gap-1 px-4">
+                    <nav
+                      className="mt-12 flex flex-col gap-1 px-4"
+                      onClick={() => setMenuOpen(false)}
+                    >
                       {links}
                     </nav>
                   </SheetContent>

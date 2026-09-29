@@ -71,14 +71,14 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       {/* Message content */}
       <div
         className={cn(
-          "flex max-w-[75%] flex-col gap-2",
+          "flex max-w-[85%] min-w-0 flex-col gap-2 sm:max-w-[75%]",
           isUser ? "items-end" : "items-start"
         )}
       >
         {/* Bubble */}
         <div
           className={cn(
-            "rounded-md px-4 py-3 text-sm leading-relaxed",
+            "min-w-0 rounded-md px-4 py-3 text-sm leading-relaxed break-words",
             isUser
               ? "bg-primary text-primary-foreground rounded-tr-sm"
               : "bg-muted text-foreground rounded-tl-sm"

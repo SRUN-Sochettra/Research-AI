@@ -235,7 +235,12 @@ export function ConversationSidebar({
       {/* Mobile: Sheet drawer */}
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <Button variant="outline" size="icon" className="md:hidden">
+          <Button
+            variant="outline"
+            size="icon"
+            className="shrink-0 md:hidden"
+            aria-label="Open conversations"
+          >
             <PanelLeft className="h-4 w-4" />
           </Button>
         </SheetTrigger>

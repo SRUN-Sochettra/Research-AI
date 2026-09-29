@@ -93,13 +93,13 @@ export function ChatInterface({
   return (
     <div className="border-border bg-card flex h-full min-h-0 flex-col overflow-hidden rounded-md border">
       {/* ── Doc header bar ── */}
-      <div className="border-border flex items-center gap-3 border-b px-5 py-3.5">
+      <div className="border-border flex items-center gap-3 border-b px-4 py-2.5 sm:px-5 sm:py-3.5">
         <div className="bg-primary/10 ring-border flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ring-1">
           <Network className="text-primary h-4 w-4" />
         </div>
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{document.title}</p>
-          <p className="text-muted-foreground text-[11px]">
+          <p className="text-muted-foreground truncate text-[11px]">
             {messages.length > 0
               ? `${messages.filter((m) => m.role === "user").length} question${messages.filter((m) => m.role === "user").length === 1 ? "" : "s"} asked`
               : "Ask anything about this document"}
@@ -181,6 +181,7 @@ export function ChatInterface({
           isLoading={isLoading}
           disabled={!isDocumentReady}
           documentTitle={document.title}
+          showSuggestions={messages.length === 0}
         />
         <p className="text-muted-foreground/60 mt-2 text-center text-[10px]">
           AI can make mistakes — always verify important information with the

@@ -5,8 +5,21 @@ import { ChatInterface } from "./chat-interface";
 import { ConversationSidebar } from "./conversation-sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { ArrowLeft, FileText, BookOpen, Download } from "lucide-react";
+import {
+  ArrowLeft,
+  FileText,
+  BookOpen,
+  Download,
+  MoreVertical,
+} from "lucide-react";
 import Link from "next/link";
 import { truncateText } from "@/lib/utils/helpers";
 import type {
@@ -238,26 +251,38 @@ export function ChatPageClient({
   return (
     <div className="flex h-[calc(100dvh-8.0625rem)] min-h-0 flex-col sm:h-[calc(100dvh-10.0625rem)]">
       {/* Header */}
-      <div className="flex items-center justify-between border-b px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild>
+      <div className="flex min-w-0 items-center justify-between gap-2 border-b px-4 py-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            asChild
+            className="shrink-0"
+            aria-label="Back to document"
+          >
             <Link href={`/documents/${document.id}`}>
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
 
-          <div className="flex items-center gap-2">
-            <FileText className="text-muted-foreground h-4 w-4" />
-            <span className="text-sm font-medium">
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <FileText className="text-muted-foreground h-4 w-4 shrink-0" />
+            <span
+              className="min-w-0 truncate text-sm font-medium"
+              title={document.title}
+            >
               {truncateText(document.title, 40)}
             </span>
-            <Badge variant="secondary" className="text-xs">
-              {document.page_count} pages
-            </Badge>
+            {document.page_count != null && (
+              <Badge variant="secondary" className="shrink-0 text-xs">
+                {document.page_count} pages
+              </Badge>
+            )}
           </div>
         </div>
-        {/* Summary toggle */}
-        <div className="flex items-center gap-2">
+
+        {/* Desktop: full inline action row */}
+        <div className="hidden shrink-0 items-center gap-2 sm:flex">
           <Button
             variant="outline"
             size="sm"
@@ -286,13 +311,49 @@ export function ChatPageClient({
               {showSummary ? "Hide" : "Show"} Summary
             </Button>
           )}
-        </div>{" "}
+        </div>
+
+        {/* Mobile: consolidated overflow menu */}
+        <div className="shrink-0 sm:hidden">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" aria-label="More actions">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem
+                onClick={handleDownloadPdf}
+                disabled={messages.length === 0}
+              >
+                <Download className="h-4 w-4" />
+                Export PDF
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={handleDownload}
+                disabled={messages.length === 0}
+              >
+                <Download className="h-4 w-4" />
+                Export Markdown
+              </DropdownMenuItem>
+              {document.summary && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setShowSummary((p) => !p)}>
+                    <BookOpen className="h-4 w-4" />
+                    {showSummary ? "Hide Summary" : "Show Summary"}
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {/* Summary panel */}
       {showSummary && document.summary && (
         <div className="bg-muted/50 border-b px-4 py-3">
-          <p className="text-muted-foreground text-sm leading-relaxed">
+          <p className="text-muted-foreground text-sm leading-relaxed break-words">
             <span className="text-foreground font-medium">Summary: </span>
             {document.summary}
           </p>
@@ -300,7 +361,7 @@ export function ChatPageClient({
       )}
 
       {/* Main content */}
-      <div className="flex min-h-0 flex-1 gap-4 overflow-hidden p-4">
+      <div className="flex min-h-0 min-w-0 flex-1 gap-2 overflow-hidden p-2 sm:gap-4 sm:p-4">
         {/* Conversation sidebar */}
         <ConversationSidebar
           documentId={document.id}
