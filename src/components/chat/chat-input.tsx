@@ -11,18 +11,26 @@ interface ChatInputProps {
   onSend: (message: string) => void;
   isLoading: boolean;
   disabled?: boolean;
+  documentTitle: string;
 }
 
-const SUGGESTED_QUESTIONS = [
-  "Summarize the main points of this document",
-  "What are the key findings?",
-  "What conclusions does the author draw?",
-  "List the most important facts mentioned",
-];
-
-export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
+function buildSuggestedQuestions(title: string) {
+  return [
+    `Summarize “${title}” as a five-point study guide`,
+    `What are the most important concepts in “${title}”?`,
+    `Explain the most difficult parts of “${title}” in simple terms`,
+    `Quiz me on “${title}” and cite the relevant pages`,
+  ];
+}
+export function ChatInput({
+  onSend,
+  isLoading,
+  disabled,
+  documentTitle,
+}: ChatInputProps) {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const suggestedQuestions = buildSuggestedQuestions(documentTitle);
 
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
@@ -62,14 +70,17 @@ export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
       {/* Suggested questions (only when empty) */}
       {value === "" && !isLoading && (
         <div className="flex flex-wrap gap-2">
-          {SUGGESTED_QUESTIONS.map((q) => (
+          {suggestedQuestions.map((q) => (
             <button
               key={q}
               onClick={() => {
                 setValue(q);
                 textareaRef.current?.focus();
               }}
-              className="bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-full border px-3 py-1 text-xs transition-colors"
+              // Truncated to one line so a long document title can't grow the
+              // composer until it squeezes the message history to zero height.
+              title={q}
+              className="bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground max-w-full truncate rounded-full border px-3 py-1 text-xs transition-colors"
             >
               {q}
             </button>

@@ -91,7 +91,7 @@ export function ChatInterface({
   const isDocumentReady = document.status === "ready";
 
   return (
-    <div className="border-border bg-card flex h-full flex-col overflow-hidden rounded-md border">
+    <div className="border-border bg-card flex h-full min-h-0 flex-col overflow-hidden rounded-md border">
       {/* ── Doc header bar ── */}
       <div className="border-border flex items-center gap-3 border-b px-5 py-3.5">
         <div className="bg-primary/10 ring-border flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ring-1">
@@ -152,7 +152,7 @@ export function ChatInterface({
       )}
 
       {/* ── Messages ── */}
-      <ScrollArea className="flex-1 scrollbar-thin" ref={scrollAreaRef}>
+      <ScrollArea className="min-h-0 flex-1 scrollbar-thin" ref={scrollAreaRef}>
         <div className="px-4 py-5">
           {messages.length === 0 ? (
             <NoMessages />
@@ -180,6 +180,7 @@ export function ChatInterface({
           onSend={sendMessage}
           isLoading={isLoading}
           disabled={!isDocumentReady}
+          documentTitle={document.title}
         />
         <p className="text-muted-foreground/60 mt-2 text-center text-[10px]">
           AI can make mistakes — always verify important information with the

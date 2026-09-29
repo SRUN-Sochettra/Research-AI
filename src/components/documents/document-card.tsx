@@ -25,7 +25,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { formatDate, formatFileSize } from "@/lib/utils/helpers";
-import type { Document } from "@/types/database";
+import { useDocumentStatus } from "@/hooks/use-document-status";
+import type { Document, DocumentStatus } from "@/types/database";
 
 interface StatusConfig {
   label: string;
@@ -66,6 +67,10 @@ const statusConfig: Record<string, StatusConfig> = {
 export function DocumentCard({ document }: { document: Document }) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
+  const liveDocument = useDocumentStatus(
+    document.id,
+    document.status as DocumentStatus
+  );
 
   const handleDelete = async () => {
     if (
@@ -88,10 +93,13 @@ export function DocumentCard({ document }: { document: Document }) {
     }
   };
 
-  const status = statusConfig[document.status] ?? statusConfig["uploaded"]!;
+  const currentStatus = liveDocument.status ?? document.status;
+  const currentSummary = liveDocument.summary ?? document.summary;
+  const currentPageCount = liveDocument.pageCount ?? document.page_count;
+  const status = statusConfig[currentStatus] ?? statusConfig["uploaded"]!;
   const StatusIcon = status.icon;
-  const isReady = document.status === "ready";
-  const isProcessing = document.status === "processing";
+  const isReady = currentStatus === "ready";
+  const isProcessing = currentStatus === "processing";
 
   return (
     <div className="card-interactive group border-border bg-card relative flex flex-col overflow-hidden rounded-md border transition-all duration-300 hover:border-white/12 hover:bg-white/[0.03]">
@@ -106,7 +114,7 @@ export function DocumentCard({ document }: { document: Document }) {
       <div className="flex flex-1 flex-col p-5">
         {/* ── Header ── */}
         <div className="mb-4 flex items-start justify-between gap-3">
-          <div className="flex w-full items-start gap-3 pr-8">
+          <div className="flex min-w-0 flex-1 items-start gap-3">
             {/* File icon */}
             <div className="bg-primary/10 ring-border relative mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md ring-1">
               <FileText className="text-primary h-4.5 w-4.5" />
@@ -134,7 +142,7 @@ export function DocumentCard({ document }: { document: Document }) {
           </div>
 
           {/* Status badge and actions */}
-          <div className="absolute top-5 right-5 flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1">
             <span
               className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium ${status.badgeClass}`}
             >
@@ -181,19 +189,18 @@ export function DocumentCard({ document }: { document: Document }) {
             <HardDrive className="h-3 w-3" />
             {formatFileSize(document.file_size)}
           </span>
-          {document.page_count != null && (
+          {currentPageCount != null && (
             <span className="flex items-center gap-1">
               <BookOpen className="h-3 w-3" />
-              {document.page_count}{" "}
-              {document.page_count === 1 ? "page" : "pages"}
+              {currentPageCount} {currentPageCount === 1 ? "page" : "pages"}
             </span>
           )}
         </div>
 
         {/* ── Summary ── */}
-        {document.summary && (
+        {currentSummary && (
           <p className="text-muted-foreground mb-4 line-clamp-2 flex-1 text-xs leading-relaxed">
-            {document.summary}
+            {currentSummary}
           </p>
         )}
 
@@ -229,7 +236,7 @@ export function DocumentCard({ document }: { document: Document }) {
             variant="secondary"
             className="w-full text-xs opacity-50"
           >
-            {document.status === "error" ? "Processing failed" : "Unavailable"}
+            {currentStatus === "error" ? "Processing failed" : "Unavailable"}
           </Button>
         )}
       </div>

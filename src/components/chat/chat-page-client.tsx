@@ -236,7 +236,7 @@ export function ChatPageClient({
   };
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] flex-col">
+    <div className="flex h-[calc(100dvh-8.0625rem)] min-h-0 flex-col sm:h-[calc(100dvh-10.0625rem)]">
       {/* Header */}
       <div className="flex items-center justify-between border-b px-4 py-3">
         <div className="flex items-center gap-3">
@@ -300,7 +300,7 @@ export function ChatPageClient({
       )}
 
       {/* Main content */}
-      <div className="flex flex-1 gap-4 overflow-hidden p-4">
+      <div className="flex min-h-0 flex-1 gap-4 overflow-hidden p-4">
         {/* Conversation sidebar */}
         <ConversationSidebar
           documentId={document.id}
@@ -313,7 +313,7 @@ export function ChatPageClient({
         />
 
         {/* Chat area */}
-        <div className="bg-card flex flex-1 flex-col overflow-hidden rounded-lg border">
+        <div className="bg-card flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border">
           <ChatInterface
             key={conversationSession}
             document={document}

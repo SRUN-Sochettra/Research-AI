@@ -101,7 +101,7 @@ function DocumentDetailCard({ doc }: { doc?: Document }) {
     );
   const isReady = doc.status === "ready";
   return (
-    <Card className="border-border bg-card flex h-[600px] flex-col">
+    <Card className="border-border bg-card flex h-[600px] min-h-0 flex-col overflow-hidden">
       <CardHeader className="border-border border-b pb-4">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
@@ -128,7 +128,7 @@ function DocumentDetailCard({ doc }: { doc?: Document }) {
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="flex flex-1 flex-col overflow-hidden p-0">
+      <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
         <div className="bg-muted grid grid-cols-2 gap-px">
           <div className="bg-background/50 flex items-center gap-2 p-4">
             <FileIcon className="text-primary h-4 w-4" />
@@ -158,11 +158,11 @@ function DocumentDetailCard({ doc }: { doc?: Document }) {
             </div>
           </div>
         </div>
-        <div className="border-border flex flex-1 flex-col overflow-hidden border-t p-4">
+        <div className="border-border flex min-h-0 flex-1 flex-col overflow-hidden border-t p-4">
           <h4 className="text-muted-foreground mb-2 text-sm font-medium">
             AI Summary
           </h4>
-          <ScrollArea className="flex-1 pr-4">
+          <ScrollArea className="min-h-0 flex-1 pr-4">
             {doc.summary ? (
               <div className="prose prose-sm prose-invert text-muted-foreground max-w-none">
                 {doc.summary}

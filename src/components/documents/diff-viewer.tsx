@@ -11,12 +11,12 @@ export function DiffViewer({ oldText, newText }: DiffViewerProps) {
   const differences = diffWords(oldText, newText);
 
   return (
-    <Card className="border-border bg-card flex flex-col">
+    <Card className="border-border bg-card flex h-96 min-h-0 flex-col overflow-hidden">
       <CardHeader className="border-border border-b pb-4">
         <CardTitle className="text-xl">Summary Comparison Diff</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-1 flex-col overflow-hidden p-4">
-        <ScrollArea className="max-h-96 flex-1 pr-4">
+      <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden p-4">
+        <ScrollArea className="min-h-0 flex-1 pr-4">
           <div className="prose prose-sm prose-invert text-muted-foreground max-w-none leading-relaxed whitespace-pre-wrap">
             {differences.map((part, index) => {
               const colorClass = part.added

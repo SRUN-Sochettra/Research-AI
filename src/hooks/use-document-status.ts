@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { DocumentStatus } from "@/types/database";
 
 interface DocumentStatusState {
@@ -19,70 +19,73 @@ export function useDocumentStatus(
     status: initialStatus,
     summary: null,
     pageCount: null,
-    isLoading: false,
+    isLoading: initialStatus !== "ready" && initialStatus !== "error",
     error: null,
   });
+  const stoppedRef = useRef(false);
 
   const poll = useCallback(async () => {
     try {
-      const response = await fetch(`/api/documents/${documentId}/status`);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch status");
-      }
+      const response = await fetch(`/api/documents/${documentId}/status`, {
+        cache: "no-store",
+      });
+      if (!response.ok) throw new Error("Failed to fetch status");
 
       const data = await response.json();
-      setState((prev) => ({
-        ...prev,
-        status: data.status,
+      const nextStatus = data.status as DocumentStatus;
+      setState({
+        status: nextStatus,
         summary: data.summary,
         pageCount: data.pageCount,
         isLoading: false,
-      }));
-
-      return data.status as DocumentStatus;
+        error: null,
+      });
+      return nextStatus;
     } catch {
-      setState((prev) => ({
-        ...prev,
-        error: "Failed to check status",
+      setState((previous) => ({
+        ...previous,
         isLoading: false,
+        error: "Failed to check status",
       }));
       return null;
     }
   }, [documentId]);
 
   useEffect(() => {
-    // Only poll if document is in a processing state
-    if (initialStatus === "ready" || initialStatus === "error") {
-      return;
-    }
+    stoppedRef.current = false;
 
-    let intervalId: NodeJS.Timeout;
+    if (initialStatus === "ready" || initialStatus === "error") return;
+
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     let attempts = 0;
-    const MAX_ATTEMPTS = 30; // 5 minutes max polling
+    const maxAttempts = 60;
 
-    const startPolling = async () => {
-      setState((prev) => ({ ...prev, isLoading: true }));
-
-      intervalId = setInterval(async () => {
-        attempts++;
-        const currentStatus = await poll();
-
-        // Stop polling when done or errored
-        if (
-          currentStatus === "ready" ||
-          currentStatus === "error" ||
-          attempts >= MAX_ATTEMPTS
-        ) {
-          clearInterval(intervalId);
-        }
-      }, 10000); // Poll every 10 seconds
+    const schedulePoll = async () => {
+      if (stoppedRef.current) return;
+      attempts += 1;
+      const currentStatus = await poll();
+      if (
+        stoppedRef.current ||
+        currentStatus === "ready" ||
+        currentStatus === "error" ||
+        attempts >= maxAttempts
+      ) {
+        return;
+      }
+      timeoutId = setTimeout(schedulePoll, 5000);
     };
 
-    startPolling();
+    void schedulePoll();
+
+    const checkWhenVisible = () => {
+      if (document.visibilityState === "visible") void poll();
+    };
+    document.addEventListener("visibilitychange", checkWhenVisible);
 
     return () => {
-      if (intervalId) clearInterval(intervalId);
+      stoppedRef.current = true;
+      if (timeoutId) clearTimeout(timeoutId);
+      document.removeEventListener("visibilitychange", checkWhenVisible);
     };
   }, [documentId, initialStatus, poll]);
 
