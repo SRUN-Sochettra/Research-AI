@@ -11,50 +11,11 @@ interface ChatInputProps {
   onSend: (message: string) => void;
   isLoading: boolean;
   disabled?: boolean;
-  documentTitle: string;
-  /** Show starter prompts only while the active conversation is empty. */
-  showSuggestions: boolean;
 }
 
-/**
- * Labels stay short so the chip row cannot dominate a small viewport, while the
- * question actually sent stays grounded in the active document's title.
- */
-const SUGGESTED_QUESTIONS = [
-  {
-    label: "Create a five-point study guide",
-    build: (title: string) => `Create a five-point study guide for “${title}”.`,
-  },
-  {
-    label: "Explain the most important concepts",
-    build: (title: string) =>
-      `Explain the most important concepts in “${title}”.`,
-  },
-  {
-    label: "Simplify the difficult sections",
-    build: (title: string) =>
-      `Simplify the difficult sections of “${title}” in simple terms.`,
-  },
-  {
-    label: "Quiz me and cite the relevant pages",
-    build: (title: string) =>
-      `Quiz me on “${title}” and cite the relevant pages.`,
-  },
-];
-
-export function ChatInput({
-  onSend,
-  isLoading,
-  disabled,
-  documentTitle,
-  showSuggestions,
-}: ChatInputProps) {
+export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const suggestedQuestions = SUGGESTED_QUESTIONS.map((s) => ({
-    ...s,
-    question: s.build(documentTitle),
-  }));
 
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
@@ -91,28 +52,6 @@ export function ChatInput({
 
   return (
     <div className="space-y-3">
-      {/* Suggested questions — empty conversation only.
-          On narrow screens the chips become a single swipeable row so they can
-          never grow tall enough to squeeze the message history to zero height. */}
-      {showSuggestions && !isLoading && (
-        <div className="-mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-x-visible sm:px-0 sm:pb-0">
-          {suggestedQuestions.map(({ label, question }) => (
-            <button
-              key={label}
-              type="button"
-              onClick={() => {
-                setValue(question);
-                textareaRef.current?.focus();
-              }}
-              title={question}
-              className="bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground max-w-[80vw] shrink-0 snap-start truncate rounded-full border px-3 py-1 text-xs whitespace-nowrap transition-colors sm:max-w-full"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      )}
-
       {/* Input area */}
       <div className="bg-background focus-within:ring-ring relative flex items-end gap-2 rounded-md border p-2 shadow-sm focus-within:ring-1">
         <Textarea

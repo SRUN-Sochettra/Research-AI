@@ -180,8 +180,6 @@ export function ChatInterface({
           onSend={sendMessage}
           isLoading={isLoading}
           disabled={!isDocumentReady}
-          documentTitle={document.title}
-          showSuggestions={messages.length === 0}
         />
         <p className="text-muted-foreground/60 mt-2 text-center text-[10px]">
           AI can make mistakes — always verify important information with the
